@@ -1,5 +1,6 @@
 window.onload = function () {
-	function typeaheadInit(cityList){
+	//function for the typeahead input.
+	function typeaheadInit(cityList){ 
 		var substringMatcher = function (strs) {
 			return function findMatches(q, cb) {
 				var matches, substringRegex;
@@ -35,6 +36,7 @@ window.onload = function () {
 			});
 	};
 
+	//to get all the city names
 	$.ajax({
 		url: "/api/city/",
 		cache: false,
@@ -47,7 +49,7 @@ window.onload = function () {
 		}
 	});
 
-
+	//for checkboxes
 	$.ajax({
 		url: "/api/roomtype/",
 		cache: false,
@@ -61,7 +63,7 @@ window.onload = function () {
 				div.append(`<label class="form-check-label" for="${d.name}">${d.name}</label>`);
 				div.appendTo('#roomtype-filter');
 			});
-
+			//to change the result when checkboxes are clicked
 			$('.filter1').click(function(d){
 				// console.log($(this).val());
 				let clicked = [];
@@ -82,7 +84,7 @@ window.onload = function () {
 					var count=0;
 					clicked.map(function(k){
 						//console.log(k,d.room_types[k]);
-						if(d.room_types[k]!=undefined){
+						if(d.room_types[k]!=undefined){ //to see if the required room type is present in the result
 							d_new.room_types[k]=d.room_types[k];
 							count+=1;
 						}
@@ -102,8 +104,11 @@ window.onload = function () {
 		}
 	});
 
+	//dates
 	var fromdate=moment().format('YYYY-MM-DD');
 	var todate=moment().format('YYYY-MM-DD');
+	
+	//datepicker as daterange picker
 	$('input[name="daterange"]').daterangepicker({
 		opens: 'right',
 		startDate: moment(),
@@ -120,6 +125,7 @@ window.onload = function () {
 
 	var result;
 
+	//to append results in the body in bootstrap card format
 	function putResults(d){
 		var out= $('<div/>')
 		var div= $('<div/>');
@@ -135,6 +141,7 @@ window.onload = function () {
 		out.appendTo('#results');
 	}
 
+	//function when the main search button is clicked
 	$("#main-filter-button").click(function(e){
 		const cityVal = $("#typeahead").val();
 		const dateRange = $("#date-range").val();

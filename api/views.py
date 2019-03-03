@@ -91,17 +91,24 @@ def search(request):
     room_results = HotelRoom.objects.filter(hotel__in=[i.id for i in city_results]).exclude(id__in = [i.room.id for i in RoomAvailability.objects.filter(Q(room__hotel__in=[i.id for i in city_results])).filter((q1 & q2) | (q3 & q4) | (q5 & q6))]).values('hotel__name', 'roomno', 'category__name', 'hotel__image_link')
 #    print([(i,i.hotel) for i in room_results])
 #    print(room_results)
+
+#To make the query set into a dictionary
     response = {}
     for result in list(room_results):
+        #if new hotel name
         if result['hotel__name'] not in response:
             response[result['hotel__name']] = {}
             response[result['hotel__name']]['image_link']=result['hotel__image_link']
             response[result['hotel__name']]['room_types']={}
-        if result['category__name'] not in response[result['hotel__name']]['room_types']:
+        #if new room type 
+        if result['category__name'] not in response[result['hotel__name']]['room_types']: 
             response[result['hotel__name']]['room_types'][result['category__name']] = 1
-        else:
+        #if room type already encountered
+        else: 
             response[result['hotel__name']]['room_types'][result['category__name']] += 1
     print(response)
+    
+    #making into json
     response = [{'hotel':key, 'room_types':response[key]['room_types'], 'image_link':response[key]['image_link']} for key in response]
     # for ele  in room_results:
     #     print(ele.hotel.get_absolute_url())
