@@ -1,7 +1,7 @@
 from django.contrib.auth.models import User, Group
 from rest_framework import viewsets
-from api.serializers import UserSerializer, GroupSerializer, HotelSerializer, CountrySerializer, CitySerializer, HotelRoomSerializer, RoomTypeSerializer, RoomAvailabilitySerializer
-from api.models import Country, City, Hotel, RoomType, HotelRoom, RoomAvailability 
+from api.serializers import UserSerializer, GroupSerializer, HotelSerializer, CountrySerializer, CitySerializer, HotelRoomSerializer, RoomTypeSerializer, RoomAvailabilitySerializer, PricePerRoomTypeSerializer
+from api.models import Country, City, Hotel, RoomType, HotelRoom, RoomAvailability, PricePerRoomType 
 from rest_framework import filters
 from django_filters.rest_framework import DjangoFilterBackend
 from django.http import JsonResponse
@@ -61,6 +61,10 @@ class RoomTypeViewSet(viewsets.ModelViewSet):
     queryset = RoomType.objects.all()
     serializer_class = RoomTypeSerializer
 
+class PricePerRoomTypeViewSet(viewsets.ModelViewSet):
+    queryset = PricePerRoomType.objects.all()
+    serializer_class = PricePerRoomTypeSerializer
+
 from rest_framework import generics
 class SearchSet(viewsets.ModelViewSet):
     queryset = City.objects.all()
@@ -88,7 +92,7 @@ def search(request):
 #print([(i.room.id) for i in RoomAvailability.objects.filter(Q(room__hotel__in=[i.id for i in city_results])).filter((q1 & q2) | (q3 & q4) | (q5 & q6))])
 
 #to get all availabe rooms           
-    room_results = HotelRoom.objects.filter(hotel__in=[i.id for i in city_results]).exclude(id__in = [i.room.id for i in RoomAvailability.objects.filter(Q(room__hotel__in=[i.id for i in city_results])).filter((q1 & q2) | (q3 & q4) | (q5 & q6))]).values('hotel__name', 'roomno', 'category__name', 'hotel__image_link')
+    room_results = HotelRoom.objects.filter(hotel__in=[i.id for i in city_results]).exclude(id__in = [i.room.id for i in RoomAvailability.objects.filter(Q(room__hotel__in=[i.id for i in city_results])).filter((q1 & q2) | (q3 & q4) | (q5 & q6))]).values('hotel__name', 'roomno', 'category__name', 'hotel__image_link', 'hotel__id')
 #    print([(i,i.hotel) for i in room_results])
 #    print(room_results)
 
@@ -100,6 +104,7 @@ def search(request):
             response[result['hotel__name']] = {}
             response[result['hotel__name']]['image_link']=result['hotel__image_link']
             response[result['hotel__name']]['room_types']={}
+            response[result['hotel__name']]['hotel_id']=result['hotel__id']
         #if new room type 
         if result['category__name'] not in response[result['hotel__name']]['room_types']: 
             response[result['hotel__name']]['room_types'][result['category__name']] = 1
@@ -109,7 +114,7 @@ def search(request):
     print(response)
     
     #making into json
-    response = [{'hotel':key, 'room_types':response[key]['room_types'], 'image_link':response[key]['image_link']} for key in response]
+    response = [{'hotel':key, 'room_types':response[key]['room_types'], 'image_link':response[key]['image_link'], 'hotel_id':response[key]['hotel_id']} for key in response]
     # for ele  in room_results:
     #     print(ele.hotel.get_absolute_url())
 
@@ -119,4 +124,3 @@ def search(request):
 
     # return JsonResponse({'hotel':hotel_results})
     return JsonResponse(response, safe=False)
-    # return JsonResponse({'hotel':'yo'})

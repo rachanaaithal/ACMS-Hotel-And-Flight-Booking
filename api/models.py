@@ -49,6 +49,17 @@ class RoomType(models.Model):
         """String for representing the Model object."""
         return self.name
 
+class PricePerRoomType(models.Model):
+    
+    hotel = models.ForeignKey('Hotel', on_delete=models.CASCADE, null=True)
+
+    category = models.ForeignKey('RoomType', on_delete=models.SET_NULL, null=True)#use when hotels can add new types of rooms
+
+    price = models.DecimalField(max_digits=6, decimal_places=2)
+
+    def __str__(self):
+        return f'{self.price}-{self.category}({self.hotel.name})'
+
 from django.urls import reverse # Used to generate URLs by reversing the URL patterns
 from django.core.validators import MinValueValidator, MaxValueValidator
 
@@ -63,8 +74,6 @@ class HotelRoom(models.Model):
     capacity = models.IntegerField(validators=[MinValueValidator(1), MaxValueValidator(5)])
 
     description = models.TextField(max_length=1000, help_text='Enter description of the room.')
-
-    price = models.DecimalField(max_digits=6, decimal_places=2)
 
     category = models.ForeignKey('RoomType', on_delete=models.SET_NULL, null=True)#use when hotels can add new types of rooms
 

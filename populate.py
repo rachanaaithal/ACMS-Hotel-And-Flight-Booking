@@ -6,7 +6,7 @@ import sys,os
 sys.path.append(project_home)
 os.environ['DJANGO_SETTINGS_MODULE'] ='Project.settings'
 
-from api.models import Country, City, Hotel, RoomType, HotelRoom, RoomAvailability
+from api.models import Country, City, Hotel, RoomType, HotelRoom, RoomAvailability, PricePerRoomType
 
 with open("/home/aithal/Documents/Project/data/countries.csv",'r') as countrycsv:
     countryreader = csv.reader(countrycsv)
@@ -61,6 +61,19 @@ with open("/home/aithal/Documents/Project/data/roomtypes.csv",'r') as roomtypesc
         except:
             print("Problem with line:", row)
 
+with open("/home/aithal/Documents/Project/data/prices.csv",'r') as pricescsv:
+    pricesreader = csv.reader(pricescsv)
+    next(pricesreader)
+
+    for row in pricesreader:
+        new= PricePerRoomType(category=RoomType.objects.filter(name=row[1])[0], hotel=Hotel.objects.filter(name=row[0])[0], price=row[2])
+#        print(new.save())
+        try:
+            new.save()
+        except:
+            print("Problem with line:", row)
+
+
 with open("/home/aithal/Documents/Project/data/hotelroom.csv",'r') as hotelroomcsv:
     hotelroomreader = csv.reader(hotelroomcsv)
     next(hotelroomreader)
@@ -68,7 +81,7 @@ with open("/home/aithal/Documents/Project/data/hotelroom.csv",'r') as hotelroomc
 
     for row in hotelroomreader:
 #        print(Hotel.objects.filter(name=row[5])[0])
-        new= HotelRoom(roomno=row[0], capacity=row[1] , description=row[2] , price=row[3], category=RoomType.objects.filter(name=row[4])[0], hotel=Hotel.objects.filter(name=row[5])[0])
+        new= HotelRoom(roomno=row[0], capacity=row[1] , description=row[2] , category=RoomType.objects.filter(name=row[3])[0], hotel=Hotel.objects.filter(name=row[4])[0])
 #        print(new.save())
         try:
             new.save()
