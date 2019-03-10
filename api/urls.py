@@ -9,7 +9,7 @@ router.register(r'groups', views.GroupViewSet)
 
 router.register(r'country', views.CountryViewSet)
 router.register(r'city', views.CityViewSet)
-router.register(r'hotel', views.HotelViewSet)
+router.register(r'hotels', views.HotelViewSet)
 router.register(r'roomtype', views.RoomTypeViewSet)
 router.register(r'hotelroom', views.HotelRoomViewSet)
 router.register(r'roomavailability', views.RoomAvailabilityViewSet)
