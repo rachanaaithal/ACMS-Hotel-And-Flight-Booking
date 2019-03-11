@@ -41,7 +41,7 @@ function initPage(id){
                 roomtype=data.name;
                 var tr=$('<tr/>')
                 tr.append(`<th scope="row">${data.name}</td>`)
-                tr.append(`<td>${d.price}</td><td><a href='/hotel/`+id+`/book/${d.category}' class="btn btn-primary">Book</a></td>`)
+                tr.append(`<td>${d.price}</td><td><a href='/hotel/`+id+`/${d.category}' class="btn btn-primary">Book</a></td>`)
                 tr.appendTo('#prices-tab-bod')
             }
         });

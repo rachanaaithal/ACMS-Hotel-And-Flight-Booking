@@ -60,12 +60,17 @@ class RoomAvailabilityViewSet(viewsets.ModelViewSet):
 class RoomTypeViewSet(viewsets.ModelViewSet):
     queryset = RoomType.objects.all()
     serializer_class = RoomTypeSerializer
+    filter_fields = {
+        'name': ['exact'],
+        'id': ['exact']
+    }
 
 class PricePerRoomTypeViewSet(viewsets.ModelViewSet):
     queryset = PricePerRoomType.objects.all()
     serializer_class = PricePerRoomTypeSerializer
     filter_fields={
-        'hotel':['exact']
+        'hotel':['exact'],
+        'category':['exact']
     }
 
 from rest_framework import generics
