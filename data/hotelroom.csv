@@ -1,27 +1,16 @@
-"roomno","capacity","description","category","hotel_name"
-"A000",2,"Hot water available.","Non-AC","Hotel Lake View"
-"A001",2,"Hot water available.","AC","Hotel Lake View"
-"A002",1,"Hot water available.","AC","Hotel Lake View"
-"B001",2,"Hot water available.","Delux","Hotel Lake View"
-"A000",2,"Hot water available.","Non-AC","Octave"
-"A001",2,"Hot water available.","AC","Octave"
-"A002",2,"Hot water available.","AC","Octave"
-"A000",2,"Hot water available.","Non-AC","Lemon Tree"
-"A001",2,"Hot water available.","Non-AC","Lemon Tree"
-"A002",2,"Hot water available.","Non-AC","Lemon Tree"
-"A000",2,"Hot water available.","AC","Mint Hotel"
-"A001",2,"Hot water available.","AC","Mint Hotel"
-"A002",2,"Hot water available.","AC","Mint Hotel"
-"A000",2,"Hot water available.","AC","Palm Meadows"
-"A001",2,"Hot water available.","AC","Palm Meadows"
-"A002",2,"Hot water available.","Delux","Palm Meadows"
-"A003",2,"Hot water available.","Delux","Palm Meadows"
-"A000",2,"Hot water available.","AC","Ramada Encore"
-"A001",2,"Hot water available.","AC","Ramada Encore"
-"A000",2,"Hot water available.","AC","La Marvella"
-"A001",2,"Hot water available.","AC","La Marvella"
-"A001",2,"Hot water available.","AC","Sterling Holidays"
-"A004",2,"Hot water available.","Delux","Sterling Holidays"
-"A007",2,"Hot water available.","Non-AC","Sterling Holidays"
-"A001",2,"Hot water available.","Non-AC","Mango Mist"
-"A002",2,"Hot water available.","Non-AC","Mango Mist"
+"price","capacity","description","category","hotel_name","no_of_rooms"
+1000,2,"Hot water available.","Non-AC","Hotel Lake View",5
+1000,2,"Hot water available.","AC","Hotel Lake View",5
+1000,2,"Hot water available.","Delux","Hotel Lake View",5
+1000,2,"Hot water available.","Non-AC","Octave",5
+1000,2,"Hot water available.","AC","Octave",5
+1000,2,"Hot water available.","Non-AC","Lemon Tree",5
+1000,2,"Hot water available.","AC","Mint Hotel",5
+1000,2,"Hot water available.","AC","Palm Meadows",5
+1000,2,"Hot water available.","Delux","Palm Meadows",5
+1000,2,"Hot water available.","AC","Ramada Encore",5
+1000,2,"Hot water available.","AC","La Marvella",5
+1000,2,"Hot water available.","AC","Sterling Holidays",5
+1000,2,"Hot water available.","Delux","Sterling Holidays",5
+1000,2,"Hot water available.","Non-AC","Sterling Holidays",5
+1000,2,"Hot water available.","Non-AC","Mango Mist",5

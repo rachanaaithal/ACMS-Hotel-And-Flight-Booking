@@ -1,6 +1,6 @@
 from django.contrib.auth.models import User, Group
 from rest_framework import serializers
-from api.models import Country, City, Hotel, RoomType, HotelRoom, RoomAvailability, PricePerRoomType 
+from api.models import Country, City, Hotel, RoomType, HotelRoom, RoomAvailability
 
 
 class UserSerializer(serializers.HyperlinkedModelSerializer):
@@ -34,10 +34,6 @@ class RoomTypeSerializer(serializers.ModelSerializer):
         model = RoomType
         fields = '__all__'
 
-class PricePerRoomTypeSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = PricePerRoomType
-        fields = '__all__'
 
 class HotelRoomSerializer(serializers.ModelSerializer):
     class Meta:

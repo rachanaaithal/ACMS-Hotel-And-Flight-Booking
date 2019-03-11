@@ -1,6 +1,10 @@
 function initPage(id, category){
     console.log(id, category);
 
+    var url = new URL(window.location.href);
+    var fromdate = url.searchParams.get("fromdate");
+    var todate = url.searchParams.get("todate");
+
     function putAboutData(data){
         $.ajax({
             url: `/api/roomtype/${category}`,
@@ -15,8 +19,8 @@ function initPage(id, category){
                 const cleaningTime = data.extratime;
                 const checkOut = moment.utc(moment(checkIn,"HH:mm:ss").diff(moment(cleaningTime,"HH:mm:ss"))).format('hh:mm A');
 
-                details.append(`<p>CheckinTime: ${moment(checkIn, "HH:mm:ss").format('hh:mm A')}</p>`);
-                details.append(`<p>CheckoutBefore: ${checkOut}</p>`);
+                details.append(`<p>Checkin: ${moment(fromdate).format('DD-MM-YYYY')} ${moment(checkIn, "HH:mm:ss").format('hh:mm A')}</p>`);
+                details.append(`<p>CheckoutBefore: ${moment(fromdate).format('DD-MM-YYYY')} ${checkOut}</p>`);
                 
                 details.appendTo('#details');
                 
@@ -43,7 +47,7 @@ function initPage(id, category){
 
     var gst=5;
     $.ajax({
-        url: `/api/priceperroomtype/?hotel=${id}&category=${category}`,
+        url: `/api/hotelroom/?hotel=${id}&category=${category}`,
         cache: false,
         success: function(data){
             const tax=data[0].price*gst/100;

@@ -32,6 +32,11 @@ function initPage(id){
         table.appendTo("#prices")
     }
 
+    
+    var url = new URL(window.location.href);
+    var fromdate = url.searchParams.get("fromdate");
+    var todate = url.searchParams.get("todate");
+
     function putPricesData(d){
         var roomtype;
         $.ajax({
@@ -41,12 +46,52 @@ function initPage(id){
                 roomtype=data.name;
                 var tr=$('<tr/>')
                 tr.append(`<th scope="row">${data.name}</td>`)
-                tr.append(`<td>${d.price}</td><td><a href='/hotel/`+id+`/${d.category}' class="btn btn-primary">Book</a></td>`)
+                tr.append(`<td>${d.price}</td><td><button id=${d.category} class="btn btn-primary process">Book</button></td>`)
                 tr.appendTo('#prices-tab-bod')
+
+
+                $('.process').click(function(e){
+                    /*
+                    var flag;
+                    $.ajax({
+                        url: `/api/hotelroom/?hotel=${id}&category=${e.target.id}`,
+                        cache: false,
+                        success: function(rooms){
+                            //console.log(rooms)
+                            flag=rooms.length;
+                            console.log('val:',flag)
+                            rooms.map(function(room){
+                                $.ajax({
+                                    url: `/api/roomavailability/?room=${room.id}`,
+                                    cache: false,
+                                    success: function (status){
+                                        flag-=1;
+                                        console.log(room.id,status,'in:',flag)
+                                    }
+                                });
+                            })
+                            
+                        },
+                        error: function(error){
+                            console.log(error);
+                        }
+                    });
+                    if(flag>0){
+                        console.log('available', flag)
+                    }
+                    else{
+                        console.log('unavailable')
+                    }
+                    */
+                    window.location.href=`/hotel/`+id+`/${d.category}/?fromdate=${fromdate}&todate=${todate}`;
+                    return false;
+                });
+            
             }
         });
     }
 
+    
 
     var id;
     $.ajax({
@@ -62,7 +107,7 @@ function initPage(id){
         }
     });
     $.ajax({
-        url: `/api/priceperroomtype/?hotel=${id}`,
+        url: `/api/hotelroom/?hotel=${id}`,
         cache: false,
         success: function(data){
             console.log(data);

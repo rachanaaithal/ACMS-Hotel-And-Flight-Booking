@@ -93,6 +93,7 @@ window.onload = function () {
 					if(count>0){
 						d_new.hotel=d.hotel;
 						d_new.image_link=d.image_link;
+						d_new.hotel_id=d.hotel_id;
 						newResult.push(d_new);
 						putResults(d_new);
 					}
@@ -127,6 +128,7 @@ window.onload = function () {
 
 	//to append results in the body in bootstrap card format
 	function putResults(d){
+		console.log(d)
 		var out= $('<div/>')
 		var div= $('<div/>');
 		div.addClass('card');    
@@ -135,7 +137,7 @@ window.onload = function () {
 		cardbody.addClass('card-body');
 		cardbody.append(`<h5 class='card-title'>${d.hotel}</h5>`);
 		cardbody.append(`<p class='card-text'>${Object.keys(d.room_types)}</p>`);
-		cardbody.append(`<a href='/hotel/${d.hotel_id}/' class="btn btn-primary">Book</a>`)
+		cardbody.append(`<a href='/hotel/${d.hotel_id}/?fromdate=${fromdate}&todate=${todate}' class="btn btn-primary">Book</a>`)
 		
 		div.append(cardbody);
 		out.append(div);
@@ -158,7 +160,7 @@ window.onload = function () {
 				$('#results').html('');
 				data.map(function(d){
 					//console.log(d.hotel, Object.keys(d.room_types));
-					
+					//console.log(d);
 					putResults(d);
 				});
 				$('.filter1').attr('checked','true');

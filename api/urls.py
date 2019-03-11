@@ -13,12 +13,14 @@ router.register(r'hotels', views.HotelViewSet)
 router.register(r'roomtype', views.RoomTypeViewSet)
 router.register(r'hotelroom', views.HotelRoomViewSet)
 router.register(r'roomavailability', views.RoomAvailabilityViewSet)
-router.register(r'priceperroomtype', views.PricePerRoomTypeViewSet)
 #router.register(r'search', views.SearchSet)
 #router.register(r'search1', views.SearchSet1)
 # Wire up our API using automatic URL routing.
 # Additionally, we include login URLs for the browsable API.
 urlpatterns = [
     path('', include(router.urls)),
-    url(r'search', views.search, name="search")
+    url(r'search', views.search, name="search"),
+#    path(r'updateavalability/',views.UpdateAvailability.as_view())
+    path('availability/', views.Availability.as_view()),
+    path('availability/<int:pk>/', views.AvailabilityDetail.as_view()),
 ]
