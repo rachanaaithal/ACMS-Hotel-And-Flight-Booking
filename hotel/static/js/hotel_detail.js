@@ -6,9 +6,14 @@ function initPage(id){
         img.appendTo('#about');
         var details=$('<div/>');
         details.append(`<h5>${data.name}</h5>`);
-        details.append(`<p>Address:${data.address}</p>`);
-        details.append(`<p>CheckinTime:${data.checkintime}</p>`);
-        details.append(`<p>CheckoutBefore:${data.checkintime}-${data.extratime}</p>`);
+        details.append(`<p>Address:${data.address}</p>`); 
+
+        const checkIn  = data.checkintime;
+        const cleaningTime = data.extratime;
+        const checkOut = moment.utc(moment(checkIn,"HH:mm:ss").diff(moment(cleaningTime,"HH:mm:ss"))).format('hh:mm A');
+
+        details.append(`<p>CheckinTime:${moment(checkIn, "HH:mm:ss").format('hh:mm A')}</p>`);
+        details.append(`<p>CheckoutBefore:${checkOut}</p>`);
         details.appendTo('#about');
         console.log(`${data.checkintime}-${data.extratime}`)
     }
@@ -18,7 +23,7 @@ function initPage(id){
         table.addClass('table table-hover')
         var thead=$('<thead/>')
         var tr=$('<tr/>')
-        tr.append(`<th scope="col">RoomType</th><th scope="col">Price</th>`)
+        tr.append(`<th scope="col">RoomType</th><th scope="col">Price</th><th></th>`)
         thead.append(tr)
         table.append(thead)
         var body=$('<tbody/>')
@@ -28,16 +33,28 @@ function initPage(id){
     }
 
     function putPricesData(d){
-        var tr=$('<tr/>')
-        tr.append(`<th scope="row">${d.category}</td><td>${d.price}</td>`)
-        tr.appendTo('#prices-tab-bod')
+        var roomtype;
+        $.ajax({
+            url: `/api/roomtype/${d.category}`,
+            cache: false,
+            success: function( data){
+                roomtype=data.name;
+                var tr=$('<tr/>')
+                tr.append(`<th scope="row">${data.name}</td>`)
+                tr.append(`<td>${d.price}</td><td><a href='/hotel/`+id+`/book/${d.category}' class="btn btn-primary">Book</a></td>`)
+                tr.appendTo('#prices-tab-bod')
+            }
+        });
     }
 
+
+    var id;
     $.ajax({
         url: `/api/hotels/${id}`,
         cache: false,
         success: function(data){
             console.log(data);
+            id=`${data.id}`;
             putAboutData(data);
         },
         error: function(error){
@@ -45,7 +62,7 @@ function initPage(id){
         }
     });
     $.ajax({
-        url: `/api/priceperroomtype/`,
+        url: `/api/priceperroomtype/?hotel=${id}`,
         cache: false,
         success: function(data){
             console.log(data);
@@ -59,4 +76,5 @@ function initPage(id){
             console.log(error);
         }
     });
+
 }

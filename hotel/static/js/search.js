@@ -136,6 +136,7 @@ window.onload = function () {
 		cardbody.append(`<h5 class='card-title'>${d.hotel}</h5>`);
 		cardbody.append(`<p class='card-text'>${Object.keys(d.room_types)}</p>`);
 		cardbody.append(`<a href='/hotel/${d.hotel_id}/' class="btn btn-primary">Book</a>`)
+		
 		div.append(cardbody);
 		out.append(div);
 		out.addClass('col-md-4')
@@ -157,6 +158,7 @@ window.onload = function () {
 				$('#results').html('');
 				data.map(function(d){
 					//console.log(d.hotel, Object.keys(d.room_types));
+					
 					putResults(d);
 				});
 				$('.filter1').attr('checked','true');

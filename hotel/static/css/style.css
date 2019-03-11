@@ -32,3 +32,20 @@
 div{
     padding: 2px;
 }
+
+#prices{
+    display: flex;
+    justify-content: center;
+    text-align: center;
+}
+
+#about{
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+}
+
+#pricestable{
+    width: 60%;
+}
