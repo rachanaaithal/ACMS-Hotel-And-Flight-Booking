@@ -3,6 +3,7 @@
 {% block content %}
     <script src="/static/js/search.js"></script>
     <script src="/static/js/typeahead.jquery.js"></script>
+    <link rel="stylesheet" href="/static/css/typeahead.css">
     <div id="main-filter">
         <div id="the-basics">
             <input id='typeahead' class="typeahead" type="text" placeholder="Enter city name">
@@ -14,10 +15,12 @@
     </div>
     <div id='res-body'>
         
-    <div id='results' class="row"></div>    
-    <div class="optional-filter">
-        <div id="roomtype-filter"></div>
-    </div>
+        <div id='results' class="row">
+            <p id='noresults'>No Results to Show</p>
+        </div>    
+        <div class="optional-filter" style="display: none">
+            <div id="roomtype-filter"></div>
+        </div>
     </div>
 
 {% endblock %}

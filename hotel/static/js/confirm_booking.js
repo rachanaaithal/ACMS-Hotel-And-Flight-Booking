@@ -20,7 +20,7 @@ function initPage(id, category){
                 const checkOut = moment.utc(moment(checkIn,"HH:mm:ss").diff(moment(cleaningTime,"HH:mm:ss"))).format('hh:mm A');
 
                 details.append(`<p>Checkin: ${moment(fromdate).format('DD-MM-YYYY')} ${moment(checkIn, "HH:mm:ss").format('hh:mm A')}</p>`);
-                details.append(`<p>CheckoutBefore: ${moment(fromdate).format('DD-MM-YYYY')} ${checkOut}</p>`);
+                details.append(`<p>CheckoutBefore: ${moment(todate).format('DD-MM-YYYY')} ${checkOut}</p>`);
                 
                 details.appendTo('#details');
                 
@@ -61,7 +61,7 @@ function initPage(id, category){
             body.attr('id','finalprices')
             table.append(body)
             table.appendTo(pay)
-            pay.appendTo('#details');
+            pay.appendTo('#price');
             var tr=$('<tr/>')
             tr.append(`<th scope="row">Base Price</td><td>${data[0].price}</td>`);
             tr.appendTo('#finalprices')
