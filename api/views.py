@@ -130,16 +130,6 @@ def search(request):
     q6=Q(to_date__gte=ed)
     q7=Q(from_date__gte=st)
     q8=Q(to_date__lte=ed)
-#print([(i.room.hotel.name, i.from_date) for i in RoomAvailability.objects.filter(Q(room__hotel__in=[i.id for i in city_results])).filter((q1 & q2) | (q3 & q4) | (q5 & q6))])
-#print([(i.room.id) for i in RoomAvailability.objects.filter(Q(room__hotel__in=[i.id for i in city_results])).filter((q1 & q2) | (q3 & q4) | (q5 & q6))])
-
-#to get all availabe rooms           
-    # room_results = HotelRoom.objects.filter(hotel__in=[i.id for i in city_results])
-    # temp = [i.room.id for i in RoomAvailability.objects.filter(Q(room__hotel__in=[i.id for i in city_results])).filter((q1 & q2) | (q3 & q4) | (q5 & q6))]
-    # room_results = room_results.exclude(id__in = temp).values('hotel__name', 'roomno', 'category__name', 'hotel__image_link', 'hotel__id')
-#    print([(i,i.hotel) for i in room_results])
-#    print(room_results)
-
 
 #Get Supply (Room type-hotel level)
     supply = HotelRoom.objects.filter(hotel__city_name__name=name).values('hotel__name', 'category__name', 'hotel__image_link', 'hotel__id','number_of_rooms')
@@ -154,10 +144,6 @@ def search(request):
             demand_dict[dem]+=1
         else:
             demand_dict[dem]=1
-    print('\n\n\nYAAAHOOOOOO', supply,'\n\n\n')
-
-
-
 
 #To make the query set into a dictionary
     response = {}
@@ -184,12 +170,36 @@ def search(request):
     
     #making into json
     response = [{'hotel':key, 'room_types':response[key]['room_types'], 'image_link':response[key]['image_link'], 'hotel_id':response[key]['hotel_id']} for key in response]
-    # for ele  in room_results:
-    #     print(ele.hotel.get_absolute_url())
 
-#to get avalaboe hotel names
-#    hotel_results = Hotel.objects.filter(id__in=[room.hotel.id for room in room_results])
-#    print([(i,i.id) for i in hotel_results])
+    return JsonResponse(response, safe=False)
 
-    # return JsonResponse({'hotel':hotel_results})
+def check(request):
+    name=request.GET["name"]
+    st=request.GET["start"]
+    ed=request.GET["end"]
+    category=request.GET["category"]
+    st=st.strip()
+    ed=ed.strip()
+
+    q1=Q(from_date__gte=st)
+    q2=Q(from_date__lte=ed) 
+    q3=Q(to_date__gte=st)
+    q4=Q(to_date__lte=ed)
+    q5=Q(from_date__lte=st)
+    q6=Q(to_date__gte=ed)
+    q7=Q(from_date__gte=st)
+    q8=Q(to_date__lte=ed)
+
+#Get Supply (Room type-hotel level)
+    supply = HotelRoom.objects.filter(hotel__id=name).filter(category__id=category).values('hotel__name', 'category__id', 'hotel__image_link', 'hotel__id','number_of_rooms')
+    
+#Get Demand from room availability table
+    demand = RoomAvailability.objects.filter((q1 & q2) | (q3 & q4) | (q5 & q6)| (q7 & q8)).filter(room__hotel__id=name).filter(room__category__id=category)
+
+#    print('checking',list(supply)[0]['number_of_rooms'],len(list(demand)))
+    if((list(supply)[0]['number_of_rooms']-len(list(demand)))>0):
+        response=True
+    else:
+        response=False
+
     return JsonResponse(response, safe=False)

@@ -153,3 +153,8 @@ REST_FRAMEWORK = {
     ],
     'DEFAULT_FILTER_BACKENDS': ('django_filters.rest_framework.DjangoFilterBackend',)
 }
+
+# Redirect to home URL after login (Default redirects to /accounts/profile/)
+LOGIN_REDIRECT_URL = '/hotel/'
+
+EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'

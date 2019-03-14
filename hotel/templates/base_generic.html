@@ -11,7 +11,7 @@
     <script type="text/javascript" src="https://cdn.jsdelivr.net/momentjs/latest/moment.min.js"></script>
     <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.min.js"></script>
     <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.css" />
-
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
     {% load static %} 
     <link rel="stylesheet" href="/static/css/style.css">
 </head>
@@ -23,9 +23,18 @@
         </button>
         <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
             <div class="navbar-nav">
-                <a class="nav-item nav-link active" href="#">Home <span class="sr-only">(current)</span></a>
-                <a class="nav-item nav-link" href="#">Hotels</a>
-                <a class="nav-item nav-link" href="#">Flights</a>
+                <div class="items">
+                    <a class="nav-item nav-link active" href="#">Home <span class="sr-only">(current)</span></a>
+                    <a class="nav-item nav-link" href="#"><i class="fas fa-hotel"></i>Hotels</a>
+                    <a class="nav-item nav-link" href="#"><i class="fas fa-plane"></i>Flights</a>    
+                </div><div class="items">
+                    {% if user.is_authenticated %}
+                    <span class="nav-item navbar-text">User: {{ user.get_username }}</span>
+                    <a class="nav-item nav-link" href="{% url 'logout'%}?next={{request.path}}">Logout</a>   
+                    {% else %}
+                    <a class="nav-item nav-link" href="{% url 'login'%}?next={{request.path}}">Login</a>   
+                    {% endif %} 
+                </div>
             </div>
         </div>
     </nav>

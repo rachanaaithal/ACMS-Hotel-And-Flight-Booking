@@ -6,7 +6,7 @@ function initPage(id){
         img.appendTo('#about');
         var details=$('<div/>');
         details.append(`<h5>${data.name}</h5>`);
-        details.append(`<p>Address:${data.address}</p>`); 
+        details.append(`<p><i class="fas fa-map-marked fa-2x"></i>${data.address}</p>`); 
 
         const checkIn  = data.checkintime;
         const cleaningTime = data.extratime;
@@ -38,7 +38,7 @@ function initPage(id){
     var todate = url.searchParams.get("todate");
 
     function putPricesData(d){
-        var roomtype;
+        
         $.ajax({
             url: `/api/roomtype/${d.category}`,
             cache: false,
@@ -46,49 +46,33 @@ function initPage(id){
                 roomtype=data.name;
                 var tr=$('<tr/>')
                 tr.append(`<th scope="row">${data.name}</td>`)
-                tr.append(`<td>${d.price}</td><td><button id=${d.category} class="btn btn-primary process">Book</button></td>`)
+                tr.append(`<td>${d.price}</td><td><button id="category-${d.category}" class="btn btn-primary process">Book</button></td>`)
                 tr.appendTo('#prices-tab-bod')
 
+                $(`#category-${d.category}`).click(function(e){
+                    console.log(fromdate,todate)
 
-                $('.process').click(function(e){
-                    /*
-                    var flag;
                     $.ajax({
-                        url: `/api/hotelroom/?hotel=${id}&category=${e.target.id}`,
+                        url: `/api/check/?name=${id}&category=${d.category}&start=${fromdate}&end=${todate}`,
                         cache: false,
-                        success: function(rooms){
-                            //console.log(rooms)
-                            flag=rooms.length;
-                            console.log('val:',flag)
-                            rooms.map(function(room){
-                                $.ajax({
-                                    url: `/api/roomavailability/?room=${room.id}`,
-                                    cache: false,
-                                    success: function (status){
-                                        flag-=1;
-                                        console.log(room.id,status,'in:',flag)
-                                    }
-                                });
-                            })
-                            
+                        success: function(data){
+                            if(data){
+                                window.location.href=`/hotel/`+id+`/${d.category}/?fromdate=${fromdate}&todate=${todate}`;    
+                            }
                         },
                         error: function(error){
                             console.log(error);
                         }
                     });
-                    if(flag>0){
-                        console.log('available', flag)
-                    }
-                    else{
-                        console.log('unavailable')
-                    }
-                    */
-                    window.location.href=`/hotel/`+id+`/${d.category}/?fromdate=${fromdate}&todate=${todate}`;
+
+
                     return false;
                 });
-            
+
             }
         });
+        
+
     }
 
     

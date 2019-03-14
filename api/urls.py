@@ -19,8 +19,7 @@ router.register(r'roomavailability', views.RoomAvailabilityViewSet)
 # Additionally, we include login URLs for the browsable API.
 urlpatterns = [
     path('', include(router.urls)),
+    #    path(r'updateavalability/',views.UpdateAvailability.as_view())
     url(r'search', views.search, name="search"),
-#    path(r'updateavalability/',views.UpdateAvailability.as_view())
-    path('availability/', views.Availability.as_view()),
-    path('availability/<int:pk>/', views.AvailabilityDetail.as_view()),
+    url(r'check', views.check, name="check"),
 ]
