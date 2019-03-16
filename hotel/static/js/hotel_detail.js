@@ -37,6 +37,21 @@ function initPage(id){
     var fromdate = url.searchParams.get("fromdate");
     var todate = url.searchParams.get("todate");
 
+
+    function readCookie(name) {
+        var nameEQ = name + "=";
+        var ca = document.cookie.split(';');
+        for(var i=0;i < ca.length;i++) {
+            var c = ca[i];
+            while (c.charAt(0)==' ') c = c.substring(1,c.length);
+            if (c.indexOf(nameEQ) == 0) return c.substring(nameEQ.length,c.length);
+        }
+        return null;
+    }
+    
+    var csrftoken = readCookie('csrftoken');
+//    var csrftoken = $('[name="csrftoken"]').attr('value');
+    console.log(csrftoken)
     function putPricesData(d){
         
         $.ajax({
@@ -50,20 +65,34 @@ function initPage(id){
                 tr.appendTo('#prices-tab-bod')
 
                 $(`#category-${d.category}`).click(function(e){
-                    console.log(fromdate,todate)
+                    
 
                     $.ajax({
                         url: `/api/check/?name=${id}&category=${d.category}&start=${fromdate}&end=${todate}`,
                         cache: false,
                         success: function(data){
-                            if(data){
-                                window.location.href=`/hotel/`+id+`/${d.category}/?fromdate=${fromdate}&todate=${todate}`;    
+                            console.log(data.id);
+                            console.log(fromdate,todate);
+                            if(data.val){
+                                $.ajax({
+                                    type: "POST",
+                                    url: `/api/roomavailability/`,
+                                    data:{'from_date': fromdate, 'to_date': todate, 'room':data.id, 'status': 'pr'},
+                                    headers:{"X-CSRFToken": csrftoken},
+                                    success:function(newdata){
+                                        console.log(newdata);
+                                        window.location.href=`/hotel/`+id+`/${d.category}/?id=${newdata.id}`;
+                                    }
+                                });
+                            
+    
                             }
                         },
                         error: function(error){
                             console.log(error);
                         }
                     });
+
 
 
                     return false;

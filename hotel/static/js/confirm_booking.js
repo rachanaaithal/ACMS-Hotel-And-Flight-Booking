@@ -1,79 +1,103 @@
+function readCookie(name) {
+    var nameEQ = name + "=";
+    var ca = document.cookie.split(';');
+    for(var i=0;i < ca.length;i++) {
+        var c = ca[i];
+        while (c.charAt(0)==' ') c = c.substring(1,c.length);
+        if (c.indexOf(nameEQ) == 0) return c.substring(nameEQ.length,c.length);
+    }
+    return null;
+}
+
 function initPage(id, category){
     console.log(id, category);
 
     var url = new URL(window.location.href);
-    var fromdate = url.searchParams.get("fromdate");
-    var todate = url.searchParams.get("todate");
+    var transaction_id = url.searchParams.get("id");
+
+    var gst=5;
 
     function putAboutData(data){
-        $.ajax({
-            url: `/api/roomtype/${category}`,
-            cache: false,
-            success: function( d){
-                var details=$('<div/>');
-                details.append(`<h5>${data.name}</h5>`);
-                details.append(`<p>Address: ${data.address}</p>`); 
-                details.append(`<p>Room Type:${d.name}</p>`);
+        var details=$('<div/>');
+        details.append(`<h5>${data.hotel}</h5>`);
+        details.append(`<p>Address: ${data.address}</p>`); 
+        details.append(`<p>Room Type:${data.category}</p>`);
 
-                const checkIn  = data.checkintime;
-                const cleaningTime = data.extratime;
-                const checkOut = moment.utc(moment(checkIn,"HH:mm:ss").diff(moment(cleaningTime,"HH:mm:ss"))).format('hh:mm A');
+        const checkIn  = data.checkintime;
+        const cleaningTime = data.extratime;
+        const checkOut = moment.utc(moment(checkIn,"HH:mm:ss").diff(moment(cleaningTime,"HH:mm:ss"))).format('hh:mm A');
 
-                details.append(`<p>Checkin: ${moment(fromdate).format('DD-MM-YYYY')} ${moment(checkIn, "HH:mm:ss").format('hh:mm A')}</p>`);
-                details.append(`<p>CheckoutBefore: ${moment(todate).format('DD-MM-YYYY')} ${checkOut}</p>`);
-                
-                details.appendTo('#details');
-                
-                
-            },
-            error: function(error){
-                console.log(error);
-            }
+        details.append(`<p>Checkin: ${moment(data.from_date).format('DD-MM-YYYY')} ${moment(checkIn, "HH:mm:ss").format('hh:mm A')}</p>`);
+        details.append(`<p>CheckoutBefore: ${moment(data.to_date).format('DD-MM-YYYY')} ${checkOut}</p>`);
+        
+        details.appendTo('#details');
+
+        const days= Math.max(moment(data.to_date).diff(moment(data.from_date), "days"),1);
+        const cost=data.price*days;
+        const tax=cost*gst/100;
+            
+        const tot=tax+parseFloat(cost);
+        var pay=$('<div/>');
+        var table=$('<table/>')
+        table.attr('id','pricestable')
+        table.addClass('table')
+        var body=$('<tbody/>')
+        body.attr('id','finalprices')
+        table.append(body)
+        table.appendTo(pay)
+        pay.appendTo('#price');
+        var tr=$('<tr/>')
+        tr.append(`<th scope="row">Base Price</td><td>${cost}</td>`);
+        tr.appendTo('#finalprices')
+        var tr=$('<tr/>')
+        tr.append(`<th scope="row">Tax</td><td>${tax.toFixed(2)}</td>`);
+        tr.appendTo('#finalprices')
+        var tr=$('<tr/>')
+        tr.append(`<th scope="row">Total</td><td>${tot.toFixed(2)}</td>`);
+        tr.appendTo('#finalprices')
+        var tr=$('<tr/>')
+        tr.append(`<td><button id="cancel" class="btn btn-danger">Cancel</button></td><td><button id="pay" class="btn btn-primary">Pay</button></td>`)
+        tr.appendTo('#finalprices')  
+
+        var csrftoken = readCookie('csrftoken');
+
+        $('#pay').click(function(e){
+            console.log(transaction_id);
+            $.ajax({
+                type: "PATCH",
+                url:`/api/roomavailability/${transaction_id}/`,
+                data:{'status':'bk'},
+                headers:{"X-CSRFToken": csrftoken},
+                success:function(newdata){
+                    console.log(newdata);
+                }
+            });
+
+        });
+
+        $('#cancel').click(function(e){
+            console.log(transaction_id);
+            $.ajax({
+                type: "PATCH",
+                url:`/api/roomavailability/${transaction_id}/`,
+                data:{'status':'dd'},
+                headers:{"X-CSRFToken": csrftoken},
+                success:function(newdata){
+                    console.log(newdata);
+                }
+            });
+
         });
     }
 
+
     $.ajax({
-        url: `/api/hotels/${id}`,
+        url: `/api/roomavailability/?id=${transaction_id}`,
         cache: false,
         success: function(data){
             console.log(data);
             id=`${data.id}`;
-            putAboutData(data);
-        },
-        error: function(error){
-            console.log(error);
-        }
-    });
-
-    var gst=5;
-    $.ajax({
-        url: `/api/hotelroom/?hotel=${id}&category=${category}`,
-        cache: false,
-        success: function(data){
-            const tax=data[0].price*gst/100;
-            
-            const tot=tax+parseFloat(data[0].price);
-            var pay=$('<div/>');
-            var table=$('<table/>')
-            table.attr('id','pricestable')
-            table.addClass('table')
-            var body=$('<tbody/>')
-            body.attr('id','finalprices')
-            table.append(body)
-            table.appendTo(pay)
-            pay.appendTo('#price');
-            var tr=$('<tr/>')
-            tr.append(`<th scope="row">Base Price</td><td>${data[0].price}</td>`);
-            tr.appendTo('#finalprices')
-            var tr=$('<tr/>')
-            tr.append(`<th scope="row">Tax</td><td>${tax.toFixed(2)}</td>`);
-            tr.appendTo('#finalprices')
-            var tr=$('<tr/>')
-            tr.append(`<th scope="row">Total</td><td>${tot.toFixed(2)}</td>`);
-            tr.appendTo('#finalprices')
-            var tr=$('<tr/>')
-            tr.append(`<td><a href='#' class="btn btn-danger">Cancel</a></td><td><a href='#' class="btn btn-primary">Pay</a></td>`)
-            tr.appendTo('#finalprices')
+            putAboutData(data[0]);
         },
         error: function(error){
             console.log(error);

@@ -40,7 +40,7 @@ window.onload = function () {
 	$('input[name="daterange"]').daterangepicker({
 		opens: 'right',
 		startDate: moment(),
-		endDate: moment(),
+		endDate: moment().add(1,'days'),
 		minDate: moment(),
 		dateFormat: 'dd-mm-yyyy',
 	}, function (start, end, label) {

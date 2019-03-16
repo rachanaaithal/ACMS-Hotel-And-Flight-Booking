@@ -9,7 +9,8 @@ from django.db.models import Q
 from django.core import serializers
 import json
 from rest_framework import generics
-
+from django.views.decorators.csrf import csrf_exempt
+from django.utils.decorators import method_decorator
 
 class UserViewSet(viewsets.ModelViewSet):
     """
@@ -65,14 +66,17 @@ class Availability(generics.ListCreateAPIView):
 class AvailabilityDetail(generics.RetrieveUpdateDestroyAPIView):
     queryset = RoomAvailability.objects.all()
     serializer_class = RoomAvailabilitySerializer
+    
 
-
-
+@method_decorator(csrf_exempt, name='dispatch')
 class RoomAvailabilityViewSet(viewsets.ModelViewSet):
     queryset = RoomAvailability.objects.all()
     serializer_class = RoomAvailabilitySerializer
+    class Meta:
+        depth=2
     filter_fields = {
-        'room': ['exact']
+        'room': ['exact'],
+        'id': ['exact']
     }
 '''
 class UpdateAvailability(generics.UpdateAPIView):
@@ -136,8 +140,8 @@ def search(request):
     
 #Get Demand from room availability table
     demand = RoomAvailability.objects.filter((q1 & q2) | (q3 & q4) | (q5 & q6)| (q7 & q8)).filter(room__hotel__city_name__name=name)
-    # print('demand:',list(demand.values('room__hotel__name','room__category__name')) )
-    demand = [x['room__hotel__name']+':'+x['room__category__name'] for x in list(demand.values('room__hotel__name','room__category__name'))]
+    #print('demand:',list(demand.values('room__hotel__name','room__category__name', 'status')) )
+    demand = [x['room__hotel__name']+':'+x['room__category__name']+x['status'] for x in list(demand.exclude(status='dd').values('room__hotel__name','room__category__name','status'))]
     demand_dict = {}
     for dem in demand:
         if dem in demand_dict:
@@ -191,15 +195,15 @@ def check(request):
     q8=Q(to_date__lte=ed)
 
 #Get Supply (Room type-hotel level)
-    supply = HotelRoom.objects.filter(hotel__id=name).filter(category__id=category).values('hotel__name', 'category__id', 'hotel__image_link', 'hotel__id','number_of_rooms')
+    supply = HotelRoom.objects.filter(hotel__id=name).filter(category__id=category).values('id','hotel__name', 'category__id', 'hotel__image_link', 'hotel__id','number_of_rooms')
     
 #Get Demand from room availability table
     demand = RoomAvailability.objects.filter((q1 & q2) | (q3 & q4) | (q5 & q6)| (q7 & q8)).filter(room__hotel__id=name).filter(room__category__id=category)
 
-#    print('checking',list(supply)[0]['number_of_rooms'],len(list(demand)))
+    #print('checking',list(supply)[0]['id'],demand)
     if((list(supply)[0]['number_of_rooms']-len(list(demand)))>0):
-        response=True
+        response={'val':True, 'id':list(supply)[0]['id']}
     else:
-        response=False
+        response={'val':False}
 
     return JsonResponse(response, safe=False)
