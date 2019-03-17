@@ -1,5 +1,7 @@
 from django.db import models
 import uuid
+from django.contrib.auth.models import User
+
 # Create your models here.
 
 class Country(models.Model):
@@ -112,6 +114,7 @@ class RoomAvailability(models.Model):
     room = models.ForeignKey('HotelRoom', on_delete=models.CASCADE, null=True)
     from_date = models.DateField(default=datetime.date.today)
     to_date = models.DateField(default=datetime.date.today)
+    booked_by = models.ForeignKey(User,null=False,on_delete=models.CASCADE)
 
     StatusTypes =(
         ('bk', 'Booked'),

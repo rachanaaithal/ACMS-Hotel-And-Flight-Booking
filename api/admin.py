@@ -9,3 +9,4 @@ admin.site.register(HotelRoom)
 admin.site.register(RoomAvailability)
 admin.site.register(Country)
 admin.site.register(City)
+

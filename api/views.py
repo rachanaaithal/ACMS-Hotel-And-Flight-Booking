@@ -78,6 +78,8 @@ class RoomAvailabilityViewSet(viewsets.ModelViewSet):
         'room': ['exact'],
         'id': ['exact']
     }
+    def perform_create(self, serializer):
+        serializer.save(booked_by=self.request.user)
 '''
 class UpdateAvailability(generics.UpdateAPIView):
     queryset = RoomAvailability.objects.all()

@@ -65,12 +65,17 @@ class HotelRoomSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 class RoomAvailabilitySerializer(serializers.ModelSerializer):
+#    booked_by = serializers.ReadOnlyField(default=serializers.CurrentUserDefault())
+    booked_by = serializers.PrimaryKeyRelatedField(read_only=True,default=serializers.CurrentUserDefault())
+#    booked_by = serializers.CreateOnlyDefault(serializers.CurrentUserDefault())
+
     hotel = serializers.ReadOnlyField(source="room.hotel.name")
     category = serializers.ReadOnlyField(source="room.category.name")
     address = serializers.ReadOnlyField(source="room.hotel.address")
     checkintime = serializers.ReadOnlyField(source="room.hotel.checkintime")
     extratime = serializers.ReadOnlyField(source="room.hotel.extratime")
     price = serializers.ReadOnlyField(source="room.price")
+
     class Meta:
         model = RoomAvailability
         fields = '__all__'
