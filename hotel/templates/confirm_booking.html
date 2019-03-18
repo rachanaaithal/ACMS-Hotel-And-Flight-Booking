@@ -1,0 +1,15 @@
+{% extends "base_generic.html" %}
+
+{% block content %}
+    <script src="/static/js/confirm_booking.js"></script>
+    <script src="/static/js/typeahead.jquery.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.24.0/locale/en-gb.js"></script>
+
+    <div id="details">
+        
+    </div>
+    <div id="price"></div>
+    <script>
+        initPage("{{id}}","{{category}}");
+    </script>
+{% endblock %}

@@ -1,5 +1,7 @@
 from django.db import models
 import uuid
+from django.contrib.auth.models import User
+
 # Create your models here.
 
 class Country(models.Model):
@@ -48,7 +50,18 @@ class RoomType(models.Model):
     def __str__(self):
         """String for representing the Model object."""
         return self.name
+'''
+class PricePerRoomType(models.Model):
+    
+    hotel = models.ForeignKey('Hotel', on_delete=models.CASCADE, null=True)
 
+    category = models.ForeignKey('RoomType', on_delete=models.SET_NULL, null=True)#use when hotels can add new types of rooms
+
+    price = models.DecimalField(max_digits=6, decimal_places=2)
+
+    def __str__(self):
+        return f'{self.price}-{self.category}({self.hotel.name})'
+'''
 from django.urls import reverse # Used to generate URLs by reversing the URL patterns
 from django.core.validators import MinValueValidator, MaxValueValidator
 
@@ -56,7 +69,7 @@ class HotelRoom(models.Model):
 
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, help_text='Unique ID for this particular hotel')
     
-    roomno = models.CharField(max_length=6, default='A000')
+#    roomno = models.CharField(max_length=6, default='A000')
     
     hotel = models.ForeignKey('Hotel', on_delete=models.CASCADE, null=True)
 
@@ -64,9 +77,11 @@ class HotelRoom(models.Model):
 
     description = models.TextField(max_length=1000, help_text='Enter description of the room.')
 
-    price = models.DecimalField(max_digits=6, decimal_places=2)
-
     category = models.ForeignKey('RoomType', on_delete=models.SET_NULL, null=True)#use when hotels can add new types of rooms
+
+    price = models.DecimalField(max_digits=6, decimal_places=2, default=0)
+
+    number_of_rooms = models.IntegerField(default=1,validators=[MinValueValidator(1)])
 
     """
     #use when hotels can't add new types of room
@@ -89,16 +104,30 @@ class HotelRoom(models.Model):
 
     def __str__(self):
         """String for representing the Model object."""
-        return f'{self.roomno} ({self.hotel.name})'
+        return f'{self.category, self.number_of_rooms} ({self.hotel.name})'
 
-from django.utils import timezone
+#from django.utils import timezone #with timezone.now
+import datetime
+
 class RoomAvailability(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, help_text='Unique ID for this particular transaction')
     room = models.ForeignKey('HotelRoom', on_delete=models.CASCADE, null=True)
-    from_date = models.DateField(default=timezone.now)
-    to_date = models.DateField(default=timezone.now)
+    from_date = models.DateField(default=datetime.date.today)
+    to_date = models.DateField(default=datetime.date.today)
+    booked_by = models.ForeignKey(User,null=False,on_delete=models.CASCADE)
+
+    StatusTypes =(
+        ('bk', 'Booked'),
+        ('pr', 'Processing'),
+        ('dd', 'Dead'),
+    )
+
+    status = models.CharField(max_length=2, choices=StatusTypes, help_text='Status')
+
+
 #    class Meta:
 #        odering = ['date']
 
     def __str__(self):
         """String for representing the Model object."""
-        return f'({self.room.roomno})({self.room.hotel.name})'
+        return f'({self.room.category})({self.room.hotel.name})'
