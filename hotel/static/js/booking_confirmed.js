@@ -1,19 +1,5 @@
-function readCookie(name) {
-    var nameEQ = name + "=";
-    var ca = document.cookie.split(';');
-    for(var i=0;i < ca.length;i++) {
-        var c = ca[i];
-        while (c.charAt(0)==' ') c = c.substring(1,c.length);
-        if (c.indexOf(nameEQ) == 0) return c.substring(nameEQ.length,c.length);
-    }
-    return null;
-}
-
-function initPage(hotel_id, category){
-    console.log(hotel_id, category);
-
-    var url = new URL(window.location.href);
-    var transaction_id = url.searchParams.get("id");
+function initPage(hotel_id, category, transaction_id){
+    console.log(hotel_id, category, transaction_id);
 
     var gst=5;
 
@@ -55,41 +41,7 @@ function initPage(hotel_id, category){
         var tr=$('<tr/>')
         tr.append(`<th scope="row">Total</td><td>${tot.toFixed(2)}</td>`);
         tr.appendTo('#finalprices')
-        var tr=$('<tr/>')
-        tr.append(`<td><button id="cancel" class="btn btn-danger">Cancel</button></td><td><button id="pay" class="btn btn-primary">Pay</button></td>`)
-        tr.appendTo('#finalprices')  
 
-        var csrftoken = readCookie('csrftoken');
-        console.log(transaction_id, hotel_id, category);
-        $('#pay').click(function(e){
-            console.log(transaction_id, hotel_id);
-            $.ajax({
-                type: "PATCH",
-                url:`/api/roomavailability/${transaction_id}/`,
-                data:{'status':'bk'},
-                headers:{"X-CSRFToken": csrftoken},
-                success:function(newdata){
-                    console.log(newdata);
-                    window.location.href=`/hotel/${hotel_id}/${category}/booked/${transaction_id}`
-                }
-            });
-
-        });
-
-        $('#cancel').click(function(e){
-            console.log(transaction_id);
-            $.ajax({
-                type: "PATCH",
-                url:`/api/roomavailability/${transaction_id}/`,
-                data:{'status':'dd'},
-                headers:{"X-CSRFToken": csrftoken},
-                success:function(newdata){
-                    console.log(newdata);
-                    window.location.href=`/hotel/${hotel_id}/${category}/canceled`
-                }
-            });
-
-        });
     }
 
 
@@ -97,7 +49,7 @@ function initPage(hotel_id, category){
         url: `/api/roomavailability/?id=${transaction_id}`,
         cache: false,
         success: function(data){
-            console.log(data);
+            //console.log(data);
             id=`${data.id}`;
             putAboutData(data[0]);
         },

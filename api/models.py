@@ -1,5 +1,7 @@
 from django.db import models
 import uuid
+from django.contrib.auth.models import User
+
 # Create your models here.
 
 class Country(models.Model):
@@ -104,15 +106,20 @@ class HotelRoom(models.Model):
         """String for representing the Model object."""
         return f'{self.category, self.number_of_rooms} ({self.hotel.name})'
 
-from django.utils import timezone
+#from django.utils import timezone #with timezone.now
+import datetime
+
 class RoomAvailability(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, help_text='Unique ID for this particular transaction')
     room = models.ForeignKey('HotelRoom', on_delete=models.CASCADE, null=True)
-    from_date = models.DateField(default=timezone.now)
-    to_date = models.DateField(default=timezone.now)
+    from_date = models.DateField(default=datetime.date.today)
+    to_date = models.DateField(default=datetime.date.today)
+    booked_by = models.ForeignKey(User,null=False,on_delete=models.CASCADE)
 
     StatusTypes =(
         ('bk', 'Booked'),
         ('pr', 'Processing'),
+        ('dd', 'Dead'),
     )
 
     status = models.CharField(max_length=2, choices=StatusTypes, help_text='Status')
