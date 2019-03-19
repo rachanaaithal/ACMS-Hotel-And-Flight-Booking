@@ -218,6 +218,7 @@ window.onload = function () {
 				if(data.length>0){
 					$('#noresults').hide();
 					$('.optional-filter').show();
+					$('.filter1').attr('checked','true');
 				}
 
 				data.map(function(d){
@@ -225,7 +226,7 @@ window.onload = function () {
 					//console.log(d);
 					putResults(d);
 				});
-				$('.filter1').attr('checked','true');
+				
             }
         });
 	}

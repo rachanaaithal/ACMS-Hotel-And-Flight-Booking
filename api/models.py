@@ -104,7 +104,7 @@ class HotelRoom(models.Model):
 
     def __str__(self):
         """String for representing the Model object."""
-        return f'{self.category, self.number_of_rooms} ({self.hotel.name})'
+        return '%s,%s(%s)' % self.category, self.number_of_rooms, self.hotel.name
 
 #from django.utils import timezone #with timezone.now
 import datetime
@@ -130,4 +130,4 @@ class RoomAvailability(models.Model):
 
     def __str__(self):
         """String for representing the Model object."""
-        return f'({self.room.category})({self.room.hotel.name})'
+        return '%s(%s)' % self.room.category, self.room.hotel.name
