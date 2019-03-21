@@ -114,7 +114,7 @@ window.onload = function () {
 				});
 				console.log(newResult);
 				
-
+				$('.filter1').attr('checked','true');
 			})
 		}
 	});
@@ -218,14 +218,16 @@ window.onload = function () {
 				if(data.length>0){
 					$('#noresults').hide();
 					$('.optional-filter').show();
+					
 				}
 
+				$('.filter1').attr('checked','true');
 				data.map(function(d){
 					//console.log(d.hotel, Object.keys(d.room_types));
 					//console.log(d);
 					putResults(d);
 				});
-				$('.filter1').attr('checked','true');
+				
             }
         });
 	}
