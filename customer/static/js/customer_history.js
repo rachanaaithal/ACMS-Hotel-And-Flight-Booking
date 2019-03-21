@@ -20,6 +20,8 @@ window.onload=function(){
         tr.append(`<th scope="row">${d.hotel}(${d.category})</td>`)
         tr.append(`<td>${d.from_date}</td><td>${d.to_date}</td><td>${d.price}</td>`)
         tr.append(`<td>${d.status}</td>`)
+        tr.addClass('clickable-row')
+        tr.attr('id',`${d.id}`);
         tr.appendTo(`#${id} >tbody`)
     }
 
@@ -49,6 +51,10 @@ window.onload=function(){
                     putData('past-bookings',d);
                     
                 }
+            });
+            $(".clickable-row").click(function(e) {
+                console.log(e.currentTarget.id);
+                window.location.href=`/hotel/bookingdetails/${e.currentTarget.id}`;
             });
         },
         error: function(error){
