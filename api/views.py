@@ -70,16 +70,23 @@ class AvailabilityDetail(generics.RetrieveUpdateDestroyAPIView):
 
 @method_decorator(csrf_exempt, name='dispatch')
 class RoomAvailabilityViewSet(viewsets.ModelViewSet):
-    queryset = RoomAvailability.objects.all()
+    #queryset = RoomAvailability.objects.all()
     serializer_class = RoomAvailabilitySerializer
     class Meta:
         depth=2
     filter_fields = {
         'room': ['exact'],
-        'id': ['exact']
+        'id': ['exact'],
+        'booked_by': ['exact'],
     }
     def perform_create(self, serializer):
         serializer.save(booked_by=self.request.user)
+    
+    def get_queryset(self):
+#This view should return a list of all the booking for the currently authenticated user.
+        user = self.request.user
+        return RoomAvailability.objects.filter(booked_by=user)
+
 '''
 class UpdateAvailability(generics.UpdateAPIView):
     queryset = RoomAvailability.objects.all()

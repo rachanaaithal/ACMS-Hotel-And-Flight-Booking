@@ -98,8 +98,15 @@ function initPage(hotel_id, category){
         cache: false,
         success: function(data){
             console.log(data);
-            id=`${data.id}`;
-            putAboutData(data[0]);
+            if(data[0].status=='pr'){
+                putAboutData(data[0]);
+            }
+            else if(data[0].status=='bk'){
+                window.location.href=`/hotel/${hotel_id}/${category}/booked/${data[0].id}`;
+            }
+            else if(data[0].status=='dd'){
+                window.location.href=`/hotel/${hotel_id}/${category}/canceled`;
+            }
         },
         error: function(error){
             console.log(error);

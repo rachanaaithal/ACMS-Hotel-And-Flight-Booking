@@ -26,7 +26,7 @@ urlpatterns = [
     url(r'^api-auth/', include('rest_framework.urls')),
     url(r'^api/',include('api.urls')),
     path('accounts/', include('django.contrib.auth.urls')),
-
+    url(r'customer/', include('customer.urls')),
 ]
 '''
 from django.views.generic import RedirectView
