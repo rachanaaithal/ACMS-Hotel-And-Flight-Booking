@@ -1,13 +1,13 @@
 {% extends "base_generic.html" %}
 
 {% block content %}
-    <script src="/static/js/booking_confirmed.js"></script>
+    <script src="/static/js/booking_details.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.24.0/locale/en-gb.js"></script>
 
     <div id="details">
     </div>
     <div id="price"></div>
     <script>
-        initPage("{{hotel_id}}","{{category}}","{{transaction_id}}","{{gst}}");
+        initPage("{{transaction_id}}","{{gst}}", "{{cancellation_charges}}");
     </script>
 {% endblock %}

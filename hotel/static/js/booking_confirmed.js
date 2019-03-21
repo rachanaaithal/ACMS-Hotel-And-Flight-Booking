@@ -1,7 +1,7 @@
-function initPage(hotel_id, category, transaction_id){
-    console.log(hotel_id, category, transaction_id);
+function initPage(hotel_id, category, transaction_id, gst){
+    console.log(hotel_id, category, transaction_id, gst);
 
-    var gst=5;
+//    var gst=5;
 
     function putAboutData(data){
         var details=$('<div/>');
