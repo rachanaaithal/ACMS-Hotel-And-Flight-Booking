@@ -36,6 +36,10 @@ class Hotel(models.Model):
 
     image_link = models.CharField(max_length=500, default="")
 
+    latitude = models.DecimalField(max_digits=14, decimal_places=10)
+
+    longitude = models.DecimalField(max_digits=14, decimal_places=10)
+
     def __str__(self):
         """String for representing the Model object."""
         return self.name

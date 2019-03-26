@@ -123,7 +123,7 @@ function initPage(id){
 	            minZoom: 1,
             	maxZoom: 19
             }).addTo(mymap);
-            var marker = L.marker([12.894441,77.5685569]).addTo(mymap);
+            var marker = L.marker([data.latitude, data.longitude]).addTo(mymap);
 
         },
         error: function(error){

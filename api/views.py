@@ -154,7 +154,7 @@ def search(request):
  
 
 #Get Supply (Room type-hotel level)
-    supply = HotelRoom.objects.filter(hotel__city_name__name=name).values('hotel__name', 'category__name', 'hotel__image_link', 'hotel__id','number_of_rooms')
+    supply = HotelRoom.objects.filter(hotel__city_name__name=name).values('hotel__name', 'category__name', 'hotel__image_link', 'hotel__id','number_of_rooms', 'hotel__latitude', 'hotel__longitude')
     
 #Get Demand from room availability table
     demand = RoomAvailability.objects.filter((q1 & q2) | (q3 & q4) | (q5 & q6)| (q7 & q8)).filter(room__hotel__city_name__name=name)
@@ -192,12 +192,14 @@ def search(request):
             response[result['hotel__name']]['image_link']=result['hotel__image_link']
             response[result['hotel__name']]['room_types']={}
             response[result['hotel__name']]['hotel_id']=result['hotel__id'] 
+            response[result['hotel__name']]['latitude']=result['hotel__latitude']
+            response[result['hotel__name']]['longitude']=result['hotel__longitude']
         response[result['hotel__name']]['room_types'][result['category__name']] = rooms_actually_available
 
     print('\n\nresponse',response)
     
     #making into json
-    response = [{'hotel':key, 'room_types':response[key]['room_types'], 'image_link':response[key]['image_link'], 'hotel_id':response[key]['hotel_id']} for key in response]
+    response = [{'hotel':key, 'room_types':response[key]['room_types'], 'image_link':response[key]['image_link'], 'hotel_id':response[key]['hotel_id'], 'latitude': response[key]['latitude'], 'longitude': response[key]['longitude']} for key in response]
 
     return JsonResponse(response, safe=False)
 

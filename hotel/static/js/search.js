@@ -234,7 +234,7 @@ window.onload = function () {
             url: "/api/search/?name="+name_url+"&start="+start_url+"&end="+end_url+"&type="+type_url,
             cache: false,
             success: function(data){
-				$('#typeahead').attr('value',name_url)
+				$('#typeahead').val(name_url)
 
 				
 				console.log(start_url, end_url)
