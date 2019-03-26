@@ -224,6 +224,11 @@ window.onload = function () {
 	var type_url = url.searchParams.get("type");
 	console.log(moment(start_url), moment(end_url), name_url, type_url)
 	console.log(type_url)
+	if(type_url == null){
+		type_url="AC|Non-AC|Delux";
+		nexturl="/hotel/"+"?name="+name_url+"&start="+start_url+"&end="+end_url+"&type="+type_url;
+		history.pushState({}, null, nexturl);
+	}
 	if(start_url!=null & end_url!=null & name_url!=null){
 		$.ajax({
             url: "/api/search/?name="+name_url+"&start="+start_url+"&end="+end_url+"&type="+type_url,
