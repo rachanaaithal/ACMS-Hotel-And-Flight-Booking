@@ -63,6 +63,7 @@ window.onload = function () {
 		}
 	});
 
+	let clicked = [];
 	//for checkboxes
 	$.ajax({
 		url: "/api/roomtype/",
@@ -76,19 +77,53 @@ window.onload = function () {
 				div.append(`<input type="checkbox" class="form-check-input filter1" id="${d.name}" value="${d.name}"></input>`);
 				div.append(`<label class="form-check-label" for="${d.name}">${d.name}</label>`);
 				div.appendTo('#roomtype-filter');
+				clicked.push(d.name)
 			});
 			//to change the result when checkboxes are clicked
 			$('.filter1').click(function(d){
 				// console.log($(this).val());
+				var cityVal = $("#typeahead").val();
 				let clicked = [];
 				$('.filter1').each(function(i,d){
-					//console.log(i,d);
+					console.log(i,d);
 					if ($(this).is(':checked')) {
 						clicked.push($(this).val());
 					}
 				})
+
 				$('#results').html('');
 				console.log(clicked);
+				nexturl="/hotel/"+"?name="+cityVal+"&start="+fromdate+"&end="+todate+"&type="+clicked.join('|')
+				history.pushState({}, null, nexturl);
+				
+				$.ajax({
+					url: "/api/search/?name="+name_url+"&start="+start_url+"&end="+end_url+"&type="+clicked.join('|'),
+					cache: false,
+					success: function(data){
+						console.log(data);
+						result=data;
+						//$('#results').html('');
+		
+						if(data.length>0){
+							$('#noresults').hide();
+							$('.optional-filter').show();
+						}
+						else{
+							$('#noresults').show();
+							$('.optional-filter').hide();
+						}
+		
+						data.map(function(d){
+							//console.log(d.hotel, Object.keys(d.room_types));
+							//console.log(d);
+							putResults(d);
+						});
+						
+					}
+				});
+
+
+				/*
 				var newResult=[];
 				result.map(function(d){
 					var d_new={}
@@ -113,8 +148,8 @@ window.onload = function () {
 					}
 				});
 				console.log(newResult);
-				
-				$('.filter1').attr('checked','true');
+				*/
+				//$('.filter1').attr('checked','true');
 			})
 		}
 	});
@@ -156,7 +191,7 @@ window.onload = function () {
 		const cityVal = $("#typeahead").val();
 		const dateRange = $("#date-range").val();
 		console.log(window.location)
-		window.location.href="/hotel/"+"?name="+cityVal+"&start="+fromdate+"&end="+todate	
+		window.location.href="/hotel/"+"?name="+cityVal+"&start="+fromdate+"&end="+todate+"&type="+clicked.join('|')
 		console.log(cityVal, dateRange, fromdate, todate);
 /*		$.ajax({
             url: "/api/search/?name="+cityVal+"&start="+fromdate+"&end="+todate,
@@ -186,11 +221,12 @@ window.onload = function () {
     var start_url= url.searchParams.get("start");
 	var end_url = url.searchParams.get("end");
 	var name_url = url.searchParams.get("name");
-	console.log(moment(start_url), moment(end_url), name_url)
-
+	var type_url = url.searchParams.get("type");
+	console.log(moment(start_url), moment(end_url), name_url, type_url)
+	console.log(type_url)
 	if(start_url!=null & end_url!=null & name_url!=null){
 		$.ajax({
-            url: "/api/search/?name="+name_url+"&start="+start_url+"&end="+end_url,
+            url: "/api/search/?name="+name_url+"&start="+start_url+"&end="+end_url+"&type="+type_url,
             cache: false,
             success: function(data){
 				$('#typeahead').attr('value',name_url)
@@ -209,19 +245,42 @@ window.onload = function () {
 					todate=end.format('YYYY-MM-DD');
 					console.log( fromdate, todate);
 				});
+
+				type_url=type_url.split('|')
+				$('.filter1').each(function(i,d){
+					console.log(i,d);
+					if ($.inArray(d.id, type_url)>-1) {
+						console.log(d.id)
+						$(this).prop("checked",true);
+						console.log(d,$(this).prop("checked"))
+					}
+					else{
+						console.log($.inArray(d.id, type_url),d.id,type_url)
+						$(this).prop("checked",false);
+						console.log(d,$(this).prop("checked"))
+					}
+				})
+
+
 				fromdate=moment(start_url).format('YYYY-MM-DD')
 				todate=moment(end_url).format('YYYY-MM-DD')
 				console.log(data);
 				result=data;
-				$('#results').html('');
+				//$('#results').html('');
 
 				if(data.length>0){
 					$('#noresults').hide();
-					$('.optional-filter').show();
-					
+					$('.optional-filter').show();	
+				}
+				else{
+					console.log("hi")
+					$('#noresults').show();
+					$('.optional-filter').hide();
 				}
 
-				$('.filter1').attr('checked','true');
+				
+
+				//$('.filter1').attr('checked','true');
 				data.map(function(d){
 					//console.log(d.hotel, Object.keys(d.room_types));
 					//console.log(d);

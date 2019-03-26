@@ -4,11 +4,14 @@
     <script src="/static/js/hotel_detail.js"></script>
     <script src="/static/js/typeahead.jquery.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.24.0/locale/en-gb.js"></script>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.4.0/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.4.0/dist/leaflet.js"></script>
 
     <div id="about">
     </div>
     <div id="prices">
     </div>
+    <div id="map" style="width:300px;height:300px"></div>
     <script>
         initPage("{{id}}");
     </script>

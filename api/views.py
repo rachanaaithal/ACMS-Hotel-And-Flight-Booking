@@ -126,13 +126,20 @@ class SearchSet(viewsets.ModelViewSet):
     }
 
 def search(request):
-    name=request.GET["name"]
-    st=request.GET["start"]
-    ed=request.GET["end"]
+    print(request.GET)
+    name=request.GET.get("name",None)
+    st=request.GET.get("start",None)
+    ed=request.GET.get("end",None)
+    type_room= request.GET.get("type",None)
     st=st.strip()
     ed=ed.strip()
 
-    print(name,st,ed)
+    if name is None or st is None or ed is None:
+        return JsonResponse([], safe=False)
+
+    if type_room is not None:
+        type_room=type_room.split('|')
+    print(name,st,ed, type_room)
     # city_results = Hotel.objects.filter(city_name__name=name)
 
     q1=Q(from_date__gte=st)
@@ -143,14 +150,21 @@ def search(request):
     q6=Q(to_date__gte=ed)
     q7=Q(from_date__gte=st)
     q8=Q(to_date__lte=ed)
+ 
 
 #Get Supply (Room type-hotel level)
     supply = HotelRoom.objects.filter(hotel__city_name__name=name).values('hotel__name', 'category__name', 'hotel__image_link', 'hotel__id','number_of_rooms')
     
 #Get Demand from room availability table
     demand = RoomAvailability.objects.filter((q1 & q2) | (q3 & q4) | (q5 & q6)| (q7 & q8)).filter(room__hotel__city_name__name=name)
+    demand = demand.exclude(status='dd').values('room__hotel__name','room__category__name','status')
+   
+    if type_room is not None:
+        supply=supply.filter(category__name__in=type_room)
+        demand=demand.filter(room__category__name__in=type_room)
+
     #print('demand:',list(demand.values('room__hotel__name','room__category__name', 'status')) )
-    demand = [x['room__hotel__name']+':'+x['room__category__name']+x['status'] for x in list(demand.exclude(status='dd').values('room__hotel__name','room__category__name','status'))]
+    demand = [x['room__hotel__name']+':'+x['room__category__name']+x['status'] for x in list(demand)]
     demand_dict = {}
     for dem in demand:
         if dem in demand_dict:
