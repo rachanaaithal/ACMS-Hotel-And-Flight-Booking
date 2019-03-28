@@ -19,7 +19,7 @@ window.onload=function(){
         var tr=$('<tr/>')
         tr.append(`<th scope="row">${d.hotel}(${d.category})</td>`)
         tr.append(`<td>${d.from_date}</td><td>${d.to_date}</td><td>${d.price}</td>`)
-        tr.append(`<td>${d.status}</td>`)
+        tr.append(`<td>${d.status_name}</td>`)
         tr.addClass('clickable-row')
         tr.attr('id',`${d.id}`);
         tr.appendTo(`#${id} >tbody`)

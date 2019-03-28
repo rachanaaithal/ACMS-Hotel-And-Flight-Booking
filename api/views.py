@@ -12,6 +12,8 @@ from rest_framework import generics
 from django.views.decorators.csrf import csrf_exempt
 from django.utils.decorators import method_decorator
 from datetime import *
+from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
+from rest_framework.response import Response
 
 class UserViewSet(viewsets.ModelViewSet):
     """
@@ -196,13 +198,28 @@ def search(request):
             response[result['hotel__name']]['longitude']=result['hotel__longitude']
         response[result['hotel__name']]['room_types'][result['category__name']] = rooms_actually_available
 
-    print('\n\nresponse',response)
     
     #making into json
     response = [{'hotel':key, 'room_types':response[key]['room_types'], 'image_link':response[key]['image_link'], 'hotel_id':response[key]['hotel_id'], 'latitude': response[key]['latitude'], 'longitude': response[key]['longitude']} for key in response]
+    print('\n\nresponse',response,len(response),type(response))
 
+    page = request.GET.get('page', 1)
+
+    paginator = Paginator(response, 6)
+    try:
+        print('try')
+        response_page = paginator.page(page)
+    except PageNotAnInteger:
+        print('except1')
+        response_page = paginator.page(1)
+    except EmptyPage:
+        print('except2')
+        response_page = paginator.page(paginator.num_pages)
+
+    print(list(response_page))
     return JsonResponse(response, safe=False)
-
+    #return JsonResponse(list(response_page), safe=False)
+    #return Response({response_page})
 def check(request):
     name=request.GET["name"]
     st=request.GET["start"]
