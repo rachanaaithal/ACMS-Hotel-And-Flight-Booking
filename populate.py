@@ -42,7 +42,7 @@ with open("/home/aithal/Documents/Project/data/hotel.csv",'r') as hotelcsv:
     for row in hotelreader:
 #        print(datetime.datetime.strptime(row[3],'%H:%M:%S').time(),datetime.timedelta(minutes=int(row[4])))
 
-        new= Hotel(name=row[0], city_name=City.objects.filter(name=row[1])[0], address=row[2], checkintime=datetime.datetime.strptime(row[3],'%H:%M:%S').time(), extratime=datetime.timedelta(minutes=int(row[4])), image_link=row[5])
+        new= Hotel(name=row[0], city_name=City.objects.filter(name=row[1])[0], address=row[2], checkintime=datetime.datetime.strptime(row[3],'%H:%M:%S').time(), extratime=datetime.timedelta(minutes=int(row[4])), image_link=row[5], latitude=row[6], longitude=row[7])
 #        print(new.save())
         try:
             new.save()

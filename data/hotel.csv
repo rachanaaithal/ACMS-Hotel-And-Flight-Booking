@@ -1,10 +1,10 @@
-"name","city_name","address","checkintime","extratime","image_link"
-"Hotel Lake View","Bengaluru","Mejestic","12:00:00",30,"https://dl.dropboxusercontent.com/s/edohe2iq5porg82/6.jpeg"
-"Octave","Bengaluru","JP Nagar","12:00:00",30,"https://dl.dropboxusercontent.com/s/edohe2iq5porg82/6.jpeg"
-"Lemon Tree","Bengaluru","Koramangala","12:00:00",30,"https://dl.dropboxusercontent.com/s/ldph8206ba35fwu/4.jpg"
-"Mint Hotel","Bengaluru","Brigade Road","12:00:00",30,"https://dl.dropboxusercontent.com/s/pcsdf4ftfprdlb5/3.jpeg"
-"Palm Meadows","Bengaluru","Whitefield","12:00:00",30,"https://dl.dropboxusercontent.com/s/edohe2iq5porg82/6.jpeg"
-"Ramada Encore","Bengaluru","Whitefield","12:00:00",30,"https://dl.dropboxusercontent.com/s/edohe2iq5porg82/6.jpeg"
-"La Marvella","Bengaluru","South End Circle","12:00:00",30,"https://dl.dropboxusercontent.com/s/pcsdf4ftfprdlb5/3.jpeg"
-"Sterling Holidays","Bengaluru","Electronic City","12:00:00",30,"https://dl.dropboxusercontent.com/s/pcsdf4ftfprdlb5/3.jpeg"
-"Mango Mist","Bengaluru","JP Nagar","12:00:00",30,"https://dl.dropboxusercontent.com/s/pcsdf4ftfprdlb5/3.jpeg"
+"name","city_name","address","checkintime","extratime","image_link","latitude","longitude"
+"Hotel Lake View","Bengaluru","Mejestic","12:00:00",30,"https://dl.dropboxusercontent.com/s/edohe2iq5porg82/6.jpeg",12.894441,77.5685569
+"Octave","Bengaluru","JP Nagar","12:00:00",30,"https://dl.dropboxusercontent.com/s/edohe2iq5porg82/6.jpeg",12.894441,77.5685569
+"Lemon Tree","Bengaluru","Koramangala","12:00:00",30,"https://dl.dropboxusercontent.com/s/ldph8206ba35fwu/4.jpg",12.894441,77.5685569
+"Mint Hotel","Bengaluru","Brigade Road","12:00:00",30,"https://dl.dropboxusercontent.com/s/pcsdf4ftfprdlb5/3.jpeg",12.894441,77.5685569
+"Palm Meadows","Bengaluru","Whitefield","12:00:00",30,"https://dl.dropboxusercontent.com/s/edohe2iq5porg82/6.jpeg",12.894441,77.5685569
+"Ramada Encore","Bengaluru","Whitefield","12:00:00",30,"https://dl.dropboxusercontent.com/s/edohe2iq5porg82/6.jpeg",12.894441,77.5685569
+"La Marvella","Bengaluru","South End Circle","12:00:00",30,"https://dl.dropboxusercontent.com/s/pcsdf4ftfprdlb5/3.jpeg",12.894441,77.5685569
+"Sterling Holidays","Bengaluru","Electronic City","12:00:00",30,"https://dl.dropboxusercontent.com/s/pcsdf4ftfprdlb5/3.jpeg",12.894441,77.5685569
+"Mango Mist","Bengaluru","JP Nagar","12:00:00",30,"https://dl.dropboxusercontent.com/s/pcsdf4ftfprdlb5/3.jpeg",12.894441,77.5685569

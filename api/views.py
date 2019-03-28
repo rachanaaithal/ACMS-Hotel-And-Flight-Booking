@@ -11,6 +11,9 @@ import json
 from rest_framework import generics
 from django.views.decorators.csrf import csrf_exempt
 from django.utils.decorators import method_decorator
+from datetime import *
+from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
+from rest_framework.response import Response
 
 class UserViewSet(viewsets.ModelViewSet):
     """
@@ -126,13 +129,20 @@ class SearchSet(viewsets.ModelViewSet):
     }
 
 def search(request):
-    name=request.GET["name"]
-    st=request.GET["start"]
-    ed=request.GET["end"]
+    print(request.GET)
+    name=request.GET.get("name",None)
+    st=request.GET.get("start",None)
+    ed=request.GET.get("end",None)
+    type_room= request.GET.get("type",None)
     st=st.strip()
     ed=ed.strip()
 
-    print(name,st,ed)
+    if name is None or st is None or ed is None:
+        return JsonResponse([], safe=False)
+
+    if type_room is not None:
+        type_room=type_room.split('|')
+    print(name,st,ed, type_room)
     # city_results = Hotel.objects.filter(city_name__name=name)
 
     q1=Q(from_date__gte=st)
@@ -143,14 +153,21 @@ def search(request):
     q6=Q(to_date__gte=ed)
     q7=Q(from_date__gte=st)
     q8=Q(to_date__lte=ed)
+ 
 
 #Get Supply (Room type-hotel level)
-    supply = HotelRoom.objects.filter(hotel__city_name__name=name).values('hotel__name', 'category__name', 'hotel__image_link', 'hotel__id','number_of_rooms')
+    supply = HotelRoom.objects.filter(hotel__city_name__name=name).values('hotel__name', 'category__name', 'hotel__image_link', 'hotel__id','number_of_rooms', 'hotel__latitude', 'hotel__longitude')
     
 #Get Demand from room availability table
     demand = RoomAvailability.objects.filter((q1 & q2) | (q3 & q4) | (q5 & q6)| (q7 & q8)).filter(room__hotel__city_name__name=name)
+    demand = demand.exclude(status='dd').values('room__hotel__name','room__category__name','status')
+   
+    if type_room is not None:
+        supply=supply.filter(category__name__in=type_room)
+        demand=demand.filter(room__category__name__in=type_room)
+
     #print('demand:',list(demand.values('room__hotel__name','room__category__name', 'status')) )
-    demand = [x['room__hotel__name']+':'+x['room__category__name']+x['status'] for x in list(demand.exclude(status='dd').values('room__hotel__name','room__category__name','status'))]
+    demand = [x['room__hotel__name']+':'+x['room__category__name']+x['status'] for x in list(demand)]
     demand_dict = {}
     for dem in demand:
         if dem in demand_dict:
@@ -177,15 +194,32 @@ def search(request):
             response[result['hotel__name']]['image_link']=result['hotel__image_link']
             response[result['hotel__name']]['room_types']={}
             response[result['hotel__name']]['hotel_id']=result['hotel__id'] 
+            response[result['hotel__name']]['latitude']=result['hotel__latitude']
+            response[result['hotel__name']]['longitude']=result['hotel__longitude']
         response[result['hotel__name']]['room_types'][result['category__name']] = rooms_actually_available
 
-    print('\n\nresponse',response)
     
     #making into json
-    response = [{'hotel':key, 'room_types':response[key]['room_types'], 'image_link':response[key]['image_link'], 'hotel_id':response[key]['hotel_id']} for key in response]
+    response = [{'hotel':key, 'room_types':response[key]['room_types'], 'image_link':response[key]['image_link'], 'hotel_id':response[key]['hotel_id'], 'latitude': response[key]['latitude'], 'longitude': response[key]['longitude']} for key in response]
+    print('\n\nresponse',response,len(response),type(response))
 
+    page = request.GET.get('page', 1)
+
+    paginator = Paginator(response, 6)
+    try:
+        print('try')
+        response_page = paginator.page(page)
+    except PageNotAnInteger:
+        print('except1')
+        response_page = paginator.page(1)
+    except EmptyPage:
+        print('except2')
+        response_page = paginator.page(paginator.num_pages)
+
+    print(list(response_page))
     return JsonResponse(response, safe=False)
-
+    #return JsonResponse(list(response_page), safe=False)
+    #return Response({response_page})
 def check(request):
     name=request.GET["name"]
     st=request.GET["start"]

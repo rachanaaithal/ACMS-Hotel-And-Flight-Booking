@@ -16,6 +16,7 @@ function initPage(id){
         details.append(`<p>CheckoutBefore:${checkOut}</p>`);
         details.appendTo('#about');
         console.log(`${data.checkintime}-${data.extratime}`)
+        
     }
     function putTable(){
         var table=$('<table/>')
@@ -114,6 +115,16 @@ function initPage(id){
             console.log(data);
             id=`${data.id}`;
             putAboutData(data);
+
+
+            var mymap = L.map('map').setView([12.894441,77.5685569], 13);
+            L.tileLayer('https://maps.wikimedia.org/osm-intl/{z}/{x}/{y}{r}.png', {
+	            attribution: '<a href="https://wikimediafoundation.org/wiki/Maps_Terms_of_Use">Wikimedia</a>',
+	            minZoom: 1,
+            	maxZoom: 19
+            }).addTo(mymap);
+            var marker = L.marker([data.latitude, data.longitude]).addTo(mymap);
+
         },
         error: function(error){
             console.log(error);

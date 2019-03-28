@@ -60,7 +60,7 @@ function initPage(transaction_id, gst, cancellation_charges){
                 tr.appendTo('#finalprices')
             }
 
-            cancellation_cost=cancellation_charges*tot
+            cancellation_cost=cancellation_charges*tot/100;
             var modal=$('<div/>')
             modal.addClass('modal fade')
             modal.attr('id', 'cancellation')
