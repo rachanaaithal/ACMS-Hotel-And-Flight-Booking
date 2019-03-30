@@ -137,6 +137,8 @@ class RoomAvailability(models.Model):
         """String for representing the Model object."""
         return '%s(%s)' % (self.room.category, self.room.hotel.name)
 		
+
+        
 class UserprofileInfo(models.Model):
     user = models.OneToOneField(User,on_delete=models.CASCADE)
     phone_regex = RegexValidator(regex=r'^[0-9]{10}$', message="Phone number must be entered in the format: '999999999'. Up to 10 digits allowed.")
