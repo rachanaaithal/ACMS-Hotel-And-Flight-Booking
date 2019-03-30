@@ -1,3 +1,4 @@
+
 from django.urls import include, path
 from rest_framework import routers
 from api import views
@@ -30,4 +31,7 @@ urlpatterns = [
     url(r'^roomavailability/(?P<pk>[^/.]+)/$',views.RoomAvailabilityViewSet.as_view({'get': 'retrieve', 'put': 'update', 'patch': 'partial_update', 'delete': 'destroy'}),name='roomavailability-detail',),
     url(r'^maxroomprice/$', views.MaxHotelRoomView.as_view()),
     url(r'^minroomprice/$', views.MinHotelRoomView.as_view()),
+
+    url(r'register',views.register,name="register"),
+
 ]

@@ -165,8 +165,8 @@ window.onload = function () {
 				success: function(data){
 					console.log(data)
 					min_price=data.price
-					console.log(max_price,min_price)
-					if(max_url!=null && min_url!=null){
+					console.log(max_price,min_price, max_url, min_url=='null')
+					if(max_url!='null' && min_url!='null'){
 						higher=max_url
 						lower=min_url
 					}

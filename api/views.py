@@ -1,7 +1,8 @@
+
 from django.contrib.auth.models import User, Group
 from rest_framework import viewsets
 from api.serializers import UserSerializer, GroupSerializer, HotelSerializer, CountrySerializer, CitySerializer, HotelRoomSerializer, RoomTypeSerializer, RoomAvailabilitySerializer
-from api.models import Country, City, Hotel, RoomType, HotelRoom, RoomAvailability
+from api.models import Country, City, Hotel, RoomType, HotelRoom, RoomAvailability, UserprofileInfo
 from rest_framework import filters
 from django_filters.rest_framework import DjangoFilterBackend
 from django.http import JsonResponse
@@ -15,6 +16,8 @@ from datetime import *
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from rest_framework.response import Response
 from django.db.models import Max, Min
+
+from django.contrib.auth import authenticate, login, logout, views
 
 class UserViewSet(viewsets.ModelViewSet):
     """
@@ -166,13 +169,13 @@ def search(request):
     max_price= request.GET.get("maxprice",None)
     st=st.strip()
     ed=ed.strip()
-
     if name is None or st is None or ed is None:
         return JsonResponse([], safe=False)
 
     if type_room is not None:
         type_room=type_room.split('|')
     print("\n\n\n\n\n\n\n\n\n",name,st,ed, type_room,min_price,max_price)
+    print(min_price=='null')
     # city_results = Hotel.objects.filter(city_name__name=name)
 
     q1=Q(from_date__gte=st)
@@ -196,10 +199,10 @@ def search(request):
         supply=supply.filter(category__name__in=type_room)
         demand=demand.filter(room__category__name__in=type_room)
     
-    if min_price is not None:
+    if min_price is not None and min_price !='null':
         supply= supply.filter(Q(price__gte=min_price))
         demand= demand.filter(Q(room__price__gte=min_price))
-    if max_price is not None:
+    if max_price is not None and max_price !='null':
         supply= supply.filter(Q(price__lte=max_price))
         demand= demand.filter(Q(room__price__lte=max_price))
     
@@ -287,3 +290,23 @@ def check(request):
         response={'val':False}
 
     return JsonResponse(response, safe=False)
+
+
+
+from django.shortcuts import redirect	
+def register(request):
+	username=request.GET["username"]
+	password=request.GET["password"]
+	fname = request.GET["fname"]
+	lname = request.GET["lname"]
+	email = request.GET["email"]
+	phno = request.GET["phno"]
+	
+	user = User(username=username,password=password,first_name=fname,last_name=lname,email=email)
+	user.set_password(user.password)
+	user.save()
+	role="User"
+	profile = UserprofileInfo(user=user,phone_number=phno,role=role)
+	profile.save()
+	login(request,user,backend='django.contrib.auth.backends.ModelBackend')
+	return redirect('/hotel/')
