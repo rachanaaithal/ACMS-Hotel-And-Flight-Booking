@@ -1,6 +1,7 @@
 from django.db import models
 import uuid
 from django.contrib.auth.models import User
+from django.core.validators import RegexValidator
 
 # Create your models here.
 
@@ -135,3 +136,11 @@ class RoomAvailability(models.Model):
     def __str__(self):
         """String for representing the Model object."""
         return '%s(%s)' % (self.room.category, self.room.hotel.name)
+		
+class UserprofileInfo(models.Model):
+    user = models.OneToOneField(User,on_delete=models.CASCADE)
+    phone_regex = RegexValidator(regex=r'^[0-9]{10}$', message="Phone number must be entered in the format: '999999999'. Up to 10 digits allowed.")
+    phone_number = models.CharField(validators=[phone_regex], max_length=17, blank=True)
+    role = models.CharField(max_length=10)
+    def __str__(self):
+        return self.user.username
