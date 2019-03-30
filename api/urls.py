@@ -24,6 +24,7 @@ urlpatterns = [
     #    path(r'updateavalability/',views.UpdateAvailability.as_view())
     url(r'search', views.search, name="search"),
     url(r'check', views.check, name="check"),
+	url(r'register',views.register,name="register"),
 #    url(r'availabilitydetail', views.AvailabilityDetail.as_view(), name="AvailabilityDetail"),
 
     url(r'^roomavailability/$',views.RoomAvailabilityViewSet.as_view({'get': 'list', 'post': 'create'}),name='roomavailability-list',),

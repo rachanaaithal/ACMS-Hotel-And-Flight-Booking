@@ -1,10 +1,11 @@
 from django.contrib.auth.models import User, Group
 from rest_framework import viewsets
 from api.serializers import UserSerializer, GroupSerializer, HotelSerializer, CountrySerializer, CitySerializer, HotelRoomSerializer, RoomTypeSerializer, RoomAvailabilitySerializer
-from api.models import Country, City, Hotel, RoomType, HotelRoom, RoomAvailability
+from api.models import Country, City, Hotel, RoomType, HotelRoom, RoomAvailability, UserprofileInfo
 from rest_framework import filters
 from django_filters.rest_framework import DjangoFilterBackend
 from django.http import JsonResponse
+from django.contrib.auth import authenticate, login, logout, views
 from django.db.models import Q
 from django.core import serializers
 import json
@@ -12,6 +13,7 @@ from rest_framework import generics
 from django.views.decorators.csrf import csrf_exempt
 from django.utils.decorators import method_decorator
 from datetime import *
+from django.shortcuts import render,redirect
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from rest_framework.response import Response
 
@@ -250,3 +252,20 @@ def check(request):
         response={'val':False}
 
     return JsonResponse(response, safe=False)
+	
+def register(request):
+	username=request.GET["username"]
+	password=request.GET["password"]
+	fname = request.GET["fname"]
+	lname = request.GET["lname"]
+	email = request.GET["email"]
+	phno = request.GET["phno"]
+	
+	user = User(username=username,password=password,first_name=fname,last_name=lname,email=email)
+	user.set_password(user.password)
+	user.save()
+	role="User"
+	profile = UserprofileInfo(user=user,phone_number=phno,role=role)
+	profile.save()
+	login(request,user,backend='django.contrib.auth.backends.ModelBackend')
+	return redirect('/hotel/')
