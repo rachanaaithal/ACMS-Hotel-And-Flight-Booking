@@ -1,5 +1,47 @@
 window.onload = function () {
+	var url = new URL(window.location.href);
+    var start_url= url.searchParams.get("start");
+	var end_url = url.searchParams.get("end");
+	var name_url = url.searchParams.get("name");
+	var type_url = url.searchParams.get("type");
+	var min_url =url.searchParams.get("minprice");
+	var max_url =url.searchParams.get("maxprice");
 	//function for the typeahead input.
+	function psedoRefresh(nexturl){
+		var nexturl = new URL(window.location.href);
+		var nextstart_url= nexturl.searchParams.get("start");
+		var nextend_url = nexturl.searchParams.get("end");
+		var nextname_url = nexturl.searchParams.get("name");
+		var nexttype_url = nexturl.searchParams.get("type");
+		var nextmin_url = nexturl.searchParams.get("minprice");
+		var nextmax_url = nexturl.searchParams.get("maxprice");
+		$.ajax({
+			url: "/api/search/?name="+nextname_url+"&start="+nextstart_url+"&end="+nextend_url+"&type="+nexttype_url+"&minprice="+nextmin_url+"&maxprice="+nextmax_url,
+			cache: false,
+			success: function(data){
+				console.log(data);
+				result=data;
+				//$('#results').html('');
+
+				if(data.length>0){
+					$('#noresults').hide();
+					$('.optional-filter').show();
+				}
+				else{
+					$('#noresults').show();
+					$('.optional-filter').show();
+				}
+
+				data.map(function(d){
+					//console.log(d.hotel, Object.keys(d.room_types));
+					//console.log(d);
+					putResults(d);
+				});
+				
+			}
+		});
+
+	}
 	function typeaheadInit(cityList){ 
 		var substringMatcher = function (strs) {
 			return function findMatches(q, cb) {
@@ -82,7 +124,7 @@ window.onload = function () {
 			//to change the result when checkboxes are clicked
 			$('.filter1').click(function(d){
 				// console.log($(this).val());
-				var cityVal = $("#typeahead").val();
+				//var cityVal = $("#typeahead").val();
 				let clicked = [];
 				$('.filter1').each(function(i,d){
 					console.log(i,d);
@@ -92,71 +134,83 @@ window.onload = function () {
 				})
 
 				$('#results').html('');
-				console.log(clicked);
-				nexturl="/hotel/"+"?name="+cityVal+"&start="+fromdate+"&end="+todate+"&type="+clicked.join('|')
+				nexturl="/hotel/"+"?name="+name_url+"&start="+start_url+"&end="+end_url+"&type="+clicked.join('|')+"&minprice="+min_url+"&maxprice="+max_url
 				history.pushState({}, null, nexturl);
 				
-				$.ajax({
-					url: "/api/search/?name="+name_url+"&start="+start_url+"&end="+end_url+"&type="+clicked.join('|'),
-					cache: false,
-					success: function(data){
-						console.log(data);
-						result=data;
-						//$('#results').html('');
-		
-						if(data.length>0){
-							$('#noresults').hide();
-							$('.optional-filter').show();
-						}
-						else{
-							$('#noresults').show();
-							$('.optional-filter').hide();
-						}
-		
-						data.map(function(d){
-							//console.log(d.hotel, Object.keys(d.room_types));
-							//console.log(d);
-							putResults(d);
-						});
-						
-					}
-				});
-
-
-				/*
-				var newResult=[];
-				result.map(function(d){
-					var d_new={}
-					
-					d_new.room_types={};
-					//console.log(d_new);
-					var count=0;
-					clicked.map(function(k){
-						//console.log(k,d.room_types[k]);
-						if(d.room_types[k]!=undefined){ //to see if the required room type is present in the result
-							d_new.room_types[k]=d.room_types[k];
-							count+=1;
-						}
-					})
-					//console.log(d_new);
-					if(count>0){
-						d_new.hotel=d.hotel;
-						d_new.image_link=d.image_link;
-						d_new.hotel_id=d.hotel_id;
-						newResult.push(d_new);
-						putResults(d_new);
-					}
-				});
-				console.log(newResult);
-				*/
-				//$('.filter1').attr('checked','true');
+				psedoRefresh(nexturl)
 			})
+		}
+	});
+
+	var tooltip = $('<div id="tooltip" />').css({
+		position: 'absolute',
+		top: -25,
+		left: -10
+	}).hide();
+
+	var max_price;
+	var min_price;
+	var lower;
+	var higher;
+	
+	$.ajax({
+		url:`/api/maxroomprice/?name=${name_url}&type=${type_url}`,
+		cache: false,
+		success: function(data){
+			console.log(data)
+			max_price=data.price
+			$.ajax({
+				url:`/api/minroomprice/?name=${name_url}&type=${type_url}`,
+				cache: false,
+				success: function(data){
+					console.log(data)
+					min_price=data.price
+					console.log(max_price,min_price)
+					if(max_url!=null && min_url!=null){
+						higher=max_url
+						lower=min_url
+					}
+					else{
+						higher=max_price
+						lower=min_price
+					}
+					$( "#slider" ).slider({
+						range:true,
+						min: parseFloat(min_price),
+						max: parseFloat(max_price),
+						values: [ parseFloat(lower),parseFloat(higher) ],
+						step: 10,
+						create: function(event,ui){
+							$(`#changevalue`).val("$" + lower + " - $" + higher)
+						},
+						change: function( event, ui ) {
+							lower= ui.values[ 0 ] 
+							higher= ui.values[ 1 ]
+							$(`#changevalue`).val("$" + ui.values[ 0 ] + " - $" + ui.values[ 1 ])
+							$('#results').html('');
+							console.log(type_url)
+							nexturl="/hotel/"+"?name="+name_url+"&start="+start_url+"&end="+end_url+"&type="+type_url+"&minprice="+ui.values[ 0 ]+"&maxprice="+ui.values[ 1 ]
+							history.pushState({}, null, nexturl);
+							console.log(ui.values[ 0 ],ui.values[ 1 ])
+							psedoRefresh(nexturl)
+						},
+						slide: function( event, ui ) {
+							tooltip.text(ui.value);
+						}
+					}).find(".ui-slider-handle").append(tooltip).hover(function() {
+						tooltip.show()
+					}, function() {
+						tooltip.hide()
+					});
+					
+				}
+			});
 		}
 	});
 
 	//dates
 	var fromdate=moment().format('YYYY-MM-DD');
-	var todate=moment().format('YYYY-MM-DD');
+	var todate=moment().add(1,'days').format('YYYY-MM-DD');
 	
 
 
@@ -191,7 +245,7 @@ window.onload = function () {
 		const cityVal = $("#typeahead").val();
 		const dateRange = $("#date-range").val();
 		console.log(window.location)
-		window.location.href="/hotel/"+"?name="+cityVal+"&start="+fromdate+"&end="+todate+"&type="+clicked.join('|')
+		window.location.href="/hotel/"+"?name="+cityVal+"&start="+fromdate+"&end="+todate+"&type="+clicked.join('|')+"&minprice="+min_price+"&maxprice="+max_price
 		console.log(cityVal, dateRange, fromdate, todate);
 /*		$.ajax({
             url: "/api/search/?name="+cityVal+"&start="+fromdate+"&end="+todate,
@@ -217,21 +271,26 @@ window.onload = function () {
 		  */
 	});
 
-	var url = new URL(window.location.href);
-    var start_url= url.searchParams.get("start");
-	var end_url = url.searchParams.get("end");
-	var name_url = url.searchParams.get("name");
-	var type_url = url.searchParams.get("type");
+	
 	console.log(moment(start_url), moment(end_url), name_url, type_url)
-	console.log(type_url)
+	console.log('\n\n\n\n',min_url,max_url)
 	if(type_url == null){
 		type_url="AC|Non-AC|Delux";
-		nexturl="/hotel/"+"?name="+name_url+"&start="+start_url+"&end="+end_url+"&type="+type_url;
+		nexturl="/hotel/"+"?name="+name_url+"&start="+start_url+"&end="+end_url+"&type="+type_url+"&minprice="+min_url+"&maxprice="+max_url;
 		history.pushState({}, null, nexturl);
 	}
+	/*
+	if(min_url==null || max_price==null){
+		min_url=min_price;
+		max_url=max_price;
+		nexturl="/hotel/"+"?name="+name_url+"&start="+start_url+"&end="+end_url+"&type="+type_url+"&minprice="+min_url+"&maxprice="+max_url;
+		history.pushState({}, null, nexturl);
+	}
+	*/
+	console.log('\n\n\n\n',min_url,max_url)
 	if(start_url!=null & end_url!=null & name_url!=null){
 		$.ajax({
-            url: "/api/search/?name="+name_url+"&start="+start_url+"&end="+end_url+"&type="+type_url,
+            url: "/api/search/?name="+name_url+"&start="+start_url+"&end="+end_url+"&type="+type_url+"&minprice="+min_url+"&maxprice="+max_url,
             cache: false,
             success: function(data){
 				$('#typeahead').val(name_url)
@@ -251,21 +310,21 @@ window.onload = function () {
 					console.log( fromdate, todate);
 				});
 
-				type_url=type_url.split('|')
+				type_url_arr=type_url.split('|')
 				$('.filter1').each(function(i,d){
 					console.log(i,d);
-					if ($.inArray(d.id, type_url)>-1) {
+					if ($.inArray(d.id, type_url_arr)>-1) {
 						console.log(d.id)
 						$(this).prop("checked",true);
 						console.log(d,$(this).prop("checked"))
 					}
 					else{
-						console.log($.inArray(d.id, type_url),d.id,type_url)
+						console.log($.inArray(d.id, type_url_arr),d.id,type_url_arr)
 						$(this).prop("checked",false);
 						console.log(d,$(this).prop("checked"))
 					}
 				})
-
+				
 
 				fromdate=moment(start_url).format('YYYY-MM-DD')
 				todate=moment(end_url).format('YYYY-MM-DD')
@@ -295,5 +354,7 @@ window.onload = function () {
             }
         });
 	}
-
+	
+	
+	
 }

@@ -27,5 +27,7 @@ urlpatterns = [
 #    url(r'availabilitydetail', views.AvailabilityDetail.as_view(), name="AvailabilityDetail"),
 
     url(r'^roomavailability/$',views.RoomAvailabilityViewSet.as_view({'get': 'list', 'post': 'create'}),name='roomavailability-list',),
-   url(r'^roomavailability/(?P<pk>[^/.]+)/$',views.RoomAvailabilityViewSet.as_view({'get': 'retrieve', 'put': 'update', 'patch': 'partial_update', 'delete': 'destroy'}),name='roomavailability-detail',),
+    url(r'^roomavailability/(?P<pk>[^/.]+)/$',views.RoomAvailabilityViewSet.as_view({'get': 'retrieve', 'put': 'update', 'patch': 'partial_update', 'delete': 'destroy'}),name='roomavailability-detail',),
+    url(r'^maxroomprice/$', views.MaxHotelRoomView.as_view()),
+    url(r'^minroomprice/$', views.MinHotelRoomView.as_view()),
 ]

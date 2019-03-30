@@ -14,6 +14,7 @@ from django.utils.decorators import method_decorator
 from datetime import *
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from rest_framework.response import Response
+from django.db.models import Max, Min
 
 class UserViewSet(viewsets.ModelViewSet):
     """
@@ -58,9 +59,35 @@ class HotelRoomViewSet(viewsets.ModelViewSet):
     filter_fields = {
         'id': ['exact'],
         'hotel': ['exact'],
-        'category': ['exact']
+        'category': ['exact']   
     }
 
+class MaxHotelRoomView(generics.ListCreateAPIView):
+    #queryset = HotelRoom.objects.all()
+    serializer_class = HotelRoomSerializer
+    def get_queryset(self):
+        city = self.request.GET.get("name",None)
+        room_type= self.request.GET.get("type",None)
+        room_type=room_type.split('|')
+        return HotelRoom.objects.filter(hotel__city_name__name=city).filter(category__name__in=room_type)
+    def get(self, request, format=None):
+        room=self.get_queryset().first()    
+        serializer = HotelRoomSerializer(room)
+        return Response(serializer.data)
+class MinHotelRoomView(generics.ListCreateAPIView):
+    #queryset = HotelRoom.objects.all()
+    serializer_class = HotelRoomSerializer
+    def get_queryset(self):
+        city = self.request.GET.get("name",None)
+        room_type= self.request.GET.get("type",None)
+        room_type=room_type.split('|')
+        return HotelRoom.objects.filter(hotel__city_name__name=city).filter(category__name__in=room_type)
+    def get(self, request, format=None):
+        room=self.get_queryset().order_by('-price').last()    
+        serializer = HotelRoomSerializer(room)
+        return Response(serializer.data)
+
+'''
 class Availability(generics.ListCreateAPIView):
     queryset = RoomAvailability.objects.all()
     serializer_class = RoomAvailabilitySerializer
@@ -69,7 +96,7 @@ class Availability(generics.ListCreateAPIView):
 class AvailabilityDetail(generics.RetrieveUpdateDestroyAPIView):
     queryset = RoomAvailability.objects.all()
     serializer_class = RoomAvailabilitySerializer
-    
+''' 
 
 @method_decorator(csrf_exempt, name='dispatch')
 class RoomAvailabilityViewSet(viewsets.ModelViewSet):
@@ -120,6 +147,7 @@ class RoomTypeViewSet(viewsets.ModelViewSet):
 
 
 
+'''
 from rest_framework import generics
 class SearchSet(viewsets.ModelViewSet):
     queryset = City.objects.all()
@@ -127,13 +155,15 @@ class SearchSet(viewsets.ModelViewSet):
     filter_fields = {
         'name': ['exact']
     }
-
+'''
 def search(request):
     print(request.GET)
     name=request.GET.get("name",None)
     st=request.GET.get("start",None)
     ed=request.GET.get("end",None)
     type_room= request.GET.get("type",None)
+    min_price= request.GET.get("minprice",None)
+    max_price= request.GET.get("maxprice",None)
     st=st.strip()
     ed=ed.strip()
 
@@ -142,7 +172,7 @@ def search(request):
 
     if type_room is not None:
         type_room=type_room.split('|')
-    print(name,st,ed, type_room)
+    print("\n\n\n\n\n\n\n\n\n",name,st,ed, type_room,min_price,max_price)
     # city_results = Hotel.objects.filter(city_name__name=name)
 
     q1=Q(from_date__gte=st)
@@ -156,16 +186,23 @@ def search(request):
  
 
 #Get Supply (Room type-hotel level)
-    supply = HotelRoom.objects.filter(hotel__city_name__name=name).values('hotel__name', 'category__name', 'hotel__image_link', 'hotel__id','number_of_rooms', 'hotel__latitude', 'hotel__longitude')
+    supply = HotelRoom.objects.filter(hotel__city_name__name=name).values('hotel__name', 'category__name', 'hotel__image_link', 'hotel__id','number_of_rooms', 'hotel__latitude', 'hotel__longitude','price')
     
 #Get Demand from room availability table
     demand = RoomAvailability.objects.filter((q1 & q2) | (q3 & q4) | (q5 & q6)| (q7 & q8)).filter(room__hotel__city_name__name=name)
-    demand = demand.exclude(status='dd').values('room__hotel__name','room__category__name','status')
+    demand = demand.exclude(status='dd').values('room__hotel__name','room__category__name','status','room__price')
    
     if type_room is not None:
         supply=supply.filter(category__name__in=type_room)
         demand=demand.filter(room__category__name__in=type_room)
-
+    
+    if min_price is not None:
+        supply= supply.filter(Q(price__gte=min_price))
+        demand= demand.filter(Q(room__price__gte=min_price))
+    if max_price is not None:
+        supply= supply.filter(Q(price__lte=max_price))
+        demand= demand.filter(Q(room__price__lte=max_price))
+    
     #print('demand:',list(demand.values('room__hotel__name','room__category__name', 'status')) )
     demand = [x['room__hotel__name']+':'+x['room__category__name']+x['status'] for x in list(demand)]
     demand_dict = {}
