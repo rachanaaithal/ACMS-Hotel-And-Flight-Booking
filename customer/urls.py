@@ -6,3 +6,5 @@ urlpatterns = [
     path('', views.history, name='history'),
 	url(r'register',views.user_register, name = 'user_register'),
 ]
+
+urlpatterns+=[url(r'profile',views.user_profile,name='user_profile'),]
