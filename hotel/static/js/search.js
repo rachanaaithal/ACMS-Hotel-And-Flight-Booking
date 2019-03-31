@@ -6,6 +6,7 @@ window.onload = function () {
 	var type_url = url.searchParams.get("type");
 	var min_url =url.searchParams.get("minprice");
 	var max_url =url.searchParams.get("maxprice");
+	var page_url = url.searchParams.get("page");
 	//function for the typeahead input.
 	function psedoRefresh(nexturl){
 		var nexturl = new URL(window.location.href);
@@ -23,7 +24,7 @@ window.onload = function () {
 				result=data;
 				//$('#results').html('');
 
-				if(data.length>0){
+				if(data['response'].length>0){
 					$('#noresults').hide();
 					$('.optional-filter').show();
 				}
@@ -32,16 +33,37 @@ window.onload = function () {
 					$('.optional-filter').show();
 				}
 
-				data.map(function(d){
+				data['response'].map(function(d){
 					//console.log(d.hotel, Object.keys(d.room_types));
 					//console.log(d);
 					putResults(d);
 				});
-				
+				paginate(data)	
 			}
 		});
 
 	}
+
+	function paginate(data){
+		var nexturl = new URL(window.location.href);
+		var nextstart_url= nexturl.searchParams.get("start");
+		var nextend_url = nexturl.searchParams.get("end");
+		var nextname_url = nexturl.searchParams.get("name");
+		var nexttype_url = nexturl.searchParams.get("type");
+		var nextmin_url = nexturl.searchParams.get("minprice");
+		var nextmax_url = nexturl.searchParams.get("maxprice");
+		$(`.pagination`).html('')
+		var span=$('<span/>')
+		span.addClass('page-links')
+		if(data['has_prev']){
+			span.append(`<a href="/hotel/?name=${nextname_url}&start=${nextstart_url}&end=${nextend_url}&type=${nexttype_url}&minprice=${nextmin_url}&maxprice=${nextmax_url}&page=${data['prev_page']}">previous</a>`)
+		}
+		if(data['has_next']){
+			span.append(`<a href="/hotel/?name=${nextname_url}&start=${nextstart_url}&end=${nextend_url}&type=${nexttype_url}&minprice=${nextmin_url}&maxprice=${nextmax_url}&page=${data['next_page']}">next</a>`)
+		}
+		span.appendTo(`.pagination`)
+	}
+
 	function typeaheadInit(cityList){ 
 		var substringMatcher = function (strs) {
 			return function findMatches(q, cb) {
@@ -276,7 +298,7 @@ window.onload = function () {
 	console.log('\n\n\n\n',min_url,max_url)
 	if(type_url == null){
 		type_url="AC|Non-AC|Delux";
-		nexturl="/hotel/"+"?name="+name_url+"&start="+start_url+"&end="+end_url+"&type="+type_url+"&minprice="+min_url+"&maxprice="+max_url;
+		nexturl="/hotel/"+"?name="+name_url+"&start="+start_url+"&end="+end_url+"&type="+type_url+"&minprice="+min_url+"&maxprice="+max_url+"&page="+page_url;
 		history.pushState({}, null, nexturl);
 	}
 	/*
@@ -290,7 +312,7 @@ window.onload = function () {
 	console.log('\n\n\n\n',min_url,max_url)
 	if(start_url!=null & end_url!=null & name_url!=null){
 		$.ajax({
-            url: "/api/search/?name="+name_url+"&start="+start_url+"&end="+end_url+"&type="+type_url+"&minprice="+min_url+"&maxprice="+max_url,
+            url: "/api/search/?name="+name_url+"&start="+start_url+"&end="+end_url+"&type="+type_url+"&minprice="+min_url+"&maxprice="+max_url+"&page="+page_url,
             cache: false,
             success: function(data){
 				$('#typeahead').val(name_url)
@@ -332,7 +354,7 @@ window.onload = function () {
 				result=data;
 				//$('#results').html('');
 
-				if(data.length>0){
+				if(data['response'].length>0){
 					$('#noresults').hide();
 					$('.optional-filter').show();	
 				}
@@ -345,12 +367,12 @@ window.onload = function () {
 				
 
 				//$('.filter1').attr('checked','true');
-				data.map(function(d){
+				data['response'].map(function(d){
 					//console.log(d.hotel, Object.keys(d.room_types));
 					//console.log(d);
 					putResults(d);
 				});
-
+				paginate(data)
             }
         });
 	}
