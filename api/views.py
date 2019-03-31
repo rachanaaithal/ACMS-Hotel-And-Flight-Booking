@@ -167,6 +167,7 @@ def search(request):
     type_room= request.GET.get("type",None)
     min_price= request.GET.get("minprice",None)
     max_price= request.GET.get("maxprice",None)
+    page = request.GET.get('page', 1)
     st=st.strip()
     ed=ed.strip()
     if name is None or st is None or ed is None:
@@ -174,7 +175,7 @@ def search(request):
 
     if type_room is not None:
         type_room=type_room.split('|')
-    print("\n\n\n\n\n\n\n\n\n",name,st,ed, type_room,min_price,max_price)
+    print("\n\n\n\n\n\n\n\n\n",name,st,ed, type_room,min_price,max_price,page)
     print(min_price=='null')
     # city_results = Hotel.objects.filter(city_name__name=name)
 
@@ -243,8 +244,8 @@ def search(request):
     response = [{'hotel':key, 'room_types':response[key]['room_types'], 'image_link':response[key]['image_link'], 'hotel_id':response[key]['hotel_id'], 'latitude': response[key]['latitude'], 'longitude': response[key]['longitude']} for key in response]
     print('\n\nresponse',response,len(response),type(response))
 
-    page = request.GET.get('page', 1)
-
+    
+    print(page)
     paginator = Paginator(response, 6)
     try:
         print('try')
@@ -256,9 +257,20 @@ def search(request):
         print('except2')
         response_page = paginator.page(paginator.num_pages)
 
-    print(list(response_page))
-    return JsonResponse(response, safe=False)
-    #return JsonResponse(list(response_page), safe=False)
+    print('\n\n\n',list(response_page),response_page.number, response_page.paginator.num_pages)
+    if response_page.has_next():
+        print('\n\nhas next',response_page.next_page_number())
+        next_page=response_page.next_page_number()
+    else:
+        next_page=0
+    if response_page.has_previous():
+        print('\n\nhas previous',response_page.previous_page_number())
+        prev_page=response_page.previous_page_number()
+    else:
+        prev_page=0
+    paginated_response={'response':list(response_page),'has_next':response_page.has_next(),'next_page':next_page,'has_prev':response_page.has_previous(),'prev_page':prev_page}
+    #return JsonResponse(response, safe=False)
+    return JsonResponse(paginated_response, safe=False)
     #return Response({response_page})
 def check(request):
     name=request.GET["name"]
