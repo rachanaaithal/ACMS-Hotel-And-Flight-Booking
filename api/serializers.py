@@ -82,3 +82,17 @@ class RoomAvailabilitySerializer(serializers.ModelSerializer):
         model = RoomAvailability
         fields = '__all__'
         #depth = 2
+		
+		
+from api.models import UserprofileInfo
+
+class User1Serializer(serializers.HyperlinkedModelSerializer):
+    class Meta:
+        model = User
+        fields = ('id','username', 'email', 'first_name','last_name')
+		
+class UserProfileSerializer(serializers.HyperlinkedModelSerializer):
+    class Meta:
+        model = UserprofileInfo
+        fields = ('id','phone_number')
+

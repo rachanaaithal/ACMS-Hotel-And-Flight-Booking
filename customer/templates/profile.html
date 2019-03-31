@@ -1,0 +1,27 @@
+{% extends "base_generic.html" %}
+{% block content %}
+
+<style>
+.new{float:left; }
+#error{color:red;}
+</style>
+<div class="new">
+    <div class="container">
+        <h1>EDIT PROFILE</h1>
+		<br>
+		<div id="error"></div>
+<div id="main-filter">
+	<div class = "as" id="the-basics" style="float:left">
+		  <b>First Name:</b>    <input id="fname" type="text" name="fname"><br><br><br>
+		  <b>Last Name:</b>     <input id="lname" type="text" name="lname"><br><br><br>
+		  <b>Email:</b>         <input id="email" type="email" name = "email"><br><br><br>
+		  <b>Phone Number:</b>  <input id="phno" type="text" name = "phno"><br><br><br><br>
+		  <input id="btn" type="button" value="CONFIRM CHANGES">
+		   <input id = "next" type="hidden" name="next" value="{{ request.path }}">
+    </div>
+	<script src="/static/js/edit.js"></script>
+	   </div>
+  </div>
+
+
+{% endblock %}

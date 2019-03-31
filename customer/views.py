@@ -9,3 +9,7 @@ def history(request):
 	
 def user_register(request):
 	return render(request,'register.html')
+	
+@login_required
+def user_profile(request):
+	return render(request,'profile.html')

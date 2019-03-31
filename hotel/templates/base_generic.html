@@ -32,7 +32,8 @@
                 </div><div class="items">
                     {% if user.is_authenticated %}
                     <span class="nav-item navbar-text">User: {{ user.get_username }}</span>
-                    <a class="nav-item nav-link" href="{% url 'logout'%}?next={{request.path}}">Logout</a>   
+                    <a class="nav-item nav-link" href="{% url 'logout'%}?next={{request.path}}">Logout</a> 
+					<a class="nav-item nav-link" href="{% url 'user_profile'%}?next={{request.path}}">Profile</a>				
                     {% else %}
                     <a class="nav-item nav-link" href="{% url 'user_register'%}?next={{request.path}}">Register</a>
                     <a class="nav-item nav-link" href="{% url 'login'%}?next={{request.path}}">Login</a>   

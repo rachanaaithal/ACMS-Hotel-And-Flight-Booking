@@ -1,4 +1,3 @@
-
 from django.contrib.auth.models import User, Group
 from rest_framework import viewsets
 from api.serializers import UserSerializer, GroupSerializer, HotelSerializer, CountrySerializer, CitySerializer, HotelRoomSerializer, RoomTypeSerializer, RoomAvailabilitySerializer
@@ -321,4 +320,42 @@ def register(request):
 	profile = UserprofileInfo(user=user,phone_number=phno,role=role)
 	profile.save()
 	login(request,user,backend='django.contrib.auth.backends.ModelBackend')
+	return redirect('/hotel/')
+	
+from api.serializers import User1Serializer,UserProfileSerializer
+
+@method_decorator(csrf_exempt, name='dispatch')	
+class User1ViewSet(viewsets.ModelViewSet):
+    #queryset = User.objects.all().order_by('-date_joined')
+	serializer_class = User1Serializer
+	def perform_create(self, serializer):
+		serializer.save(username=self.request.user)
+	def get_queryset(self):
+		user=self.request.user
+		return User.objects.filter(username=user)
+	
+@method_decorator(csrf_exempt, name='dispatch')	
+class UserProfileViewSet(viewsets.ModelViewSet):
+    #queryset = User.objects.all().order_by('-date_joined')
+	serializer_class = UserProfileSerializer
+	def perform_create(self, serializer):
+		serializer.save(user=self.request.user)
+	def get_queryset(self):
+		user=self.request.user
+		return UserprofileInfo.objects.filter(user=user)
+		
+def edit(request):
+	fname = request.GET["fname"]
+	lname = request.GET["lname"]
+	email = request.GET["email"]
+	phno = request.GET["phno"]
+	
+	u = User.objects.get(id=request.user.id)
+	u.first_name=fname
+	u.last_name=lname
+	u.email=email
+	u.save()
+	pro = UserprofileInfo.objects.get(user=request.user)
+	pro.phone_number=phno
+	pro.save()
 	return redirect('/hotel/')
