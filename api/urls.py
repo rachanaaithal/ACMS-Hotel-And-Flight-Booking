@@ -13,6 +13,9 @@ router.register(r'city', views.CityViewSet)
 router.register(r'hotels', views.HotelViewSet)
 router.register(r'roomtype', views.RoomTypeViewSet)
 router.register(r'hotelroom', views.HotelRoomViewSet)
+router.register(r'flights', views.FlightViewSet)
+router.register(r'flight_seats', views.Flight_SeatsViewSet)
+router.register(r'seattype', views.SeatTypeViewSet)
 #router.register(r'roomavailability', views.RoomAvailabilityViewSet)
 #router.register(r'roomavailabilitycreate', views.Availability)
 #router.register(r'availabilitydetail',views.AvailabilityDetail)
@@ -24,7 +27,9 @@ urlpatterns = [
     path('', include(router.urls)),
     #    path(r'updateavalability/',views.UpdateAvailability.as_view())
     url(r'search', views.search, name="search"),
+    url(r'sflights', views.sflights,name="searchflight"),
     url(r'check', views.check, name="check"),
+    url(r'checkflightstatus', views.checkflightstatus, name="checkflightstatus"),
 #    url(r'availabilitydetail', views.AvailabilityDetail.as_view(), name="AvailabilityDetail"),
 
     url(r'^roomavailability/$',views.RoomAvailabilityViewSet.as_view({'get': 'list', 'post': 'create'}),name='roomavailability-list',),
@@ -33,5 +38,8 @@ urlpatterns = [
     url(r'^minroomprice/$', views.MinHotelRoomView.as_view()),
 
     url(r'register',views.register,name="register"),
+    url(r'^seat_availability/$',views.Seat_AvailabilityViewSet.as_view({'get': 'list', 'post': 'create'}),name='seat_availability-list',),
+	url(r'^seat_availability/(?P<pk>[^/.]+)/$',views.Seat_AvailabilityViewSet.as_view({'get': 'retrieve', 'put': 'update', 'patch': 'partial_update', 'delete': 'destroy'}),name='seat_availability-detail',),
+
 
 ]

@@ -1,8 +1,8 @@
 
 from django.contrib.auth.models import User, Group
 from rest_framework import viewsets
-from api.serializers import UserSerializer, GroupSerializer, HotelSerializer, CountrySerializer, CitySerializer, HotelRoomSerializer, RoomTypeSerializer, RoomAvailabilitySerializer
-from api.models import Country, City, Hotel, RoomType, HotelRoom, RoomAvailability, UserprofileInfo
+from api.serializers import UserSerializer, GroupSerializer, HotelSerializer, CountrySerializer, CitySerializer, HotelRoomSerializer, RoomTypeSerializer, RoomAvailabilitySerializer, Seat_AvailabilitySerializer, SeatTypeSerializer, FlightSerializer, Flight_SeatsSerializer
+from api.models import Country, City, Hotel, RoomType, HotelRoom, RoomAvailability, UserprofileInfo, Seat_Availability, Flight, Flight_Seats, SeatType
 from rest_framework import filters
 from django_filters.rest_framework import DjangoFilterBackend
 from django.http import JsonResponse
@@ -16,7 +16,8 @@ from datetime import *
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from rest_framework.response import Response
 from django.db.models import Max, Min
-
+import datetime
+from django.utils import timezone
 from django.contrib.auth import authenticate, login, logout, views
 
 class UserViewSet(viewsets.ModelViewSet):
@@ -310,3 +311,189 @@ def register(request):
 	profile.save()
 	login(request,user,backend='django.contrib.auth.backends.ModelBackend')
 	return redirect('/hotel/')
+
+
+class FlightViewSet(viewsets.ModelViewSet):
+    queryset = Flight.objects.all()
+    serializer_class = FlightSerializer
+    filter_fields={
+        'id' : ['exact'],
+        'flightnumber' : ['exact'],
+        'airline_name' : ['exact'],
+        'source' : ['exact'],
+        'destination' : ['exact'],
+        'on_date' : ['exact']
+    }
+    
+class Flight_SeatsViewSet(viewsets.ModelViewSet):
+    queryset = Flight_Seats.objects.all()
+    serializer_class = Flight_SeatsSerializer
+    filter_fields={
+        'id' : ['exact'],
+        'category' : ['exact'],
+        'seat_position' : ['exact'],
+        'flight' : ['exact']
+    }
+    
+class SeatTypeViewSet(viewsets.ModelViewSet):
+    queryset = SeatType.objects.all()
+    serializer_class = SeatTypeSerializer
+    filter_fields = {
+        'name': ['exact'],
+        'id': ['exact']
+    }  
+
+@method_decorator(csrf_exempt, name='dispatch')
+class Seat_AvailabilityViewSet(viewsets.ModelViewSet):
+    serializer_class = Seat_AvailabilitySerializer
+    class Meta:
+        depth=2
+    filter_fields={
+        'seat':['exact'],
+        'id':['exact'],
+        'booked_by':['exact']
+    }
+    def perform_create(self, serializer):
+        serializer.save(booked_by=self.request.user)
+
+    def get_queryset(self):
+        user=self.request.user
+        return Seat_Availability.objects.filter(booked_by=user)
+
+def sflights(request):
+    source=request.GET.get("source",None)
+    st=request.GET.get("start",None)
+    destination=request.GET.get("destination",None)
+    type_seat= request.GET.get("type",None)
+    st=st.strip()
+    print(st)
+    if source is None or st is None or destination is None:
+        return JsonResponse([], safe=False)
+
+    if type_seat is not None:
+        type_seat=type_seat.split('|')
+    st=datetime.datetime.strptime(st, "%Y-%m-%d").date()
+    print(source,st.day,destination, type_seat)
+    # city_results = Hotel.objects.filter(city_name__name=name)
+
+    q1=Q(flight__on_date__day=st.day)
+    q2=Q(flight__source__name=source)
+    q3=Q(flight__destination__name=destination)
+    q4=Q(seat__flight__source__name=source)
+    q5=Q(seat__flight__destination__name=destination)
+    q6=Q(date__day=st.day)
+    #print("helloooo")
+    #z=Flight_Seats.objects.values('category__name')
+    #print("z:", z)
+    supply = Flight_Seats.objects.filter(q2).filter(q3).filter(q1).values('flight__id','flight__airline_name', 'category__name', 'flight__image_link', 'flight__flightnumber','flight__on_date','seat_position','number_of_seats','flight__takeoff_time', 'flight__landing_time')
+    print("Supply 1:", list(supply))
+#Get Demand from room availability table
+    demand = Seat_Availability.objects.filter(q4).filter(q5).filter(q6)
+    #demand = [x['seat__flight__airline_name']+':'+x['seat__category__name']+x['seat__seat_position'] for x in list(demand.exclude(status='dd').values('seat__flight__name','seat__category__name','seat_position','status'))]
+    demand = demand.exclude(status='dd').values('seat__flight__airline_name','seat__category__name','seat__seat_position','status')
+    #print("Demand 1:", list(demand))
+    if type_seat is not None:
+        supply=supply.filter(category__name__in=type_seat)
+        demand=demand.filter(seat__category__name__in=type_seat)
+    #print("Demand 2:",list(demand))
+    print("Supply 2:",list(supply))
+    #print('demand:',list(demand.values('room__hotel__name','room__category__name', 'status')) )
+    demand = [x['seat__flight__airline_name']+':'+x['seat__category__name']+x['seat__seat_position'] for x in list(demand)]
+    demand_dict = {}
+    for dem in demand:
+        if dem in demand_dict:
+            demand_dict[dem]+=1
+        else:
+            demand_dict[dem]=1
+    #print(demand_dict)
+#To make the query set into a dictionary
+    response = {}
+    for result in list(supply):
+        #if room exists to book
+        checkKey = result['flight__airline_name']+':'+result['category__name']+result['seat_position']
+        if checkKey in demand_dict:
+            seats_actually_available = result['number_of_seats'] - demand_dict[checkKey]
+            if seats_actually_available==0:
+                continue
+        else:
+            seats_actually_available = result['number_of_seats']
+        
+        #if new flight name
+        if result['flight__airline_name'] not in response:
+            response[result['flight__airline_name']] = {}
+            response[result['flight__airline_name']]['image_link']=result['flight__image_link']
+            response[result['flight__airline_name']]['date']=result['flight__on_date']
+            response[result['flight__airline_name']]['seat_position']={}
+            response[result['flight__airline_name']]['flight_id']=result['flight__id']
+            response[result['flight__airline_name']]['category']=result['category__name']
+            response[result['flight__airline_name']]['flightnumber']=result['flight__flightnumber'] 
+            response[result['flight__airline_name']]['takeoff_time']=result['flight__takeoff_time']
+            response[result['flight__airline_name']]['landing_time']=result['flight__landing_time']
+        elif result['flight__id'] not in response[result['flight__airline_name']]:
+            response[result['flight__airline_name']] = {}
+            response[result['flight__airline_name']]['date']=result['flight__on_date']
+            response[result['flight__airline_name']]['image_link']=result['flight__image_link']
+            response[result['flight__airline_name']]['seat_position']={}
+            response[result['flight__airline_name']]['flight_id']=result['flight__id']
+            response[result['flight__airline_name']]['category']=result['category__name']
+            response[result['flight__airline_name']]['flightnumber']=result['flight__flightnumber'] 
+            response[result['flight__airline_name']]['takeoff_time']=result['flight__takeoff_time']
+            response[result['flight__airline_name']]['landing_time']=result['flight__landing_time']
+        response[result['flight__airline_name']]['seat_position'][result['seat_position']] = seats_actually_available
+
+    print('\n\nresponse',response)
+    
+    #making into json
+    response = [{'flight':key, 'seat_position':response[key]['seat_position'], 'image_link':response[key]['image_link'], 'flight_id':response[key]['flight_id'],'on_date':response[key]['date'],'flightnumber':response[key]['flightnumber'], 'category':response[key]['category'], 'takeoff_time':response[key]['takeoff_time'], 'landing_time':response[key]['landing_time']} for key in response]
+    print('\n\nresponse',response,len(response),type(response))
+
+    '''page = request.GET.get('page', 1)
+
+    paginator = Paginator(response, 6)
+    try:
+        print('try')
+        response_page = paginator.page(page)
+    except PageNotAnInteger:
+        print('except1')
+        response_page = paginator.page(1)
+    except EmptyPage:
+        print('except2')
+        response_page = paginator.page(paginator.num_pages)
+
+    print(list(response_page))'''
+    return JsonResponse(response, safe=False)
+    #return JsonResponse(list(response_page), safe=False)
+    #return Response({response_page})
+
+
+
+def checkflightstatus(request):
+    name=request.GET["name"]
+    st=request.GET["start"]
+    ed=request.GET["end"]
+    category=request.GET["category"]
+    st=st.strip()
+    ed=ed.strip()
+
+    q1=Q(from_date__gte=st)
+    q2=Q(from_date__lte=ed) 
+    q3=Q(to_date__gte=st)
+    q4=Q(to_date__lte=ed)
+    q5=Q(from_date__lte=st)
+    q6=Q(to_date__gte=ed)
+    q7=Q(from_date__gte=st)
+    q8=Q(to_date__lte=ed)
+
+#Get Supply (Room type-hotel level)
+    supply = HotelRoom.objects.filter(hotel__id=name).filter(category__id=category).values('id','hotel__name', 'category__id', 'hotel__image_link', 'hotel__id','number_of_rooms')
+    
+#Get Demand from room availability table
+    demand = RoomAvailability.objects.filter((q1 & q2) | (q3 & q4) | (q5 & q6)| (q7 & q8)).filter(room__hotel__id=name).filter(room__category__id=category)
+
+    #print('checking',list(supply)[0]['id'],demand)
+    if((list(supply)[0]['number_of_rooms']-len(list(demand)))>0):
+        response={'val':True, 'id':list(supply)[0]['id']}
+    else:
+        response={'val':False}
+
+    return JsonResponse(response, safe=False)

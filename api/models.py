@@ -2,6 +2,8 @@ from django.db import models
 import uuid
 from django.contrib.auth.models import User
 from django.core.validators import RegexValidator
+import datetime
+from django.utils import timezone
 
 # Create your models here.
 
@@ -146,3 +148,80 @@ class UserprofileInfo(models.Model):
     role = models.CharField(max_length=10)
     def __str__(self):
         return self.user.username
+
+class SeatType(models.Model):
+    name = models.CharField(max_length=200, help_text='Enter type of seats')
+    def __str__(self):
+        return self.name
+
+
+class Flight(models.Model):
+    """Model representing a flight.
+    DAYS=(
+        ('sun', 'Sunday'),
+        ('mon', 'Monday'),
+        ('tue', 'Tuesday'),
+        ('wed', 'Wednesday'),
+        ('thur', 'Thursday'),
+        ('fri', 'Friday'),
+        ('sat', 'Saturday'),
+    )"""
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, help_text='Unique ID for this particular flight')
+    flightnumber = models.IntegerField(default=1)
+    airline_name=models.CharField(max_length=100)
+    takeoff_time=models.TimeField()
+    landing_time=models.TimeField()
+    source = models.ForeignKey('City', on_delete=models.CASCADE, related_name='source')
+    destination = models.ForeignKey('City', on_delete=models.CASCADE, related_name='destination') 
+    on_date=models.DateField(default=timezone.now)
+    #day=models.CharField( max_length=4, choices=DAYS, blank=True, default='sun', help_text='day of departure')
+    image_link = models.CharField(max_length=500, default="")
+    tail_id = models.CharField(max_length=10)
+    '''class Meta:
+        unique_together = (('flight_id', 'airline_id'),)'''
+    def __str__(self):
+        """String for representing the Model object."""
+        return self.id
+    def get_absolute_url(self):
+        """Returns the url to access a detail record for this book."""
+        return reverse('Flight-detail', args=[str(self.id)])
+
+class Flight_Seats(models.Model):
+    """Model representing a flight."""
+    POSITION=(
+        ('a', 'Aisle'),
+        ('m', 'Middle'),
+        ('w', 'Window'),
+        ('h', 'Herringbone'),
+        ('p', 'Private'),
+    )
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, help_text='Unique ID for this particular seat')
+    flight = models.ForeignKey('Flight', on_delete=models.CASCADE)
+    number_of_seats = models.IntegerField(default=1)
+    category=models.ForeignKey('SeatType', on_delete=models.SET_NULL, null=True)
+    seat_position=models.CharField( max_length=1, choices=POSITION, blank=False, default='m', help_text='position of seats')
+    price = models.DecimalField(max_digits=8, decimal_places=2, default=0)
+    def __str__(self):
+        '''if self.seat_position==None:
+            return "ERROR-CUSTOMER NAME IS NULL"
+        elif self.seat_position=='':
+            return ""'''
+        return '%s, %s'%(self.category, self.seat_position)
+    #return 'hi'
+
+class Seat_Availability(models.Model):
+    """Model representing a flight."""
+    StatusTypes =(
+        ('bk', 'Booked'),
+        ('pr', 'Processing'),
+        ('dd', 'Dead'),
+    )
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, help_text='Unique ID for this particular transaction')
+    seat = models.ForeignKey('Flight_Seats', on_delete=models.CASCADE)
+    status = models.CharField(max_length=2, choices=StatusTypes, help_text='Status')
+    date=models.DateField(default=timezone.now)
+    booked_by = models.ForeignKey(User,null=False,on_delete=models.CASCADE)
+    '''class Meta:
+        unique_together = (('flight_id', 'seat_id'),)'''
+    def __str__(self):
+        return '%s,%s'%(self.status, self.seat.category)

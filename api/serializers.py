@@ -1,6 +1,6 @@
 from django.contrib.auth.models import User, Group
 from rest_framework import serializers
-from api.models import Country, City, Hotel, RoomType, HotelRoom, RoomAvailability
+from api.models import Country, City, Hotel, RoomType, HotelRoom, RoomAvailability, Flight, Flight_Seats, Seat_Availability, SeatType
 
 
 class UserSerializer(serializers.HyperlinkedModelSerializer):
@@ -82,3 +82,38 @@ class RoomAvailabilitySerializer(serializers.ModelSerializer):
         model = RoomAvailability
         fields = '__all__'
         #depth = 2
+
+class SeatTypeSerializer(serializers.ModelSerializer):
+    class Meta:
+        fields='__all__'
+        model=SeatType
+
+class FlightSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        fields = '__all__'
+        model = Flight
+        
+class Flight_SeatsSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        fields = '__all__'
+        model = Flight_Seats
+
+class Seat_AvailabilitySerializer(serializers.ModelSerializer):
+
+    booked_by=serializers.PrimaryKeyRelatedField(read_only=True, default=serializers.CurrentUserDefault())
+    airline=serializers.ReadOnlyField(source="seat.flight.airline_name")
+    flight_number=serializers.ReadOnlyField(source="seat.flight.flightnumber")
+    category=serializers.ReadOnlyField(source="seat.category.name")
+    source=serializers.ReadOnlyField(source="seat.flight.source")
+    destination=serializers.ReadOnlyField(source="seat.flight.destination")
+    date=serializers.ReadOnlyField(source="seat.flight.date")
+    takeoff_time=serializers.ReadOnlyField(source="seat.flight.takeoff_time")
+    landing_time=serializers.ReadOnlyField(source="seat.flight.landing_time")
+    price=serializers.ReadOnlyField(source="seat.price")
+    def get_status_name(self, obj):
+        return obj.get_status_display()
+    class Meta:
+        fields = '__all__'
+        model=Seat_Availability    
