@@ -168,7 +168,7 @@ window.onload = function () {
 		var cardbody= $('<div/>');
 		cardbody.addClass('card-body flightbody');
 		cardbody.append(`<p class='card-text'><span class='chiptext'>Seat Position</span> ${Object.keys(d.seat_position)}</p>`);
-		cardbody.append(`<a href='/flight/${d.flightnumber}/?startdate=${startdate}' class="btn btn-primary book-btn">Book</a>`)
+		cardbody.append(`<a href='/flight/${d.flight_id}/?startdate=${startdate}&source=${d.source}&destination=${d.destination}' class="btn btn-primary book-btn">Book</a>`)
 		
 		div.append(cardbody);
 		out.append(div);

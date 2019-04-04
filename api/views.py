@@ -366,14 +366,14 @@ def sflights(request):
     destination=request.GET.get("destination",None)
     type_seat= request.GET.get("type",None)
     st=st.strip()
-    print(st)
+    #print(st)
     if source is None or st is None or destination is None:
         return JsonResponse([], safe=False)
 
     if type_seat is not None:
         type_seat=type_seat.split('|')
     st=datetime.datetime.strptime(st, "%Y-%m-%d").date()
-    print(source,st.day,destination, type_seat)
+    #print(source,st.day,destination, type_seat)
     # city_results = Hotel.objects.filter(city_name__name=name)
 
     q1=Q(flight__on_date__day=st.day)
@@ -386,7 +386,7 @@ def sflights(request):
     #z=Flight_Seats.objects.values('category__name')
     #print("z:", z)
     supply = Flight_Seats.objects.filter(q2).filter(q3).filter(q1).values('flight__id','flight__airline_name', 'category__name', 'flight__image_link', 'flight__flightnumber','flight__on_date','seat_position','number_of_seats','flight__takeoff_time', 'flight__landing_time')
-    print("Supply 1:", list(supply))
+    #print("Supply 1:", list(supply))
 #Get Demand from room availability table
     demand = Seat_Availability.objects.filter(q4).filter(q5).filter(q6)
     #demand = [x['seat__flight__airline_name']+':'+x['seat__category__name']+x['seat__seat_position'] for x in list(demand.exclude(status='dd').values('seat__flight__name','seat__category__name','seat_position','status'))]
@@ -396,7 +396,7 @@ def sflights(request):
         supply=supply.filter(category__name__in=type_seat)
         demand=demand.filter(seat__category__name__in=type_seat)
     #print("Demand 2:",list(demand))
-    print("Supply 2:",list(supply))
+    #print("Supply 2:",list(supply))
     #print('demand:',list(demand.values('room__hotel__name','room__category__name', 'status')) )
     demand = [x['seat__flight__airline_name']+':'+x['seat__category__name']+x['seat__seat_position'] for x in list(demand)]
     demand_dict = {}
@@ -429,6 +429,8 @@ def sflights(request):
             response[result['flight__airline_name']]['flightnumber']=result['flight__flightnumber'] 
             response[result['flight__airline_name']]['takeoff_time']=result['flight__takeoff_time']
             response[result['flight__airline_name']]['landing_time']=result['flight__landing_time']
+            response[result['flight__airline_name']]['source']=source
+            response[result['flight__airline_name']]['destination']=destination
         elif result['flight__id'] not in response[result['flight__airline_name']]:
             response[result['flight__airline_name']] = {}
             response[result['flight__airline_name']]['date']=result['flight__on_date']
@@ -439,13 +441,15 @@ def sflights(request):
             response[result['flight__airline_name']]['flightnumber']=result['flight__flightnumber'] 
             response[result['flight__airline_name']]['takeoff_time']=result['flight__takeoff_time']
             response[result['flight__airline_name']]['landing_time']=result['flight__landing_time']
+            response[result['flight__airline_name']]['source']=source
+            response[result['flight__airline_name']]['destination']=destination
         response[result['flight__airline_name']]['seat_position'][result['seat_position']] = seats_actually_available
 
-    print('\n\nresponse',response)
+    #print('\n\nresponse',response)
     
     #making into json
-    response = [{'flight':key, 'seat_position':response[key]['seat_position'], 'image_link':response[key]['image_link'], 'flight_id':response[key]['flight_id'],'on_date':response[key]['date'],'flightnumber':response[key]['flightnumber'], 'category':response[key]['category'], 'takeoff_time':response[key]['takeoff_time'], 'landing_time':response[key]['landing_time']} for key in response]
-    print('\n\nresponse',response,len(response),type(response))
+    response = [{'flight':key, 'seat_position':response[key]['seat_position'], 'source':response[key]['source'], 'destination':response[key]['destination'],'image_link':response[key]['image_link'], 'flight_id':response[key]['flight_id'],'on_date':response[key]['date'],'flightnumber':response[key]['flightnumber'], 'category':response[key]['category'], 'takeoff_time':response[key]['takeoff_time'], 'landing_time':response[key]['landing_time']} for key in response]
+    #print('\n\nresponse',response,len(response),type(response))
 
     '''page = request.GET.get('page', 1)
 
@@ -467,31 +471,27 @@ def sflights(request):
 
 
 
-def checkflightstatus(request):
-    name=request.GET["name"]
+def cflightstatus(request):
+    source=request.GET["source"]
+    destination=request.GET["destination"]
     st=request.GET["start"]
-    ed=request.GET["end"]
+    flight_id=request.GET["flightid"]
     category=request.GET["category"]
     st=st.strip()
-    ed=ed.strip()
+    st=datetime.datetime.strptime(st, "%Y-%m-%d").date()
 
-    q1=Q(from_date__gte=st)
-    q2=Q(from_date__lte=ed) 
-    q3=Q(to_date__gte=st)
-    q4=Q(to_date__lte=ed)
-    q5=Q(from_date__lte=st)
-    q6=Q(to_date__gte=ed)
-    q7=Q(from_date__gte=st)
-    q8=Q(to_date__lte=ed)
+    q4=Q(seat__flight__source__name=source)
+    q5=Q(seat__flight__destination__name=destination)
+    q6=Q(date__day=st.day)
 
-#Get Supply (Room type-hotel level)
-    supply = HotelRoom.objects.filter(hotel__id=name).filter(category__id=category).values('id','hotel__name', 'category__id', 'hotel__image_link', 'hotel__id','number_of_rooms')
+#Get Supply (Room type-hotel level_
+    supply = Flight_Seats.objects.filter(flight__id=flight_id).filter(category__id=category).values('id','flight__id','flight__airline_name', 'category__name', 'flight__image_link', 'flight__flightnumber','flight__on_date','seat_position','number_of_seats','flight__takeoff_time', 'flight__landing_time')
     
 #Get Demand from room availability table
-    demand = RoomAvailability.objects.filter((q1 & q2) | (q3 & q4) | (q5 & q6)| (q7 & q8)).filter(room__hotel__id=name).filter(room__category__id=category)
+    demand = Seat_Availability.objects.filter(q4).filter(q5).filter(q6).filter(seat__flight__id=flight_id).filter(seat__category__id=category).values('seat__flight__airline_name','seat__category__name','seat__seat_position','status')
 
     #print('checking',list(supply)[0]['id'],demand)
-    if((list(supply)[0]['number_of_rooms']-len(list(demand)))>0):
+    if((list(supply)[0]['number_of_seats']-len(list(demand)))>0):
         response={'val':True, 'id':list(supply)[0]['id']}
     else:
         response={'val':False}

@@ -29,7 +29,7 @@ urlpatterns = [
     url(r'search', views.search, name="search"),
     url(r'sflights', views.sflights,name="searchflight"),
     url(r'check', views.check, name="check"),
-    url(r'checkflightstatus', views.checkflightstatus, name="checkflightstatus"),
+    url(r'cflightstatus', views.cflightstatus, name="cflightstatus"),
 #    url(r'availabilitydetail', views.AvailabilityDetail.as_view(), name="AvailabilityDetail"),
 
     url(r'^roomavailability/$',views.RoomAvailabilityViewSet.as_view({'get': 'list', 'post': 'create'}),name='roomavailability-list',),

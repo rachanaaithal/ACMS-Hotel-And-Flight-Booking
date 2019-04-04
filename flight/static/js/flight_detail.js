@@ -11,8 +11,8 @@ function initPage(id){
         const landing_time  = data.landing_time;
         const takeoff_time = data.takeoff_time;
 
-        details.append(`<p>TakeoffTime:${moment(takeoff_time, "HH:mm:ss").format('hh:mm A')}</p>`);
-        details.append(`<p>LandingTime:${moment(landing_time, "HH:mm:ss").format('hh:mm A')}</p>`);
+        details.append(`<p>TakeoffTime:${moment(takeoff_time, "HH:mm").format('hh:mm A')}</p>`);
+        details.append(`<p>LandingTime:${moment(landing_time, "HH:mm").format('hh:mm A')}</p>`);
         details.appendTo('#about');
         console.log(`${data.landing_time}-${data.takeoff_time}`)
     }
@@ -33,7 +33,7 @@ function initPage(id){
 
     
     var url = new URL(window.location.href);
-    var fromdate = url.searchParams.get("start");
+    var fromdate = url.searchParams.get("startdate");
     var source = url.searchParams.get("source");
     var dest=url.searchParams.get("destination");
 
@@ -65,7 +65,7 @@ function initPage(id){
 
                 $(`#category-${d.category}`).click(function(e){
                     $.ajax({
-                        url: `/api/checkflight/?name=${id}&category=${d.category}&start=${fromdate}&source=${source}&destination=${dest}`,
+                        url: `/api/cflightstatus/?flightid=${id}&category=${d.category}&start=${fromdate}&source=${source}&destination=${dest}`,
                         cache: false,
                         success: function(data){
                             console.log(data.id);
@@ -105,11 +105,14 @@ function initPage(id){
 
     var id;
     $.ajax({
-        url: `/api/flight/${id}`,
+        url: `/api/flights/${id}`,
         cache: false,
         success: function(data){
             console.log(data);
-            id=`${data.flight_id}`;
+            id=`${data.id}`;
+            source=`${data.source}`;
+            console.log(source);
+            console.log(id);
             putAboutData(data);
         },
         error: function(error){

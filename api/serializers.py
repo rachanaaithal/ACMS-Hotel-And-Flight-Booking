@@ -89,13 +89,13 @@ class SeatTypeSerializer(serializers.ModelSerializer):
         model=SeatType
 
 class FlightSerializer(serializers.ModelSerializer):
-
+    source = serializers.ReadOnlyField(source='source.name')
+    destination=serializers.ReadOnlyField(source='destination.name')
     class Meta:
         fields = '__all__'
         model = Flight
         
 class Flight_SeatsSerializer(serializers.ModelSerializer):
-
     class Meta:
         fields = '__all__'
         model = Flight_Seats
@@ -106,8 +106,8 @@ class Seat_AvailabilitySerializer(serializers.ModelSerializer):
     airline=serializers.ReadOnlyField(source="seat.flight.airline_name")
     flight_number=serializers.ReadOnlyField(source="seat.flight.flightnumber")
     category=serializers.ReadOnlyField(source="seat.category.name")
-    source=serializers.ReadOnlyField(source="seat.flight.source")
-    destination=serializers.ReadOnlyField(source="seat.flight.destination")
+    #source=serializers.ReadOnlyField(source="seat.flight.source")
+    #destination=serializers.ReadOnlyField(source="seat.flight.destination")
     date=serializers.ReadOnlyField(source="seat.flight.date")
     takeoff_time=serializers.ReadOnlyField(source="seat.flight.takeoff_time")
     landing_time=serializers.ReadOnlyField(source="seat.flight.landing_time")
