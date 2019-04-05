@@ -381,7 +381,7 @@ def sflights(request):
     q3=Q(flight__destination__name=destination)
     q4=Q(seat__flight__source__name=source)
     q5=Q(seat__flight__destination__name=destination)
-    q6=Q(date__day=st.day)
+    q6=Q(on_date__day=st.day)
     #print("helloooo")
     #z=Flight_Seats.objects.values('category__name')
     #print("z:", z)
@@ -390,7 +390,7 @@ def sflights(request):
 #Get Demand from room availability table
     demand = Seat_Availability.objects.filter(q4).filter(q5).filter(q6)
     #demand = [x['seat__flight__airline_name']+':'+x['seat__category__name']+x['seat__seat_position'] for x in list(demand.exclude(status='dd').values('seat__flight__name','seat__category__name','seat_position','status'))]
-    demand = demand.exclude(status='dd').values('seat__flight__airline_name','seat__category__name','seat__seat_position','status')
+    demand = demand.exclude(status='dd').values('seat__flight__airline_name','seat__category__name','seat__seat_position','status', 'on_date')
     #print("Demand 1:", list(demand))
     if type_seat is not None:
         supply=supply.filter(category__name__in=type_seat)
@@ -482,13 +482,13 @@ def cflightstatus(request):
 
     q4=Q(seat__flight__source__name=source)
     q5=Q(seat__flight__destination__name=destination)
-    q6=Q(date__day=st.day)
+    q6=Q(on_date__day=st.day)
 
 #Get Supply (Room type-hotel level_
     supply = Flight_Seats.objects.filter(flight__id=flight_id).filter(category__id=category).values('id','flight__id','flight__airline_name', 'category__name', 'flight__image_link', 'flight__flightnumber','flight__on_date','seat_position','number_of_seats','flight__takeoff_time', 'flight__landing_time')
     
 #Get Demand from room availability table
-    demand = Seat_Availability.objects.filter(q4).filter(q5).filter(q6).filter(seat__flight__id=flight_id).filter(seat__category__id=category).values('seat__flight__airline_name','seat__category__name','seat__seat_position','status')
+    demand = Seat_Availability.objects.filter(q4).filter(q5).filter(q6).filter(seat__flight__id=flight_id).filter(seat__category__id=category).values('seat__flight__airline_name','seat__category__name','seat__seat_position','status', 'on_date')
 
     #print('checking',list(supply)[0]['id'],demand)
     if((list(supply)[0]['number_of_seats']-len(list(demand)))>0):

@@ -9,31 +9,29 @@ function readCookie(name) {
     return null;
 }
 
-function initPage(hotel_id, category){
-    console.log(hotel_id, category);
+function initPage(flight_id, category){
+    console.log(flight_id, category);
 
     var url = new URL(window.location.href);
     var transaction_id = url.searchParams.get("id");
-
+    console.log(transaction_id);
     var gst=5;
 
     function putAboutData(data){
         var details=$('<div/>');
-        details.append(`<h5>${data.hotel}</h5>`);
-        details.append(`<p>Address: ${data.address}</p>`); 
-        details.append(`<p>Room Type:${data.category}</p>`);
+        details.append(`<h5>${data.airline}</h5>`);
+        details.append(`<p>SeatType:${data.category}</p>`);
 
-        const checkIn  = data.checkintime;
-        const cleaningTime = data.extratime;
-        const checkOut = moment.utc(moment(checkIn,"HH:mm:ss").diff(moment(cleaningTime,"HH:mm:ss"))).format('hh:mm A');
-
-        details.append(`<p>Checkin: ${moment(data.from_date).format('DD-MM-YYYY')} ${moment(checkIn, "HH:mm:ss").format('hh:mm A')}</p>`);
-        details.append(`<p>CheckoutBefore: ${moment(data.to_date).format('DD-MM-YYYY')} ${checkOut}</p>`);
+        const landingtime  = data.landing_time;
+        const takeofftime = data.takeoff_time;
+        let date = JSON.stringify(data.on_date);
+        date = date.slice(1,11);
+        
+        details.append(`<p>TakeoffTime: ${date} ${moment(takeofftime, "HH:mm").format('hh:mm A')}</p>`);
+        details.append(`<p>LandingTime: ${date} ${moment(landingtime, "HH:mm").format('hh:mm A')}</p>`);
         
         details.appendTo('#details');
-
-        const days= Math.max(moment(data.to_date).diff(moment(data.from_date), "days"),1);
-        const cost=data.price*days;
+        const cost=data.price;
         const tax=cost*gst/100;
             
         const tot=tax+parseFloat(cost);
@@ -60,17 +58,17 @@ function initPage(hotel_id, category){
         tr.appendTo('#finalprices')  
 
         var csrftoken = readCookie('csrftoken');
-        console.log(transaction_id, hotel_id, category);
+        console.log(transaction_id, flight_id, category);
         $('#pay').click(function(e){
-            console.log(transaction_id, hotel_id);
+            console.log(transaction_id, flight_id);
             $.ajax({
                 type: "PATCH",
-                url:`/api/roomavailability/${transaction_id}/`,
+                url:`/api/seat_availability/${transaction_id}/`,
                 data:{'status':'bk'},
                 headers:{"X-CSRFToken": csrftoken},
                 success:function(newdata){
                     console.log(newdata);
-                    window.location.href=`/hotel/${hotel_id}/${category}/booked/${transaction_id}`
+                    window.location.href=`/flight/${flight_id}/${category}/booked/${transaction_id}`
                 }
             });
 
@@ -80,12 +78,12 @@ function initPage(hotel_id, category){
             console.log(transaction_id);
             $.ajax({
                 type: "PATCH",
-                url:`/api/roomavailability/${transaction_id}/`,
+                url:`/api/seat_availability/${transaction_id}/`,
                 data:{'status':'dd'},
                 headers:{"X-CSRFToken": csrftoken},
                 success:function(newdata){
                     console.log(newdata);
-                    window.location.href=`/hotel/${hotel_id}/${category}/canceled`
+                    window.location.href=`/flight/${flight_id}/${category}/canceled`
                 }
             });
 
@@ -94,7 +92,7 @@ function initPage(hotel_id, category){
 
 
     $.ajax({
-        url: `/api/roomavailability/?id=${transaction_id}`,
+        url: `/api/seat_availability/?id=${transaction_id}`,
         cache: false,
         success: function(data){
             console.log(data);
@@ -102,10 +100,10 @@ function initPage(hotel_id, category){
                 putAboutData(data[0]);
             }
             else if(data[0].status=='bk'){
-                window.location.href=`/hotel/${hotel_id}/${category}/booked/${data[0].id}`;
+                window.location.href=`/flights/${flight_id}/${category}/booked/${data[0].id}`;
             }
             else if(data[0].status=='dd'){
-                window.location.href=`/hotel/${hotel_id}/${category}/canceled`;
+                window.location.href=`/flights/${flight_id}/${category}/canceled`;
             }
         },
         error: function(error){

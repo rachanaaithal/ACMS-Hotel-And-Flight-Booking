@@ -14,7 +14,6 @@ function initPage(id){
         details.append(`<p>TakeoffTime:${moment(takeoff_time, "HH:mm").format('hh:mm A')}</p>`);
         details.append(`<p>LandingTime:${moment(landing_time, "HH:mm").format('hh:mm A')}</p>`);
         details.appendTo('#about');
-        console.log(`${data.landing_time}-${data.takeoff_time}`)
     }
     function putTable(){
         var table=$('<table/>')
@@ -62,7 +61,7 @@ function initPage(id){
                 tr.append(`<th scope="row">${data.name}</td>`)
                 tr.append(`<td>${d.price}</td><td><button id="category-${d.category}" class="btn btn-primary process">Book</button></td>`)
                 tr.appendTo('#prices-tab-bod')
-
+                console.log(fromdate)
                 $(`#category-${d.category}`).click(function(e){
                     $.ajax({
                         url: `/api/cflightstatus/?flightid=${id}&category=${d.category}&start=${fromdate}&source=${source}&destination=${dest}`,
@@ -74,7 +73,7 @@ function initPage(id){
                                 $.ajax({
                                     type: "POST",
                                     url: `/api/seat_availability/`,
-                                    data:{'date': fromdate, 'seat':data.id, 'status': 'pr'},
+                                    data:{'on_date': fromdate ,'seat':data.id, 'status': 'pr'},
                                     headers:{"X-CSRFToken": csrftoken},
                                     success:function(newdata){
                                         console.log(newdata);
@@ -110,9 +109,6 @@ function initPage(id){
         success: function(data){
             console.log(data);
             id=`${data.id}`;
-            source=`${data.source}`;
-            console.log(source);
-            console.log(id);
             putAboutData(data);
         },
         error: function(error){

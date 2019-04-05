@@ -219,7 +219,7 @@ class Seat_Availability(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, help_text='Unique ID for this particular transaction')
     seat = models.ForeignKey('Flight_Seats', on_delete=models.CASCADE)
     status = models.CharField(max_length=2, choices=StatusTypes, help_text='Status')
-    date=models.DateField(default=timezone.now)
+    on_date=models.DateField(default=timezone.now)
     booked_by = models.ForeignKey(User,null=False,on_delete=models.CASCADE)
     '''class Meta:
         unique_together = (('flight_id', 'seat_id'),)'''
