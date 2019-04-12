@@ -21,6 +21,8 @@ function initPage(flight_id, category){
         var details=$('<div/>');
         details.append(`<h5>${data.airline}</h5>`);
         details.append(`<p>SeatType:${data.category}</p>`);
+        details.append(`<p><i class="fas fa-map-marked fa-2x"></i>${data.source}</p>`); 
+        details.append(`<p><i class="fas fa-map-marked fa-2x"></i>${data.destination}</p>`); 
 
         const landingtime  = data.landing_time;
         const takeofftime = data.takeoff_time;

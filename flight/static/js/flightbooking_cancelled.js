@@ -1,3 +1,3 @@
-function initPage(hotel_id, category){
-    console.log(hotel_id, category);
+function initPage(flight_id, category){
+    console.log(flight_id, category);
 }
