@@ -15,18 +15,18 @@ function initPage(transaction_id, gst, cancellation_charges){
 
     function putAboutData(data){
         var details=$('<div/>');
-        details.append(`<p>${data.airline}</p>`); 
-        details.append(`<p><i class="fas fa-map-marked fa-2x"></i>${data.source}</p>`); 
-        details.append(`<p><i class="fas fa-map-marked fa-2x"></i>${data.destination}</p>`); 
-        details.append(`<p>Seat Type:${data.category}</p>`);
+        details.append(`<p><b> Airline: </b>${data.airline}</p>`); 
+        details.append(`<p><i class="fas fa-map-marked fa-2x"></i><b> Source: </b>${data.source}</p>`); 
+        details.append(`<p><i class="fas fa-map-marked fa-2x"></i><b> Destination: </b>${data.destination}</p>`); 
+        details.append(`<p><b>Seat Type:  </b>${data.category}</p>`);
 
         const landing_time  = data.landing_time;
         const takeoff_time = data.takeoff_time;
         let date = JSON.stringify(data.on_date);
         date = date.slice(1,11);
         
-        details.append(`<p>TakeoffTime: ${date} ${moment(takeoff_time, "HH:mm").format('hh:mm A')}</p>`);
-        details.append(`<p>LandingTime: ${date} ${moment(landing_time, "HH:mm").format('hh:mm A')}</p>`);
+        details.append(`<p><b>TakeoffTime: </b>${date} ${moment(takeoff_time, "HH:mm").format('hh:mm A')}</p>`);
+        details.append(`<p><b>LandingTime: </b>${date} ${moment(landing_time, "HH:mm").format('hh:mm A')}</p>`);
 
 
         console.log(data.status=='bk')
@@ -57,7 +57,7 @@ function initPage(transaction_id, gst, cancellation_charges){
             today= moment();
             if(moment(data.on_date)>today){
                 var tr=$('<tr/>')
-                tr.append(`<td><button id="cancel" class="btn btn-danger" data-toggle="modal" data-target="#cancellation">Cancel Booking</button></td><td><button id="download" class="btn btn-primary">Download</button></td>`)
+                tr.append(`<td><button id="cancel" class="btn btn-danger" data-toggle="modal" data-target="#cancellation">Cancel Booking</button></td><td><button id="download" class="btn btn-primary" style="display">Download</button></td>`)
                 tr.appendTo('#finalprices')
             }
 
@@ -89,13 +89,22 @@ function initPage(transaction_id, gst, cancellation_charges){
                     }
                 });
             });
+             $('#download').click(function (e) {
+            var pdf = new jsPDF('p','pt','a4');
+            $("#download").attr("style", "display:none");
+            $("#cancel").attr("style", "display:none");
+            pdf.addHTML(document.body,function() {
+                pdf.save('Flight-ticket.pdf');
+                $("#download").attr("style", "display");
+                $("#cancel").attr("style", "display");
+            });
+        });
         }
         else if(data.status=='dd'){
             details.append(`<p>Booking was cancelled.<\p>`)
         }
         details.appendTo('#details');
     }
-
 
     $.ajax({
         url:`/api/seat_availability/?id=${transaction_id}`,
