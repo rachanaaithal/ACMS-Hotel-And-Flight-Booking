@@ -167,9 +167,22 @@ window.onload = function () {
 		div.append(imgdiv);
 		var cardbody= $('<div/>');
 		cardbody.addClass('card-body flightbody');
-		cardbody.append(`<p class='card-text'><span class='chiptext'>Seat Position</span> ${Object.keys(d.seat_position)}</p>`);
-		cardbody.append(`<a href='/flight/${d.flight_id}/?startdate=${startdate}&source=${d.source}&destination=${d.destination}' class="btn btn-primary book-btn">Book</a>`)
-		
+		cardbody.append(`<p><b>Takeoff time:</b> ${d.takeoff_time}</p>`)
+		cardbody.append(`<p><b>Landing time:</b> ${d.landing_time}</p>`)
+		if(d.category=="Economy"){
+			cardbody.append(`<a href='/flight/${d.flight_id}/?startdate=${startdate}&source=${d.source}&destination=${d.destination}&seat_position=a' class="btn btn-primary book-btn">Book Aisle Seat</a>`)
+			cardbody.append(`<p></p>`)
+			cardbody.append(`<a href='/flight/${d.flight_id}/?startdate=${startdate}&source=${d.source}&destination=${d.destination}&seat_position=m' class="btn btn-primary book-btn">Book Middle Seat</a>`)
+			cardbody.append(`<p></p>`)
+			cardbody.append(`<a href='/flight/${d.flight_id}/?startdate=${startdate}&source=${d.source}&destination=${d.destination}&seat_position=w' class="btn btn-primary book-btn">Book Window Seat</a>`)			
+		}
+		if(d.category=="Business"){
+			cardbody.append(`<a href='/flight/${d.flight_id}/?startdate=${startdate}&source=${d.source}&destination=${d.destination}&seat_position=h' class="btn btn-primary book-btn">Book Herringbone Seat</a>`)
+		}
+		if(d.category=="First Class"){
+		//cardbody.append(`<p class='card-text'><span class='chiptext'>Seat Position</span> ${Object.keys(d.seat_position)}</p>`);
+			cardbody.append(`<a href='/flight/${d.flight_id}/?startdate=${startdate}&source=${d.source}&destination=${d.destination}&seat_position=p' class="btn btn-primary book-btn">Book Private Seat</a>`)
+		}
 		div.append(cardbody);
 		out.append(div);
 		out.addClass('col-md-4 carddiv')
@@ -265,7 +278,6 @@ window.onload = function () {
 					$('.optional-filter').show();		
 				}
 				else{
-					console.log("hi")
 					$('#noresults').show();
 					$('.optional-filter').hide();
 				}

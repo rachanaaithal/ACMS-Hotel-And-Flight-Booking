@@ -35,6 +35,7 @@ function initPage(id){
     var fromdate = url.searchParams.get("startdate");
     var source = url.searchParams.get("source");
     var dest=url.searchParams.get("destination");
+    var seat_position=url.searchParams.get("seat_position");
 
     function readCookie(name) {
         var nameEQ = name + "=";
@@ -53,22 +54,21 @@ function initPage(id){
     function putPricesData(d){
         
         $.ajax({
-            url: `/api/seattype/${d.category}`,
+            url: `/api/seattype/${d[0].category}`,
             cache: false,
             success: function( data){
                 seattype=data.name;
+                d.map(function (da){
                 var tr=$('<tr/>')
+                tr.append(`<th scope="row">${da.id}</td>`)
                 tr.append(`<th scope="row">${data.name}</td>`)
-                tr.append(`<td>${d.price}</td><td><button id="category-${d.category}" class="btn btn-primary process">Book</button></td>`)
+                tr.append(`<td>${da.price}</td><td><button id="seatid-${da.id}" class="btn btn-primary process">Book</button></td>`)
                 tr.appendTo('#prices-tab-bod')
-                console.log(fromdate)
-                $(`#category-${d.category}`).click(function(e){
+                $(`#seatid-${da.id}`).click(function(e){
                     $.ajax({
-                        url: `/api/cflightstatus/?flightid=${id}&category=${d.category}&start=${fromdate}&source=${source}&destination=${dest}`,
+                        url: `/api/cflightstatus/?seat_id=${da.id}&flightid=${id}&category=${da.category}&start=${fromdate}&source=${source}&destination=${dest}`,
                         cache: false,
                         success: function(data){
-                            console.log(data.id);
-                            console.log(fromdate,source, dest);
                             if(data.val){
                                 $.ajax({
                                     type: "POST",
@@ -76,12 +76,19 @@ function initPage(id){
                                     data:{'on_date': fromdate ,'seat':data.id, 'status': 'pr'},
                                     headers:{"X-CSRFToken": csrftoken},
                                     success:function(newdata){
-                                        console.log(newdata);
-                                        window.location.href=`/flight/`+id+`/${d.category}/?id=${newdata.id}`;
+                                        window.location.href=`/flight/`+id+`/${d[0].category}/?id=${newdata.id}`;
                                     }
                                 });
                             
     
+                            }
+                            else{
+                                var m=$('<tr/>');
+                                m.attr('id', 'alreadybooked');
+                                m.append(`This Seat has already been booked.`);
+                                if($("#prices-tab-bod").find("#alreadybooked").length==0){
+                                    m.appendTo('#prices-tab-bod');
+                                }
                             }
                         },
                         error: function(error){
@@ -93,7 +100,7 @@ function initPage(id){
 
                     return false;
                 });
-
+            });
             }
         });
         
@@ -116,15 +123,15 @@ function initPage(id){
         }
     });
     $.ajax({
-        url: `/api/flight_seats/?flight=${id}`,
+        url: `/api/flight_seats/?flight=${id}&seat_position=${seat_position}`,
         cache: false,
         success: function(data){
-            console.log(data);
             putTable();
-            data.map(function (d){
-                putPricesData(d);
-            });
-            
+            //i=0;
+            //data.map(function (d){
+              //  putPricesData(d, i++);
+            //});
+            putPricesData(data);
         },
         error: function(error){
             console.log(error);

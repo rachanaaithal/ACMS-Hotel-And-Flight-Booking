@@ -112,6 +112,7 @@ class Seat_AvailabilitySerializer(serializers.ModelSerializer):
     takeoff_time=serializers.ReadOnlyField(source="seat.flight.takeoff_time")
     landing_time=serializers.ReadOnlyField(source="seat.flight.landing_time")
     price=serializers.ReadOnlyField(source="seat.price")
+    seat_id=serializers.ReadOnlyField(source="seat.id")
     def get_status_name(self, obj):
         return obj.get_status_display()
     class Meta:

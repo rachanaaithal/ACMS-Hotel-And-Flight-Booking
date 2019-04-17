@@ -11,7 +11,7 @@ function readCookie(name) {
 
 
 function initPage(transaction_id, gst, cancellation_charges){
-    console.log(transaction_id, gst, cancellation_charges);
+    console.log(gst, transaction_id, cancellation_charges);
 
     function putAboutData(data){
         var details=$('<div/>');
@@ -19,6 +19,7 @@ function initPage(transaction_id, gst, cancellation_charges){
         details.append(`<p><i class="fas fa-map-marked fa-2x"></i><b> Source: </b>${data.source}</p>`); 
         details.append(`<p><i class="fas fa-map-marked fa-2x"></i><b> Destination: </b>${data.destination}</p>`); 
         details.append(`<p><b>Seat Type:  </b>${data.category}</p>`);
+        details.append(`<p><b> Seat Number: </b>${data.seat}</p>`);
 
         const landing_time  = data.landing_time;
         const takeoff_time = data.takeoff_time;
@@ -33,7 +34,7 @@ function initPage(transaction_id, gst, cancellation_charges){
         
         if(data.status=='bk'){
             const tax=data.price*gst/100;
-                
+            
             const tot=tax+parseFloat(data.price);
             var pay=$('<div/>');
             var table=$('<table/>')
@@ -61,7 +62,7 @@ function initPage(transaction_id, gst, cancellation_charges){
                 tr.appendTo('#finalprices')
             }
 
-            cancellation_cost=cancellation_charges*tot
+            cancellation_cost=cancellation_charges*tot/100;
             var modal=$('<div/>')
             modal.addClass('modal fade')
             modal.attr('id', 'cancellation')
@@ -110,7 +111,6 @@ function initPage(transaction_id, gst, cancellation_charges){
         url:`/api/seat_availability/?id=${transaction_id}`,
         cache: false,
         success: function(data){
-            console.log(data);
             putAboutData(data[0])
         },
 

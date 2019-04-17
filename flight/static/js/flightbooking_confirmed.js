@@ -10,6 +10,7 @@ function initPage(flight_id, category, transaction_id, gst){
         details.append(`<p><i class="fas fa-map-marked fa-2x"></i><b> Source: </b>${data.source}</p>`); 
         details.append(`<p><i class="fas fa-map-marked fa-2x"></i><b> Destination: </b>${data.destination}</p>`); 
         details.append(`<p><b>Seat Type: </b>${data.category}</p>`);
+        details.append(`<p><b>Seat Number: ${data.seat}</b></p>`); 
 
         const landing_time  = data.landing_time;
         const takeoff_time = data.takeoff_time;

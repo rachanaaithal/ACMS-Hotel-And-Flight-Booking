@@ -475,6 +475,7 @@ def cflightstatus(request):
     source=request.GET["source"]
     destination=request.GET["destination"]
     st=request.GET["start"]
+    seat_id=request.GET["seat_id"]
     flight_id=request.GET["flightid"]
     category=request.GET["category"]
     st=st.strip()
@@ -484,11 +485,11 @@ def cflightstatus(request):
     q5=Q(seat__flight__destination__name=destination)
     q6=Q(on_date__day=st.day)
 
-#Get Supply (Room type-hotel level_
-    supply = Flight_Seats.objects.filter(flight__id=flight_id).filter(category__id=category).values('id','flight__id','flight__airline_name', 'category__name', 'flight__image_link', 'flight__flightnumber','flight__on_date','seat_position','number_of_seats','flight__takeoff_time', 'flight__landing_time')
+
+    supply = Flight_Seats.objects.filter(id=seat_id).filter(flight__id=flight_id).filter(category__id=category).values('id','flight__id','flight__airline_name', 'category__name', 'flight__image_link', 'flight__flightnumber','flight__on_date','seat_position','number_of_seats','flight__takeoff_time', 'flight__landing_time')
     
-#Get Demand from room availability table
-    demand = Seat_Availability.objects.filter(q4).filter(q5).filter(q6).filter(seat__flight__id=flight_id).filter(seat__category__id=category).values('seat__flight__airline_name','seat__category__name','seat__seat_position','status', 'on_date')
+
+    demand = Seat_Availability.objects.filter(q4).filter(q5).filter(q6).filter(seat__id=seat_id).filter(seat__flight__id=flight_id).filter(seat__category__id=category).values('seat__flight__airline_name','seat__category__name','seat__seat_position','status', 'on_date')
 
     #print('checking',list(supply)[0]['id'],demand)
     if((list(supply)[0]['number_of_seats']-len(list(demand)))>0):
@@ -497,3 +498,16 @@ def cflightstatus(request):
         response={'val':False}
 
     return JsonResponse(response, safe=False)
+
+'''def s_flight_seats_find(request):
+    flightid=request.GET["flight"]
+    seatpos=request.GET["seatpos"]
+
+    total_count=Flight_Seats.objects.filter(flight__id=flightid).filter(seat_position=seatpos).count()
+    left_count=Flight_Seats.objects.filter(flight__id=flightid).filter(seat_position=seatpos).values('number_of_seats')
+    supply=Flight_Seats.objects.filter(flight__id=flight_id).filter(seat_position=seatpos).values('id','number_of_seats','seat_position','price','flight','category')
+
+    response={'total':total_count, 'left':left_count, 'supply': list(supply)}
+
+
+    return JsonResponse(response, safe=False)'''

@@ -175,6 +175,7 @@ class Flight(models.Model):
     destination = models.ForeignKey('City', on_delete=models.CASCADE, related_name='destination') 
     on_date=models.DateField(default=timezone.now)
     #day=models.CharField( max_length=4, choices=DAYS, blank=True, default='sun', help_text='day of departure')
+    #number_of_seats = models.IntegerField(default=1)
     image_link = models.CharField(max_length=500, default="")
     tail_id = models.CharField(max_length=10)
     '''class Meta:
@@ -196,6 +197,8 @@ class Flight_Seats(models.Model):
         ('p', 'Private'),
     )
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, help_text='Unique ID for this particular seat')
+    #change it to AutoField
+    #seat_number=models.IntegerField(default=1)
     flight = models.ForeignKey('Flight', on_delete=models.CASCADE)
     number_of_seats = models.IntegerField(default=1)
     category=models.ForeignKey('SeatType', on_delete=models.SET_NULL, null=True)
@@ -225,3 +228,7 @@ class Seat_Availability(models.Model):
         unique_together = (('flight_id', 'seat_id'),)'''
     def __str__(self):
         return '%s,%s'%(self.status, self.seat.category)
+
+
+#uncomment the number of seats variable to have number of seats in a flight
+#comment out the number of seats from flight_seats and just update the model for nuber of seats in the flight model

@@ -10,17 +10,16 @@ function readCookie(name) {
 }
 
 function initPage(flight_id, category){
-    console.log(flight_id, category);
 
     var url = new URL(window.location.href);
     var transaction_id = url.searchParams.get("id");
-    console.log(transaction_id);
     var gst=5;
 
     function putAboutData(data){
         var details=$('<div/>');
         details.append(`<h5>${data.airline}</h5>`);
         details.append(`<p>SeatType:${data.category}</p>`);
+        details.append(`<p>SeatNumber:${data.seat}</p>`);
         details.append(`<p><i class="fas fa-map-marked fa-2x"></i>${data.source}</p>`); 
         details.append(`<p><i class="fas fa-map-marked fa-2x"></i>${data.destination}</p>`); 
 
