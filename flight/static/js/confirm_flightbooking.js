@@ -58,6 +58,14 @@ function initPage(flight_id, category){
         tr.append(`<td><button id="cancel" class="btn btn-danger">Cancel</button></td><td><button id="pay" class="btn btn-primary">Pay</button></td>`)
         tr.appendTo('#finalprices')  
 
+        clicked=["Economy", "Business", "First Class"]
+        function redirect(){
+        window.location.href = "/flight/"+"?source="+data.source+"&destination="+data.destination+"&start="+data.on_dat+"&type="+clicked.join('|')
+        }
+
+        setTimeout(redirect, 60000); 
+
+
         var csrftoken = readCookie('csrftoken');
         console.log(transaction_id, flight_id, category);
         $('#pay').click(function(e){

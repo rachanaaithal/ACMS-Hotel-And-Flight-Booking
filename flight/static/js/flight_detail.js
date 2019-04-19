@@ -51,8 +51,7 @@ function initPage(id){
     var csrftoken = readCookie('csrftoken');
 //    var csrftoken = $('[name="csrftoken"]').attr('value');
     console.log(csrftoken)
-    function putPricesData(d){
-        
+    
         $.ajax({
             url: `/api/seattype/${d[0].category}`,
             cache: false,
