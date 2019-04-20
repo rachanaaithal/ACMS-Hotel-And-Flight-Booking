@@ -1,0 +1,12 @@
+flight,numberofseats,category,seatposition,price
+335,20,"Business",h,10000,
+3231,25,"First Class",p,20000,
+448,100,"Economy",,5000,
+1746,80,"Economy",,5000,
+3920,70,"Economy",,5000,
+378,90,"Economy",,5000,
+509,100,"Economy",,5000,
+535,10,"First Class",p,25000,
+11,30,"Business",h,15000,
+810,25,"First Class",p,30000,
+100,15,"Business",h,10000,

@@ -22,7 +22,7 @@ urlpatterns = [
     path('admin/', admin.site.urls),
 
     url(r'hotel/', include('hotel.urls')),
-
+    url(r'flight/', include('flight.urls')),
     url(r'^api-auth/', include('rest_framework.urls')),
     url(r'^api/',include('api.urls')),
     path('accounts/', include('django.contrib.auth.urls')),
