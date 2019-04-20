@@ -158,8 +158,9 @@ window.onload = function () {
 				$('#results').html('');
 				nexturl="/hotel/"+"?name="+name_url+"&start="+start_url+"&end="+end_url+"&type="+clicked.join('|')+"&minprice="+min_url+"&maxprice="+max_url
 				history.pushState({}, null, nexturl);
-				
-				psedoRefresh(nexturl)
+				console.log(clicked);
+				priceRefresh(clicked);
+				//psedoRefresh(nexturl)
 			})
 		}
 	});
@@ -175,61 +176,75 @@ window.onload = function () {
 	var lower;
 	var higher;
 	
-	$.ajax({
-		url:`/api/maxroomprice/?name=${name_url}&type=${type_url}`,
-		cache: false,
-		success: function(data){
-			console.log(data)
-			max_price=data.price
-			$.ajax({
-				url:`/api/minroomprice/?name=${name_url}&type=${type_url}`,
-				cache: false,
-				success: function(data){
-					console.log(data)
-					min_price=data.price
-					console.log(max_price,min_price, max_url, min_url=='null')
-					if(max_url!='null' && min_url!='null'){
-						higher=max_url
-						lower=min_url
-					}
-					else{
-						higher=max_price
-						lower=min_price
-					}
-					$( "#slider" ).slider({
-						range:true,
-						min: parseFloat(min_price),
-						max: parseFloat(max_price),
-						values: [ parseFloat(lower),parseFloat(higher) ],
-						step: 10,
-						create: function(event,ui){
-							$(`#changevalue`).val("$" + lower + " - $" + higher)
-						},
-						change: function( event, ui ) {
-							lower= ui.values[ 0 ] 
-							higher= ui.values[ 1 ]
-							$(`#changevalue`).val("$" + ui.values[ 0 ] + " - $" + ui.values[ 1 ])
-							$('#results').html('');
-							console.log(type_url)
-							nexturl="/hotel/"+"?name="+name_url+"&start="+start_url+"&end="+end_url+"&type="+type_url+"&minprice="+ui.values[ 0 ]+"&maxprice="+ui.values[ 1 ]
-							history.pushState({}, null, nexturl);
-							console.log(ui.values[ 0 ],ui.values[ 1 ])
-							psedoRefresh(nexturl)
-						},
-						slide: function( event, ui ) {
-							tooltip.text(ui.value);
-						}
-					}).find(".ui-slider-handle").append(tooltip).hover(function() {
-						tooltip.show()
-					}, function() {
-						tooltip.hide()
-					});
-					
-				}
-			});
+	function priceRefresh(para_clicked){
+		if(para_clicked==undefined){
+			type_to_use=type_url
 		}
-	});
+		else{
+			type_to_use=para_clicked.join('|')
+		}
+		$.ajax({
+			url:`/api/maxroomprice/?name=${name_url}&type=${type_to_use}`,
+			cache: false,
+			success: function(data){
+				console.log(data)
+				console.log(para_clicked,para_clicked==undefined)
+				max_price=data.price
+				$.ajax({
+					url:`/api/minroomprice/?name=${name_url}&type=${type_to_use}`,
+					cache: false,
+					success: function(data){
+						console.log(data)
+						min_price=data.price
+						console.log(max_price,min_price, max_url, min_url=='null')
+						if(max_url!='null' && min_url!='null'){
+							higher=max_url
+							lower=min_url
+						}
+						else{
+							higher=max_price
+							lower=min_price
+						}
+						
+						$( "#slider" ).slider({
+							range:true,
+							min: parseFloat(min_price),
+							max: parseFloat(max_price),
+							values: [ parseFloat(lower),parseFloat(higher) ],
+							step: 10,
+							create: function(event,ui){
+								$(`#changevalue`).val("$" + lower + " - $" + higher)
+							},
+							change: function( event, ui ) {
+								lower= ui.values[ 0 ] 
+								higher= ui.values[ 1 ]
+								$(`#changevalue`).val("$" + ui.values[ 0 ] + " - $" + ui.values[ 1 ])
+								$('#results').html('');
+								console.log(type_url)
+								nexturl="/hotel/"+"?name="+name_url+"&start="+start_url+"&end="+end_url+"&type="+type_to_use+"&minprice="+ui.values[ 0 ]+"&maxprice="+ui.values[ 1 ]
+								console.log(nexturl, para_clicked)
+								history.pushState({}, null, nexturl);
+								console.log(ui.values[ 0 ],ui.values[ 1 ])
+								psedoRefresh(nexturl)
+							},
+							slide: function( event, ui ) {
+								tooltip.text(ui.value);
+							}
+						}).find(".ui-slider-handle").append(tooltip).hover(function() {
+							tooltip.show()
+						}, function() {
+							tooltip.hide()
+						});
+					
+						
+					}
+				});
+			}
+		});
+	}
 
+	priceRefresh();
+	
 	//dates
 	var fromdate=moment().format('YYYY-MM-DD');
 	var todate=moment().add(1,'days').format('YYYY-MM-DD');

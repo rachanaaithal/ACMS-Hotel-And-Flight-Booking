@@ -146,3 +146,11 @@ class UserprofileInfo(models.Model):
     role = models.CharField(max_length=10)
     def __str__(self):
         return self.user.username
+
+class HotelPhotos(models.Model):
+
+    hotel = models.ForeignKey('Hotel', on_delete=models.CASCADE, null=True)
+    image_link = models.CharField(max_length=500, default="")
+
+    def __str__(self):
+        return self.hotel.name
