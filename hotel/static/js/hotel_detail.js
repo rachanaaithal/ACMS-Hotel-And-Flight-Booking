@@ -1,9 +1,7 @@
 function initPage(id){
     console.log(id);
     function putAboutData(data){
-        var img=$('<div/>')
-        img.append(`<img src=${data.image_link}>`);
-        img.appendTo('#about');
+        
         var details=$('<div/>');
         details.append(`<h5>${data.name}</h5>`);
         details.append(`<p><i class="fas fa-map-marked fa-2x"></i>${data.address}</p>`); 
@@ -14,7 +12,7 @@ function initPage(id){
 
         details.append(`<p>CheckinTime:${moment(checkIn, "HH:mm:ss").format('hh:mm A')}</p>`);
         details.append(`<p>CheckoutBefore:${checkOut}</p>`);
-        details.appendTo('#about');
+        details.appendTo('#data');
         console.log(`${data.checkintime}-${data.extratime}`)
         
     }
@@ -145,5 +143,27 @@ function initPage(id){
             console.log(error);
         }
     });
+
+    function putImage(d){
+        console.log("here")
+        $(`<li data-target="#carouselHotelIndicators" data-slide-to="${d.id-1}"></li>`).appendTo('.carousel-indicators')
+        $(`<div class="carousel-item"><img class="d-block w-100" src="${d.image_link}" alt="${d.id-1}"></div>`).appendTo('.carousel-inner')
+    }
+
+    $.ajax({
+        url:`/api/hotelphotos/?hotel=${id}`,
+        cache: false,
+        success: function(data){
+            console.log(data);
+            data.map(function(d){
+                putImage(d);
+            });
+            $('.carousel-item').first().addClass('active');
+            $('.carousel-indicators > li').first().addClass('active');
+        },
+        error: function(error){
+            console.log(error);
+        }
+    })
 
 }

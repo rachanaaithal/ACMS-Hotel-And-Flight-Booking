@@ -13,6 +13,9 @@ router.register(r'city', views.CityViewSet)
 router.register(r'hotels', views.HotelViewSet)
 router.register(r'roomtype', views.RoomTypeViewSet)
 router.register(r'hotelroom', views.HotelRoomViewSet)
+router.register(r'hotelphotos', views.HotelPhotosViewSet)
+
+
 router.register(r'profile1', views.User1ViewSet,base_name='profile1')
 router.register(r'profile2', views.UserProfileViewSet,base_name='profile2')
 #router.register(r'roomavailability', views.RoomAvailabilityViewSet)

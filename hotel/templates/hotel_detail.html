@@ -7,11 +7,31 @@
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.4.0/dist/leaflet.css" />
     <script src="https://unpkg.com/leaflet@1.4.0/dist/leaflet.js"></script>
 
+    {% load static %} 
+    <link rel="stylesheet" href="/static/css/style2.css">
     <div id="about">
+        <div id="carouselHotelIndicators" class="carousel slide" data-ride="carousel">
+            <ol class="carousel-indicators" id="indec">
+            </ol>
+            <div class="carousel-inner" id="inner">
+            </div>
+            <a class="carousel-control-prev" href="#carouselHotelIndicators" role="button" data-slide="prev">
+                <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                <span class="sr-only">Previous</span>
+            </a>
+            <a class="carousel-control-next" href="#carouselHotelIndicators" role="button" data-slide="next">
+                <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                <span class="sr-only">Next</span>
+            </a>
+        </div>
+        <div id="details">
+            <div id="data"></div>    
+            <div id="map" style="width:300px;height:300px;"></div>
+        </div>
     </div>
     <div id="prices">
     </div>
-    <div id="map" style="width:300px;height:300px"></div>
+
     <script>
         initPage("{{id}}");
     </script>

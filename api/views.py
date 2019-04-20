@@ -1,7 +1,7 @@
 from django.contrib.auth.models import User, Group
 from rest_framework import viewsets
-from api.serializers import UserSerializer, GroupSerializer, HotelSerializer, CountrySerializer, CitySerializer, HotelRoomSerializer, RoomTypeSerializer, RoomAvailabilitySerializer
-from api.models import Country, City, Hotel, RoomType, HotelRoom, RoomAvailability, UserprofileInfo
+from api.serializers import UserSerializer, GroupSerializer, HotelSerializer, CountrySerializer, CitySerializer, HotelRoomSerializer, RoomTypeSerializer, RoomAvailabilitySerializer, HotelPhotosSerializer
+from api.models import Country, City, Hotel, RoomType, HotelRoom, RoomAvailability, HotelPhotos, UserprofileInfo
 from rest_framework import filters
 from django_filters.rest_framework import DjangoFilterBackend
 from django.http import JsonResponse
@@ -18,6 +18,7 @@ from django.db.models import Max, Min
 
 from django.contrib.auth import authenticate, login, logout, views
 
+import random
 class UserViewSet(viewsets.ModelViewSet):
     """
     API endpoint that allows users to be viewed or edited.
@@ -71,9 +72,10 @@ class MaxHotelRoomView(generics.ListCreateAPIView):
         city = self.request.GET.get("name",None)
         room_type= self.request.GET.get("type",None)
         room_type=room_type.split('|')
+        print("\n\n\n\n\n\n\n\n\n\nn\nhere:",HotelRoom.objects.filter(category__name__in=room_type),"\n\nnow:",HotelRoom.objects.filter(hotel__city_name__name=city).filter(category__name__in=room_type),"\n\n")
         return HotelRoom.objects.filter(hotel__city_name__name=city).filter(category__name__in=room_type)
     def get(self, request, format=None):
-        room=self.get_queryset().first()    
+        room=self.get_queryset().order_by('-price').first()
         serializer = HotelRoomSerializer(room)
         return Response(serializer.data)
 class MinHotelRoomView(generics.ListCreateAPIView):
@@ -230,8 +232,14 @@ def search(request):
         
         #if new hotel name
         if result['hotel__name'] not in response:
+
+            images=HotelPhotos.objects.filter(hotel__name=result['hotel__name']).values('image_link')
+            images=[x['image_link'] for x in list(images)]
+            print("\n\n\n\n",images,"\n\n\n\n\n\n")
+            
             response[result['hotel__name']] = {}
-            response[result['hotel__name']]['image_link']=result['hotel__image_link']
+            #response[result['hotel__name']]['image_link']=result['hotel__image_link']
+            response[result['hotel__name']]['image_link']=random.choice(list(images))
             response[result['hotel__name']]['room_types']={}
             response[result['hotel__name']]['hotel_id']=result['hotel__id'] 
             response[result['hotel__name']]['latitude']=result['hotel__latitude']
@@ -301,6 +309,13 @@ def check(request):
         response={'val':False}
 
     return JsonResponse(response, safe=False)
+
+class HotelPhotosViewSet(viewsets.ModelViewSet):
+    queryset = HotelPhotos.objects.all()
+    serializer_class = HotelPhotosSerializer
+    filter_fields = {
+        'hotel': ['exact'],
+    }
 
 
 
