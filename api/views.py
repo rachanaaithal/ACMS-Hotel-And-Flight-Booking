@@ -233,12 +233,13 @@ def search(request):
         #if new hotel name
         if result['hotel__name'] not in response:
 
-            images=HotelPhotos.objects.filter(hotel__name=result['hotel__name'])
+            images=HotelPhotos.objects.filter(hotel__name=result['hotel__name']).values('image_link')
+            images=[x['image_link'] for x in list(images)]
             print("\n\n\n\n",images,"\n\n\n\n\n\n")
             
             response[result['hotel__name']] = {}
-            response[result['hotel__name']]['image_link']=result['hotel__image_link']
-            #response[result['hotel__name']]['image_link']=random.choice(list(images))
+            #response[result['hotel__name']]['image_link']=result['hotel__image_link']
+            response[result['hotel__name']]['image_link']=random.choice(list(images))
             response[result['hotel__name']]['room_types']={}
             response[result['hotel__name']]['hotel_id']=result['hotel__id'] 
             response[result['hotel__name']]['latitude']=result['hotel__latitude']
