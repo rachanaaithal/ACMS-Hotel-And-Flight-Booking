@@ -36,6 +36,7 @@ function initPage(id){
     var source = url.searchParams.get("source");
     var dest=url.searchParams.get("destination");
     var seat_position=url.searchParams.get("seat_position");
+    console.log(seat_position)
 
     function readCookie(name) {
         var nameEQ = name + "=";
@@ -52,6 +53,7 @@ function initPage(id){
 //    var csrftoken = $('[name="csrftoken"]').attr('value');
     console.log(csrftoken)
     
+    function putPricesData(d){
         $.ajax({
             url: `/api/seattype/${d[0].category}`,
             cache: false,
@@ -106,8 +108,7 @@ function initPage(id){
 
     }
 
-    
-
+  
     var id;
     $.ajax({
         url: `/api/flights/${id}`,
