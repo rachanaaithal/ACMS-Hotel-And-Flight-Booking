@@ -10,12 +10,23 @@ function readCookie(name) {
 }
 
 function initPage(flight_id, category){
+    
 
     var url = new URL(window.location.href);
     var transaction_id = url.searchParams.get("id");
     var gst=5;
 
     function putAboutData(data){
+     //function disableBack() { window.history.forward(); console.log("in disable"); }
+    //disableBack();
+    //window.onpageshow = function(evt) { if (evt.persisted) {disableBack();} }
+
+    window.history.pushState(null, "", window.location.href);        
+        window.onpopstate = function() {
+            alert("Please do not press back button during transaction!");
+            window.history.pushState(null, "", window.location.href);
+        };
+
         var details=$('<div/>');
         details.append(`<h5>${data.airline}</h5>`);
         details.append(`<p>SeatType:${data.category}</p>`);

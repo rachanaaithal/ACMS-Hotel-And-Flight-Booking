@@ -77,7 +77,9 @@ function initPage(id){
                                     data:{'on_date': fromdate ,'seat':data.id, 'status': 'pr'},
                                     headers:{"X-CSRFToken": csrftoken},
                                     success:function(newdata){
-                                        window.location.href=`/flight/`+id+`/${d[0].category}/?id=${newdata.id}`;
+                                        url=`/flight/`+id+`/${d[0].category}/?id=${newdata.id}`;
+                                        window.location.replace(url);
+                                        return (false);
                                     }
                                 });
                             
