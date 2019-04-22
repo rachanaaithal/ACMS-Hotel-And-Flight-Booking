@@ -1,6 +1,8 @@
 from django.contrib.auth.models import User, Group
 from rest_framework import serializers
-from api.models import Country, City, Hotel, RoomType, HotelRoom, RoomAvailability, Flight, Flight_Seats, Seat_Availability, SeatType
+
+from api.models import Country, City, Hotel, RoomType, HotelRoom, RoomAvailability, HotelPhotos
+from api.models import Flight, Flight_Seats, Seat_Availability, SeatType
 
 
 class UserSerializer(serializers.HyperlinkedModelSerializer):
@@ -82,6 +84,23 @@ class RoomAvailabilitySerializer(serializers.ModelSerializer):
         model = RoomAvailability
         fields = '__all__'
         #depth = 2
+
+class HotelPhotosSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = HotelPhotos
+        fields = '__all__'
+		
+from api.models import UserprofileInfo
+
+class User1Serializer(serializers.HyperlinkedModelSerializer):
+    class Meta:
+        model = User
+        fields = ('id','username', 'email', 'first_name','last_name')
+		
+class UserProfileSerializer(serializers.HyperlinkedModelSerializer):
+    class Meta:
+        model = UserprofileInfo
+        fields = ('id','phone_number')
 
 class SeatTypeSerializer(serializers.ModelSerializer):
     class Meta:

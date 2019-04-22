@@ -1,8 +1,12 @@
-
 from django.contrib.auth.models import User, Group
 from rest_framework import viewsets
-from api.serializers import UserSerializer, GroupSerializer, HotelSerializer, CountrySerializer, CitySerializer, HotelRoomSerializer, RoomTypeSerializer, RoomAvailabilitySerializer, Seat_AvailabilitySerializer, SeatTypeSerializer, FlightSerializer, Flight_SeatsSerializer
-from api.models import Country, City, Hotel, RoomType, HotelRoom, RoomAvailability, UserprofileInfo, Seat_Availability, Flight, Flight_Seats, SeatType
+
+from api.serializers import UserSerializer, GroupSerializer, HotelSerializer, CountrySerializer, CitySerializer, HotelRoomSerializer, RoomTypeSerializer, RoomAvailabilitySerializer, HotelPhotosSerializer
+from api.models import Country, City, Hotel, RoomType, HotelRoom, RoomAvailability, HotelPhotos, UserprofileInfo
+
+from api.serializers import Seat_AvailabilitySerializer, SeatTypeSerializer, FlightSerializer, Flight_SeatsSerializer
+from api.models import Seat_Availability, Flight, Flight_Seats, SeatType
+
 from rest_framework import filters
 from django_filters.rest_framework import DjangoFilterBackend
 from django.http import JsonResponse
@@ -20,6 +24,7 @@ import datetime
 from django.utils import timezone
 from django.contrib.auth import authenticate, login, logout, views
 
+import random
 class UserViewSet(viewsets.ModelViewSet):
     """
     API endpoint that allows users to be viewed or edited.
@@ -73,9 +78,10 @@ class MaxHotelRoomView(generics.ListCreateAPIView):
         city = self.request.GET.get("name",None)
         room_type= self.request.GET.get("type",None)
         room_type=room_type.split('|')
+        print("\n\n\n\n\n\n\n\n\n\nn\nhere:",HotelRoom.objects.filter(category__name__in=room_type),"\n\nnow:",HotelRoom.objects.filter(hotel__city_name__name=city).filter(category__name__in=room_type),"\n\n")
         return HotelRoom.objects.filter(hotel__city_name__name=city).filter(category__name__in=room_type)
     def get(self, request, format=None):
-        room=self.get_queryset().first()    
+        room=self.get_queryset().order_by('-price').first()
         serializer = HotelRoomSerializer(room)
         return Response(serializer.data)
 class MinHotelRoomView(generics.ListCreateAPIView):
@@ -168,6 +174,7 @@ def search(request):
     type_room= request.GET.get("type",None)
     min_price= request.GET.get("minprice",None)
     max_price= request.GET.get("maxprice",None)
+    page = request.GET.get('page', 1)
     st=st.strip()
     ed=ed.strip()
     if name is None or st is None or ed is None:
@@ -175,7 +182,7 @@ def search(request):
 
     if type_room is not None:
         type_room=type_room.split('|')
-    print("\n\n\n\n\n\n\n\n\n",name,st,ed, type_room,min_price,max_price)
+    print("\n\n\n\n\n\n\n\n\n",name,st,ed, type_room,min_price,max_price,page)
     print(min_price=='null')
     # city_results = Hotel.objects.filter(city_name__name=name)
 
@@ -231,8 +238,14 @@ def search(request):
         
         #if new hotel name
         if result['hotel__name'] not in response:
+
+            images=HotelPhotos.objects.filter(hotel__name=result['hotel__name']).values('image_link')
+            images=[x['image_link'] for x in list(images)]
+            print("\n\n\n\n",images,"\n\n\n\n\n\n")
+            
             response[result['hotel__name']] = {}
-            response[result['hotel__name']]['image_link']=result['hotel__image_link']
+            #response[result['hotel__name']]['image_link']=result['hotel__image_link']
+            response[result['hotel__name']]['image_link']=random.choice(list(images))
             response[result['hotel__name']]['room_types']={}
             response[result['hotel__name']]['hotel_id']=result['hotel__id'] 
             response[result['hotel__name']]['latitude']=result['hotel__latitude']
@@ -244,8 +257,8 @@ def search(request):
     response = [{'hotel':key, 'room_types':response[key]['room_types'], 'image_link':response[key]['image_link'], 'hotel_id':response[key]['hotel_id'], 'latitude': response[key]['latitude'], 'longitude': response[key]['longitude']} for key in response]
     print('\n\nresponse',response,len(response),type(response))
 
-    page = request.GET.get('page', 1)
-
+    
+    print(page)
     paginator = Paginator(response, 6)
     try:
         print('try')
@@ -257,9 +270,20 @@ def search(request):
         print('except2')
         response_page = paginator.page(paginator.num_pages)
 
-    print(list(response_page))
-    return JsonResponse(response, safe=False)
-    #return JsonResponse(list(response_page), safe=False)
+    print('\n\n\n',list(response_page),response_page.number, response_page.paginator.num_pages)
+    if response_page.has_next():
+        print('\n\nhas next',response_page.next_page_number())
+        next_page=response_page.next_page_number()
+    else:
+        next_page=0
+    if response_page.has_previous():
+        print('\n\nhas previous',response_page.previous_page_number())
+        prev_page=response_page.previous_page_number()
+    else:
+        prev_page=0
+    paginated_response={'response':list(response_page),'has_next':response_page.has_next(),'next_page':next_page,'has_prev':response_page.has_previous(),'prev_page':prev_page}
+    #return JsonResponse(response, safe=False)
+    return JsonResponse(paginated_response, safe=False)
     #return Response({response_page})
 def check(request):
     name=request.GET["name"]
@@ -292,6 +316,13 @@ def check(request):
 
     return JsonResponse(response, safe=False)
 
+class HotelPhotosViewSet(viewsets.ModelViewSet):
+    queryset = HotelPhotos.objects.all()
+    serializer_class = HotelPhotosSerializer
+    filter_fields = {
+        'hotel': ['exact'],
+    }
+
 
 
 from django.shortcuts import redirect	
@@ -311,6 +342,45 @@ def register(request):
 	profile.save()
 	login(request,user,backend='django.contrib.auth.backends.ModelBackend')
 	return redirect('/hotel/')
+	
+from api.serializers import User1Serializer,UserProfileSerializer
+
+@method_decorator(csrf_exempt, name='dispatch')	
+class User1ViewSet(viewsets.ModelViewSet):
+    #queryset = User.objects.all().order_by('-date_joined')
+	serializer_class = User1Serializer
+	def perform_create(self, serializer):
+		serializer.save(username=self.request.user)
+	def get_queryset(self):
+		user=self.request.user
+		return User.objects.filter(username=user)
+	
+@method_decorator(csrf_exempt, name='dispatch')	
+class UserProfileViewSet(viewsets.ModelViewSet):
+    #queryset = User.objects.all().order_by('-date_joined')
+	serializer_class = UserProfileSerializer
+	def perform_create(self, serializer):
+		serializer.save(user=self.request.user)
+	def get_queryset(self):
+		user=self.request.user
+		return UserprofileInfo.objects.filter(user=user)
+		
+def edit(request):
+	fname = request.GET["fname"]
+	lname = request.GET["lname"]
+	email = request.GET["email"]
+	phno = request.GET["phno"]
+	
+	u = User.objects.get(id=request.user.id)
+	u.first_name=fname
+	u.last_name=lname
+	u.email=email
+	u.save()
+	pro = UserprofileInfo.objects.get(user=request.user)
+	pro.phone_number=phno
+	pro.save()
+	return redirect('/hotel/')
+
 
 
 class FlightViewSet(viewsets.ModelViewSet):

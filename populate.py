@@ -6,7 +6,7 @@ import sys,os
 sys.path.append(project_home)
 os.environ['DJANGO_SETTINGS_MODULE'] ='Project.settings'
 
-from api.models import Country, City, Hotel, RoomType, HotelRoom, RoomAvailability
+from api.models import Country, City, Hotel, RoomType, HotelRoom, RoomAvailability, HotelPhotos
 
 with open("/home/aithal/Documents/Project/data/countries.csv",'r') as countrycsv:
     countryreader = csv.reader(countrycsv)
@@ -71,6 +71,18 @@ with open("/home/aithal/Documents/Project/data/hotelroom.csv",'r') as hotelroomc
 #        print(Hotel.objects.filter(name=row[5])[0])
         new= HotelRoom(price=row[0], capacity=row[1] , description=row[2] , category=RoomType.objects.filter(name=row[3])[0], hotel=Hotel.objects.filter(name=row[4])[0], number_of_rooms=row[5])
 #        print(new.save())
+        try:
+            new.save()
+        except:
+            print("Problem with line:", row)
+
+
+with open("/home/aithal/Documents/Project/data/hotelphotos.csv",'r') as hotelphotoscsv:
+    hotelphotosreader = csv.reader(hotelphotoscsv)
+    next(hotelphotosreader)
+
+    for row in hotelphotosreader:
+        new= HotelPhotos(hotel=Hotel.objects.filter(name=row[0])[0], image_link=row[1])
         try:
             new.save()
         except:

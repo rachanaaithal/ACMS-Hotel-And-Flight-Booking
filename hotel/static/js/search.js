@@ -6,6 +6,7 @@ window.onload = function () {
 	var type_url = url.searchParams.get("type");
 	var min_url =url.searchParams.get("minprice");
 	var max_url =url.searchParams.get("maxprice");
+	var page_url = url.searchParams.get("page");
 	//function for the typeahead input.
 	function psedoRefresh(nexturl){
 		var nexturl = new URL(window.location.href);
@@ -23,7 +24,7 @@ window.onload = function () {
 				result=data;
 				//$('#results').html('');
 
-				if(data.length>0){
+				if(data['response'].length>0){
 					$('#noresults').hide();
 					$('.optional-filter').show();
 				}
@@ -32,16 +33,37 @@ window.onload = function () {
 					$('.optional-filter').show();
 				}
 
-				data.map(function(d){
+				data['response'].map(function(d){
 					//console.log(d.hotel, Object.keys(d.room_types));
 					//console.log(d);
 					putResults(d);
 				});
-				
+				paginate(data)	
 			}
 		});
 
 	}
+
+	function paginate(data){
+		var nexturl = new URL(window.location.href);
+		var nextstart_url= nexturl.searchParams.get("start");
+		var nextend_url = nexturl.searchParams.get("end");
+		var nextname_url = nexturl.searchParams.get("name");
+		var nexttype_url = nexturl.searchParams.get("type");
+		var nextmin_url = nexturl.searchParams.get("minprice");
+		var nextmax_url = nexturl.searchParams.get("maxprice");
+		$(`.pagination`).html('')
+		var span=$('<span/>')
+		span.addClass('page-links')
+		if(data['has_prev']){
+			span.append(`<a href="/hotel/?name=${nextname_url}&start=${nextstart_url}&end=${nextend_url}&type=${nexttype_url}&minprice=${nextmin_url}&maxprice=${nextmax_url}&page=${data['prev_page']}">previous</a>`)
+		}
+		if(data['has_next']){
+			span.append(`<a href="/hotel/?name=${nextname_url}&start=${nextstart_url}&end=${nextend_url}&type=${nexttype_url}&minprice=${nextmin_url}&maxprice=${nextmax_url}&page=${data['next_page']}">next</a>`)
+		}
+		span.appendTo(`.pagination`)
+	}
+
 	function typeaheadInit(cityList){ 
 		var substringMatcher = function (strs) {
 			return function findMatches(q, cb) {
@@ -136,8 +158,9 @@ window.onload = function () {
 				$('#results').html('');
 				nexturl="/hotel/"+"?name="+name_url+"&start="+start_url+"&end="+end_url+"&type="+clicked.join('|')+"&minprice="+min_url+"&maxprice="+max_url
 				history.pushState({}, null, nexturl);
-				
-				psedoRefresh(nexturl)
+				console.log(clicked);
+				priceRefresh(clicked);
+				//psedoRefresh(nexturl)
 			})
 		}
 	});
@@ -153,61 +176,75 @@ window.onload = function () {
 	var lower;
 	var higher;
 	
-	$.ajax({
-		url:`/api/maxroomprice/?name=${name_url}&type=${type_url}`,
-		cache: false,
-		success: function(data){
-			console.log(data)
-			max_price=data.price
-			$.ajax({
-				url:`/api/minroomprice/?name=${name_url}&type=${type_url}`,
-				cache: false,
-				success: function(data){
-					console.log(data)
-					min_price=data.price
-					console.log(max_price,min_price, max_url, min_url=='null')
-					if(max_url!='null' && min_url!='null'){
-						higher=max_url
-						lower=min_url
-					}
-					else{
-						higher=max_price
-						lower=min_price
-					}
-					$( "#slider" ).slider({
-						range:true,
-						min: parseFloat(min_price),
-						max: parseFloat(max_price),
-						values: [ parseFloat(lower),parseFloat(higher) ],
-						step: 10,
-						create: function(event,ui){
-							$(`#changevalue`).val("$" + lower + " - $" + higher)
-						},
-						change: function( event, ui ) {
-							lower= ui.values[ 0 ] 
-							higher= ui.values[ 1 ]
-							$(`#changevalue`).val("$" + ui.values[ 0 ] + " - $" + ui.values[ 1 ])
-							$('#results').html('');
-							console.log(type_url)
-							nexturl="/hotel/"+"?name="+name_url+"&start="+start_url+"&end="+end_url+"&type="+type_url+"&minprice="+ui.values[ 0 ]+"&maxprice="+ui.values[ 1 ]
-							history.pushState({}, null, nexturl);
-							console.log(ui.values[ 0 ],ui.values[ 1 ])
-							psedoRefresh(nexturl)
-						},
-						slide: function( event, ui ) {
-							tooltip.text(ui.value);
-						}
-					}).find(".ui-slider-handle").append(tooltip).hover(function() {
-						tooltip.show()
-					}, function() {
-						tooltip.hide()
-					});
-					
-				}
-			});
+	function priceRefresh(para_clicked){
+		if(para_clicked==undefined){
+			type_to_use=type_url
 		}
-	});
+		else{
+			type_to_use=para_clicked.join('|')
+		}
+		$.ajax({
+			url:`/api/maxroomprice/?name=${name_url}&type=${type_to_use}`,
+			cache: false,
+			success: function(data){
+				console.log(data)
+				console.log(para_clicked,para_clicked==undefined)
+				max_price=data.price
+				$.ajax({
+					url:`/api/minroomprice/?name=${name_url}&type=${type_to_use}`,
+					cache: false,
+					success: function(data){
+						console.log(data)
+						min_price=data.price
+						console.log(max_price,min_price, max_url, min_url=='null')
+						if(max_url!='null' && min_url!='null'){
+							higher=max_url
+							lower=min_url
+						}
+						else{
+							higher=max_price
+							lower=min_price
+						}
+						
+						$( "#slider" ).slider({
+							range:true,
+							min: parseFloat(min_price),
+							max: parseFloat(max_price),
+							values: [ parseFloat(lower),parseFloat(higher) ],
+							step: 10,
+							create: function(event,ui){
+								$(`#changevalue`).val("$" + lower + " - $" + higher)
+							},
+							change: function( event, ui ) {
+								lower= ui.values[ 0 ] 
+								higher= ui.values[ 1 ]
+								$(`#changevalue`).val("$" + ui.values[ 0 ] + " - $" + ui.values[ 1 ])
+								$('#results').html('');
+								console.log(type_url)
+								nexturl="/hotel/"+"?name="+name_url+"&start="+start_url+"&end="+end_url+"&type="+type_to_use+"&minprice="+ui.values[ 0 ]+"&maxprice="+ui.values[ 1 ]
+								console.log(nexturl, para_clicked)
+								history.pushState({}, null, nexturl);
+								console.log(ui.values[ 0 ],ui.values[ 1 ])
+								psedoRefresh(nexturl)
+							},
+							slide: function( event, ui ) {
+								tooltip.text(ui.value);
+							}
+						}).find(".ui-slider-handle").append(tooltip).hover(function() {
+							tooltip.show()
+						}, function() {
+							tooltip.hide()
+						});
+					
+						
+					}
+				});
+			}
+		});
+	}
 
+	priceRefresh();
+	
 	//dates
 	var fromdate=moment().format('YYYY-MM-DD');
 	var todate=moment().add(1,'days').format('YYYY-MM-DD');
@@ -276,7 +313,7 @@ window.onload = function () {
 	console.log('\n\n\n\n',min_url,max_url)
 	if(type_url == null){
 		type_url="AC|Non-AC|Delux";
-		nexturl="/hotel/"+"?name="+name_url+"&start="+start_url+"&end="+end_url+"&type="+type_url+"&minprice="+min_url+"&maxprice="+max_url;
+		nexturl="/hotel/"+"?name="+name_url+"&start="+start_url+"&end="+end_url+"&type="+type_url+"&minprice="+min_url+"&maxprice="+max_url+"&page="+page_url;
 		history.pushState({}, null, nexturl);
 	}
 	/*
@@ -290,7 +327,7 @@ window.onload = function () {
 	console.log('\n\n\n\n',min_url,max_url)
 	if(start_url!=null & end_url!=null & name_url!=null){
 		$.ajax({
-            url: "/api/search/?name="+name_url+"&start="+start_url+"&end="+end_url+"&type="+type_url+"&minprice="+min_url+"&maxprice="+max_url,
+            url: "/api/search/?name="+name_url+"&start="+start_url+"&end="+end_url+"&type="+type_url+"&minprice="+min_url+"&maxprice="+max_url+"&page="+page_url,
             cache: false,
             success: function(data){
 				$('#typeahead').val(name_url)
@@ -332,7 +369,7 @@ window.onload = function () {
 				result=data;
 				//$('#results').html('');
 
-				if(data.length>0){
+				if(data['response'].length>0){
 					$('#noresults').hide();
 					$('.optional-filter').show();	
 				}
@@ -345,12 +382,12 @@ window.onload = function () {
 				
 
 				//$('.filter1').attr('checked','true');
-				data.map(function(d){
+				data['response'].map(function(d){
 					//console.log(d.hotel, Object.keys(d.room_types));
 					//console.log(d);
 					putResults(d);
 				});
-
+				paginate(data)
             }
         });
 	}

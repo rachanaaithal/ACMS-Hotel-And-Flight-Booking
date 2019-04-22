@@ -149,6 +149,17 @@ class UserprofileInfo(models.Model):
     def __str__(self):
         return self.user.username
 
+class HotelPhotos(models.Model):
+
+    hotel = models.ForeignKey('Hotel', on_delete=models.CASCADE, null=True)
+    image_link = models.CharField(max_length=500, default="")
+
+    def __str__(self):
+        return self.hotel.name
+
+
+
+
 class SeatType(models.Model):
     name = models.CharField(max_length=200, help_text='Enter type of seats')
     def __str__(self):
