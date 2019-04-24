@@ -45,6 +45,7 @@ INSTALLED_APPS = [
     'hotel.apps.HotelConfig',
     'api.apps.ApiConfig',
     'rest_framework',
+    'flight.apps.FlightConfig',
     'django_filters',
     'customer.apps.CustomerConfig',
 ]

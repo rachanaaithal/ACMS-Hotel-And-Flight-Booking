@@ -1,0 +1,12 @@
+flightnumber,airlinename,takeofftime,landingtime,source,destination,date,image_link,tailid
+335,Indigo,20:03:00,22:11:00,IAD,TPA,2019-01-03,https://www.dropbox.com/s/enp28mweejmqehw/IndiGo.png?dl=0,
+3231,Lufthansa,07:54:00,10:02:00,IAD,TPA,2019-01-04,https://www.dropbox.com/s/8pgkxukwfjjss2p/lufthansa.png?dl=0,
+448,Jet Airways,06:28:00,08:04:00,IND,BWI,2019-01-05,https://www.dropbox.com/s/hy5y9bq2bv48w54/jetairways.png?dl=0,
+1746,Emirates,09:26:00,10:54:00,IND,BWI,2019-01-06,https://www.dropbox.com/s/kjeqbpdobrgniv7/emirates.png?dl=0,
+3920,Air India,18:29:00,19:59:00,IND,BWI,2019-01-07,https://www.dropbox.com/s/j4pu6ospzwl4x4f/airindia.jpg?dl=0,
+378,Swiss,19:40:00,21:21:00,IND,JAX,2019-01-01,https://www.dropbox.com/s/p4tjuhic2qqucu1/swiss.png?dl=0,
+509,Iberia,19:37:00,20:37:00,IND,LAS,2019-01-02,https://www.dropbox.com/s/w3171fp61lsy0l4/iberia.png?dl=0,
+535,British Airways,10:39:00,11:32:00,IND,LAS,2019-01-28,https://www.dropbox.com/s/757meer4vwnzuiy/britishairways.png?dl=0,
+11,Air Asia,06:17:00,06:52:00,IND,MCI,2019-01-29,https://www.dropbox.com/s/m7btw8pybwimj8z/airasia.png?dl=0,
+810,EgyptAir,16:20:00,16:39:00,IND,MCI,2019-01-30,https://www.dropbox.com/s/c1kjsj2unzxmj5h/egyptair.png?dl=0,
+100,Ethiopian,07:06:00,09:16:00,IND,MCO,2019-01-31,https://www.dropbox.com/s/yeb6mcfkhy1ye5g/EthiopianAirlines.png?dl=0,
