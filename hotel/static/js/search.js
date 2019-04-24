@@ -22,7 +22,7 @@ window.onload = function () {
 			success: function(data){
 				console.log(data);
 				result=data;
-				//$('#results').html('');
+				$('#results').html('');
 
 				if(data['response'].length>0){
 					$('#noresults').hide();
