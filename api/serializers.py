@@ -1,8 +1,6 @@
 from django.contrib.auth.models import User, Group
 from rest_framework import serializers
-
 from api.models import Country, City, Hotel, RoomType, HotelRoom, RoomAvailability, HotelPhotos
-from api.models import Flight, Flight_Seats, Seat_Availability, SeatType
 
 
 class UserSerializer(serializers.HyperlinkedModelSerializer):
@@ -102,38 +100,3 @@ class UserProfileSerializer(serializers.HyperlinkedModelSerializer):
         model = UserprofileInfo
         fields = ('id','phone_number')
 
-class SeatTypeSerializer(serializers.ModelSerializer):
-    class Meta:
-        fields='__all__'
-        model=SeatType
-
-class FlightSerializer(serializers.ModelSerializer):
-    source = serializers.ReadOnlyField(source='source.name')
-    destination=serializers.ReadOnlyField(source='destination.name')
-    class Meta:
-        fields = '__all__'
-        model = Flight
-        
-class Flight_SeatsSerializer(serializers.ModelSerializer):
-    class Meta:
-        fields = '__all__'
-        model = Flight_Seats
-
-class Seat_AvailabilitySerializer(serializers.ModelSerializer):
-
-    booked_by=serializers.PrimaryKeyRelatedField(read_only=True, default=serializers.CurrentUserDefault())
-    airline=serializers.ReadOnlyField(source="seat.flight.airline_name")
-    flight_number=serializers.ReadOnlyField(source="seat.flight.flightnumber")
-    category=serializers.ReadOnlyField(source="seat.category.name")
-    source=serializers.ReadOnlyField(source="seat.flight.source.name")
-    destination=serializers.ReadOnlyField(source="seat.flight.destination.name")
-    date=serializers.ReadOnlyField(source="seat.flight.date")
-    takeoff_time=serializers.ReadOnlyField(source="seat.flight.takeoff_time")
-    landing_time=serializers.ReadOnlyField(source="seat.flight.landing_time")
-    price=serializers.ReadOnlyField(source="seat.price")
-    seat_id=serializers.ReadOnlyField(source="seat.id")
-    def get_status_name(self, obj):
-        return obj.get_status_display()
-    class Meta:
-        fields = '__all__'
-        model=Seat_Availability    
