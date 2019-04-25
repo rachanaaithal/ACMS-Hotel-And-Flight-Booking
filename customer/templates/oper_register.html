@@ -1,0 +1,34 @@
+{% extends "base_generic.html" %}
+{% block content %}
+<style>
+.new{float:left; }
+#error{color:red;}
+</style>
+
+ 
+ <div class="new">
+    <div class="container">
+        <h1>Register Here</h1>
+        <h3>Just fill out the form.</h3><br><div id="error"> </div>
+		<br><div id='error'></div>
+<div id="main-filter">
+	<div class = "as" id="the-basics" style="float:left">
+          <b>Hotel Name:</b> <br>     <input id="name" type="text" name="name"><br><br><br>
+		  <b>City:</b>  <br>    <div id='city'></div><br><br><br>
+		  <b>Email:</b><br><input id="email" type="email" name="email"></input><br><br><br>
+		  <b>Phone Number:</b><br>  <input id="phno" type="text" name = "phno"><br><br><br>
+		  <b>Address:</b>   <br>   <textarea id ="add" rows="4" cols="50"></textarea><br><br><br>
+		  <b>Checkin Time:</b> <br>   <input id="ctime" type="time" name="ctime"><br><br><br>
+		  <b>Extra Time:</b>  <br>   <input id="etime" type="number" name="etime" placeholder="In minutes"><br><br><br>
+		  <b>Latitude:</b> <br>        <input id="lat" type="number" name = "lat"><br><br><br>
+		  <b>Logitude:</b>  <br> <input id="long" type="number" name = "long"><br><br><br>
+		  <b>Image Url 1:</b> <br><input id="img1" type="url" name="img1" placeholder="Provide public url of image"><br><br><br>
+		  <b>Image Url 2:</b> <br><input id="img2" type="url" name="img2" placeholder="Provide public url of image"><br><br><br>
+		  <b>Image Url 3:</b> <br><input id="img3" type="url" name="img3" placeholder="Provide public url of image"><br><br><br>
+		  <div id="next_img"></div><input id="add_img" type="button" value= "Add more images">
+		  <input id="btn" type="button" value="Register">
+    </div>
+	<script src="/static/js/new.js"></script>
+	   </div>
+  </div>
+{% endblock %}

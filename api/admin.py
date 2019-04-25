@@ -11,3 +11,11 @@ admin.site.register(Country)
 admin.site.register(City)
 admin.site.register(UserprofileInfo)
 admin.site.register(HotelPhotos)
+
+from api.models import Registered_Hotel,Operator
+admin.site.register(Registered_Hotel)
+admin.site.register(Operator)
+
+from api.models import Registered_HotelPhotos
+admin.site.register(Registered_HotelPhotos)
+

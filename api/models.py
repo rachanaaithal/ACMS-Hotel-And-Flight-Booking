@@ -154,3 +154,43 @@ class HotelPhotos(models.Model):
 
     def __str__(self):
         return self.hotel.name
+		
+class Registered_Hotel(models.Model):
+  id = models.UUIDField(primary_key=True, default=uuid.uuid4, help_text='Unique ID for this particular hotel')
+  name = models.CharField(max_length=100)
+  #country_name = models.ForeignKey(Country, on_delete=models.CASCADE)
+  city_name = models.ForeignKey(City, on_delete=models.CASCADE)
+  address = models.CharField(max_length=200)
+  email = models.EmailField(max_length=70)
+  phone_regex = RegexValidator(regex=r'^[0-9]{10}$', message="Phone number must be entered in the format: '999999999'. Up to 10 digits allowed.")
+  phone_number = models.CharField(validators=[phone_regex], max_length=17, blank=True)
+  checkintime = models.TimeField()
+  extratime = models.DurationField()
+  #extra time is for the hotel to clean(used to calculate checkout time)
+  image_link = models.CharField(max_length=500, default="")
+  latitude = models.DecimalField(max_digits=14, decimal_places=10)
+  longitude = models.DecimalField(max_digits=14, decimal_places=10)
+  count = models.IntegerField(default=0)
+  def __str__(self):
+    """String for representing the Model object."""
+    return self.name
+  def get_absolute_url(self):
+    """Returns the url to access a detail record for this hotel."""
+    return reverse('hotel-detail', args=[str(self.id)])
+		
+class Operator(models.Model):
+	user = models.OneToOneField(User,on_delete=models.CASCADE)
+	hotel = models.OneToOneField(Hotel,on_delete=models.CASCADE)
+	phone_regex = RegexValidator(regex=r'^[0-9]{10}$', message="Phone number must be entered in the format: '999999999'. Up to 10 digits allowed.")
+	phone_number = models.CharField(validators=[phone_regex], max_length=17, blank=True)
+	role = models.CharField(max_length=10)
+	def __str__(self):
+		return self.user.username
+		
+class Registered_HotelPhotos(models.Model):
+
+    hotel = models.ForeignKey('Registered_Hotel', on_delete=models.CASCADE, null=True)
+    image_link = models.CharField(max_length=500, default="")
+
+    def __str__(self):
+        return self.hotel.name

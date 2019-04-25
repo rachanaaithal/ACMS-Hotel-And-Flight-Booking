@@ -18,6 +18,12 @@ router.register(r'hotelphotos', views.HotelPhotosViewSet)
 
 router.register(r'profile1', views.User1ViewSet,base_name='profile1')
 router.register(r'profile2', views.UserProfileViewSet,base_name='profile2')
+
+
+router.register(r'citylist',views.CityListViewSet,base_name='citylist')
+router.register(r'newhotels',views.NewHotelViewSet,base_name='new_hotels')
+router.register(r'hotels12', views.Hotels_ViewSet)
+
 #router.register(r'roomavailability', views.RoomAvailabilityViewSet)
 #router.register(r'roomavailabilitycreate', views.Availability)
 #router.register(r'availabilitydetail',views.AvailabilityDetail)
@@ -37,6 +43,8 @@ urlpatterns = [
     url(r'^maxroomprice/$', views.MaxHotelRoomView.as_view()),
     url(r'^minroomprice/$', views.MinHotelRoomView.as_view()),
 
+	url(r'oper_register',views.oper_register,name="oper_register"),
+	
     url(r'register',views.register,name="register"),
 
 ]
@@ -44,3 +52,5 @@ urlpatterns = [
 
 
 urlpatterns +=[url(r'edit',views.edit,name="edit"),]
+
+urlpatterns +=[url(r'add_oper',views.add_oper,name="add_oper"),]

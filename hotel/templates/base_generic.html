@@ -35,8 +35,10 @@
                     <a class="nav-item nav-link" href="{% url 'logout'%}?next={{request.path}}">Logout</a> 
 					<a class="nav-item nav-link" href="{% url 'user_profile'%}?next={{request.path}}">Profile</a>				
                     {% else %}
-                    <a class="nav-item nav-link" href="{% url 'user_register'%}?next={{request.path}}">Register</a>
-                    <a class="nav-item nav-link" href="{% url 'login'%}?next={{request.path}}">Login</a>   
+					
+                    <a class="nav-item nav-link" href="{% url 'register'%}?next={{request.path}}">Register</a>
+                    
+					<a class="nav-item nav-link" href="{% url 'login'%}?next={{request.path}}">Login</a>   
                     {% endif %} 
                 </div>
             </div>

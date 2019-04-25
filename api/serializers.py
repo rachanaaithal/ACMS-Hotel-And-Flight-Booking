@@ -100,3 +100,17 @@ class UserProfileSerializer(serializers.HyperlinkedModelSerializer):
         model = UserprofileInfo
         fields = ('id','phone_number')
 
+
+from api.models import Registered_Hotel
+
+class NewHotelSerializer(serializers.ModelSerializer):
+	city = serializers.ReadOnlyField(source="city_name.name")
+	class Meta:
+		model = Registered_Hotel
+		fields = '__all__'
+		
+class Hotel_Serializer(serializers.ModelSerializer):
+	city = serializers.ReadOnlyField(source="city_name.name")
+	class Meta:
+		model = Hotel
+		fields = '__all__'
