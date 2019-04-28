@@ -7,7 +7,8 @@ window.onload = function () {
 	var min_url =url.searchParams.get("minprice");
 	var max_url =url.searchParams.get("maxprice");
 	var page_url = url.searchParams.get("page");
-	//function for the typeahead input.
+	
+	
 	function psedoRefresh(nexturl){
 		var nexturl = new URL(window.location.href);
 		var nextstart_url= nexturl.searchParams.get("start");
@@ -20,7 +21,7 @@ window.onload = function () {
 			url: "/api/search/?name="+nextname_url+"&start="+nextstart_url+"&end="+nextend_url+"&type="+nexttype_url+"&minprice="+nextmin_url+"&maxprice="+nextmax_url,
 			cache: false,
 			success: function(data){
-				console.log(data);
+//				console.log(data);
 				result=data;
 				$('#results').html('');
 
@@ -34,8 +35,6 @@ window.onload = function () {
 				}
 
 				data['response'].map(function(d){
-					//console.log(d.hotel, Object.keys(d.room_types));
-					//console.log(d);
 					putResults(d);
 				});
 				paginate(data)	
@@ -64,6 +63,7 @@ window.onload = function () {
 		span.appendTo(`.pagination`)
 	}
 
+	//function for the typeahead input.
 	function typeaheadInit(cityList){ 
 		var substringMatcher = function (strs) {
 			return function findMatches(q, cb) {
@@ -145,8 +145,6 @@ window.onload = function () {
 			});
 			//to change the result when checkboxes are clicked
 			$('.filter1').click(function(d){
-				// console.log($(this).val());
-				//var cityVal = $("#typeahead").val();
 				let clicked = [];
 				$('.filter1').each(function(i,d){
 					console.log(i,d);
@@ -283,29 +281,6 @@ window.onload = function () {
 		const dateRange = $("#date-range").val();
 		console.log(window.location)
 		window.location.href="/hotel/"+"?name="+cityVal+"&start="+fromdate+"&end="+todate+"&type="+clicked.join('|')+"&minprice="+min_price+"&maxprice="+max_price
-		console.log(cityVal, dateRange, fromdate, todate);
-/*		$.ajax({
-            url: "/api/search/?name="+cityVal+"&start="+fromdate+"&end="+todate,
-            cache: false,
-            success: function(data){
-				console.log(data);
-				result=data;
-				$('#results').html('');
-
-				if(data.length>0){
-					$('#noresults').hide();
-					$('.optional-filter').show();
-				}
-
-				data.map(function(d){
-					//console.log(d.hotel, Object.keys(d.room_types));
-					//console.log(d);
-					putResults(d);
-				});
-				$('.filter1').attr('checked','true');
-            }
-		  });
-		  */
 	});
 
 	
@@ -324,7 +299,6 @@ window.onload = function () {
 		history.pushState({}, null, nexturl);
 	}
 	*/
-	console.log('\n\n\n\n',min_url,max_url)
 	if(start_url!=null & end_url!=null & name_url!=null){
 		$.ajax({
             url: "/api/search/?name="+name_url+"&start="+start_url+"&end="+end_url+"&type="+type_url+"&minprice="+min_url+"&maxprice="+max_url+"&page="+page_url,
@@ -333,7 +307,7 @@ window.onload = function () {
 				$('#typeahead').val(name_url)
 
 				
-				console.log(start_url, end_url)
+//				console.log(start_url, end_url)
 				$('input[name="daterange"]').daterangepicker({
 					opens: 'right',
 					startDate: moment(start_url), 
@@ -341,24 +315,24 @@ window.onload = function () {
 					minDate: moment(),
 					dateFormat: 'dd-mm-yyyy',
 				}, function (start, end, label) {
-					console.log("A new date selection was made: " + start.format('YYYY-MM-DD') + ' to ' + end.format('YYYY-MM-DD'));
+//					console.log("A new date selection was made: " + start.format('YYYY-MM-DD') + ' to ' + end.format('YYYY-MM-DD'));
 					fromdate=start.format('YYYY-MM-DD');
 					todate=end.format('YYYY-MM-DD');
-					console.log( fromdate, todate);
+//					console.log( fromdate, todate);
 				});
 
 				type_url_arr=type_url.split('|')
 				$('.filter1').each(function(i,d){
-					console.log(i,d);
+//					console.log(i,d);
 					if ($.inArray(d.id, type_url_arr)>-1) {
-						console.log(d.id)
+//						console.log(d.id)
 						$(this).prop("checked",true);
-						console.log(d,$(this).prop("checked"))
+//						console.log(d,$(this).prop("checked"))
 					}
 					else{
-						console.log($.inArray(d.id, type_url_arr),d.id,type_url_arr)
+//						console.log($.inArray(d.id, type_url_arr),d.id,type_url_arr)
 						$(this).prop("checked",false);
-						console.log(d,$(this).prop("checked"))
+//						console.log(d,$(this).prop("checked"))
 					}
 				})
 				
@@ -380,11 +354,7 @@ window.onload = function () {
 				}
 
 				
-
-				//$('.filter1').attr('checked','true');
 				data['response'].map(function(d){
-					//console.log(d.hotel, Object.keys(d.room_types));
-					//console.log(d);
 					putResults(d);
 				});
 				paginate(data)
