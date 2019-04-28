@@ -1,16 +1,16 @@
-"price","capacity","description","category","hotel_name","no_of_rooms"
-500,2,"Hot water available.","Non-AC","Hotel Lake View",5
-700,2,"Hot water available.","AC","Hotel Lake View",5
-1000,2,"Hot water available.","Delux","Hotel Lake View",5
-600,2,"Hot water available.","Non-AC","Octave",5
-800,2,"Hot water available.","AC","Octave",5
-700,2,"Hot water available.","Non-AC","Lemon Tree",5
-800,2,"Hot water available.","AC","Mint Hotel",5
-800,2,"Hot water available.","AC","Palm Meadows",5
-1100,2,"Hot water available.","Delux","Palm Meadows",5
-900,2,"Hot water available.","AC","Ramada Encore",5
-850,2,"Hot water available.","AC","La Marvella",5
-800,2,"Hot water available.","AC","Sterling Holidays",5
-1200,2,"Hot water available.","Delux","Sterling Holidays",5
-600,2,"Hot water available.","Non-AC","Sterling Holidays",5
-600,2,"Hot water available.","Non-AC","Mango Mist",5
+"base_price","max_price","capacity","description","category","hotel_name","no_of_rooms"
+500,700,2,"Hot water available.","Non-AC","Hotel Lake View",5
+700,1000,2,"Hot water available.","AC","Hotel Lake View",5
+1000,1500,2,"Hot water available.","Delux","Hotel Lake View",5
+600,800,2,"Hot water available.","Non-AC","Octave",5
+800,1000,2,"Hot water available.","AC","Octave",5
+700,1000,2,"Hot water available.","Non-AC","Lemon Tree",5
+800,1000,2,"Hot water available.","AC","Mint Hotel",5
+800,1000,2,"Hot water available.","AC","Palm Meadows",5
+1100,1500,2,"Hot water available.","Delux","Palm Meadows",5
+900,1300,2,"Hot water available.","AC","Ramada Encore",5
+850,1000,2,"Hot water available.","AC","La Marvella",5
+800,1000,2,"Hot water available.","AC","Sterling Holidays",5
+1200,1500,2,"Hot water available.","Delux","Sterling Holidays",5
+600,800,2,"Hot water available.","Non-AC","Sterling Holidays",5
+600,800,2,"Hot water available.","Non-AC","Mango Mist",5
