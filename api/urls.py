@@ -44,6 +44,7 @@ urlpatterns = [
     url(r'^roomavailability/(?P<pk>[^/.]+)/$',views.RoomAvailabilityViewSet.as_view({'get': 'retrieve', 'put': 'update', 'patch': 'partial_update', 'delete': 'destroy'}),name='roomavailability-detail',),
     url(r'^maxroomprice/$', views.MaxHotelRoomView.as_view()),
     url(r'^minroomprice/$', views.MinHotelRoomView.as_view()),
+    url(r'^prices/$', views.prices, name="prices"),
 
     url(r'oper_register',views.oper_register,name="oper_register"),
     url(r'register',views.register,name="register"),

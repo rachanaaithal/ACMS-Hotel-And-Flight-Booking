@@ -60,9 +60,11 @@ class RoomTypeSerializer(serializers.ModelSerializer):
 
 
 class HotelRoomSerializer(serializers.ModelSerializer):
+    price = serializers.ReadOnlyField(source="base_price")
     class Meta:
         model = HotelRoom
         fields = '__all__'
+    
 
 class RoomAvailabilitySerializer(serializers.ModelSerializer):
 #    booked_by = serializers.ReadOnlyField(default=serializers.CurrentUserDefault())
@@ -74,7 +76,7 @@ class RoomAvailabilitySerializer(serializers.ModelSerializer):
     address = serializers.ReadOnlyField(source="room.hotel.address")
     checkintime = serializers.ReadOnlyField(source="room.hotel.checkintime")
     extratime = serializers.ReadOnlyField(source="room.hotel.extratime")
-    price = serializers.ReadOnlyField(source="room.price")
+#    price = serializers.ReadOnlyField(source="room.base_price")
     status_name = serializers.SerializerMethodField()
     def get_status_name(self, obj):
         return obj.get_status_display()
