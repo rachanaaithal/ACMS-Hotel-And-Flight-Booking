@@ -84,7 +84,9 @@ class HotelRoom(models.Model):
 
     category = models.ForeignKey('RoomType', on_delete=models.SET_NULL, null=True)#use when hotels can add new types of rooms
 
-    price = models.DecimalField(max_digits=6, decimal_places=2, default=0)
+    base_price = models.DecimalField(max_digits=6, decimal_places=2, default=0)
+
+    max_price = models.DecimalField(max_digits=6, decimal_places=2, default=0)
 
     number_of_rooms = models.IntegerField(default=1,validators=[MinValueValidator(1)])
 
@@ -120,7 +122,7 @@ class RoomAvailability(models.Model):
     from_date = models.DateField(default=datetime.date.today)
     to_date = models.DateField(default=datetime.date.today)
     booked_by = models.ForeignKey(User,null=False,on_delete=models.CASCADE)
-
+    price = models.DecimalField(max_digits=6, decimal_places=2, default=0)
     StatusTypes =(
         ('bk', 'Booked'),
         ('pr', 'Processing'),

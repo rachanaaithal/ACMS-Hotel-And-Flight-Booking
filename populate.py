@@ -69,7 +69,7 @@ with open("/home/aithal/Documents/Project/data/hotelroom.csv",'r') as hotelroomc
 
     for row in hotelroomreader:
 #        print(Hotel.objects.filter(name=row[5])[0])
-        new= HotelRoom(price=row[0], capacity=row[1] , description=row[2] , category=RoomType.objects.filter(name=row[3])[0], hotel=Hotel.objects.filter(name=row[4])[0], number_of_rooms=row[5])
+        new= HotelRoom(base_price=row[0], max_price=row[1], capacity=row[2] , description=row[3] , category=RoomType.objects.filter(name=row[4])[0], hotel=Hotel.objects.filter(name=row[5])[0], number_of_rooms=row[6])
 #        print(new.save())
         try:
             new.save()

@@ -49,7 +49,6 @@ function initPage(id){
     }
     
     var csrftoken = readCookie('csrftoken');
-//    var csrftoken = $('[name="csrftoken"]').attr('value');
     console.log(csrftoken)
     function putPricesData(d){
         
@@ -58,44 +57,67 @@ function initPage(id){
             cache: false,
             success: function( data){
                 roomtype=data.name;
-                var tr=$('<tr/>')
-                tr.append(`<th scope="row">${data.name}</td>`)
-                tr.append(`<td>${d.price}</td><td><button id="category-${d.category}" class="btn btn-primary process">Book</button></td>`)
-                tr.appendTo('#prices-tab-bod')
 
-                $(`#category-${d.category}`).click(function(e){
-                    
+                $.ajax({
+                    url:`/api/prices/?name=${id}&category=${d.category}&start=${fromdate}&end=${todate}`,
+                    cache: false,
+                    success: function(price){
+                        console.log(price);
 
-                    $.ajax({
-                        url: `/api/check/?name=${id}&category=${d.category}&start=${fromdate}&end=${todate}`,
-                        cache: false,
-                        success: function(data){
-                            console.log(data.id);
-                            console.log(fromdate,todate);
-                            if(data.val){
-                                $.ajax({
-                                    type: "POST",
-                                    url: `/api/roomavailability/`,
-                                    data:{'from_date': fromdate, 'to_date': todate, 'room':data.id, 'status': 'pr'},
-                                    headers:{"X-CSRFToken": csrftoken},
-                                    success:function(newdata){
-                                        console.log(newdata);
-                                        window.location.href=`/hotel/`+id+`/${d.category}/?id=${newdata.id}`;
-                                    }
-                                });
+
+
+
+                        var tr=$('<tr/>')
+                        tr.append(`<th scope="row">${data.name}</td>`)
+                        tr.append(`<td>${price.price}</td><td><button id="category-${d.category}" class="btn btn-primary process">Book</button></td>`)
+                        tr.appendTo('#prices-tab-bod')
+
+                        $(`#category-${d.category}`).click(function(e){
                             
-    
-                            }
-                        },
-                        error: function(error){
-                            console.log(error);
-                        }
-                    });
+
+                            $.ajax({
+                                url: `/api/check/?name=${id}&category=${d.category}&start=${fromdate}&end=${todate}`,
+                                cache: false,
+                                success: function(data){
+                                    console.log(data.id);
+                                    console.log(fromdate,todate);
+                                    if(data.val){
+                                        $.ajax({
+                                            type: "POST",
+                                            url: `/api/roomavailability/`,
+                                            data:{'from_date': fromdate, 'to_date': todate, 'room':data.id, 'status': 'pr', 'price': price.price},
+                                            headers:{"X-CSRFToken": csrftoken},
+                                            success:function(newdata){
+                                                console.log(newdata);
+                                                window.location.href=`/hotel/`+id+`/${d.category}/?id=${newdata.id}`;
+                                            }
+                                        });
+                                    
+            
+                                    }
+                                },
+                                error: function(error){
+                                    console.log(error);
+                                }
+                            });
 
 
 
-                    return false;
+                            return false;
+                        });
+
+
+                    },
+                    error: function(error){
+                        console.log(error);
+                    }
                 });
+
+
+
+
+
+
 
             }
         });

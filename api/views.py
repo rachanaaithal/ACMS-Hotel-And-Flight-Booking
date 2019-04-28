@@ -75,7 +75,7 @@ class MaxHotelRoomView(generics.ListCreateAPIView):
         print("\n\n\n\n\n\n\n\n\n\nn\nhere:",HotelRoom.objects.filter(category__name__in=room_type),"\n\nnow:",HotelRoom.objects.filter(hotel__city_name__name=city).filter(category__name__in=room_type),"\n\n")
         return HotelRoom.objects.filter(hotel__city_name__name=city).filter(category__name__in=room_type)
     def get(self, request, format=None):
-        room=self.get_queryset().order_by('-price').first()
+        room=self.get_queryset().order_by('-base_price').first()
         serializer = HotelRoomSerializer(room)
         return Response(serializer.data)
 class MinHotelRoomView(generics.ListCreateAPIView):
@@ -87,7 +87,7 @@ class MinHotelRoomView(generics.ListCreateAPIView):
         room_type=room_type.split('|')
         return HotelRoom.objects.filter(hotel__city_name__name=city).filter(category__name__in=room_type)
     def get(self, request, format=None):
-        room=self.get_queryset().order_by('-price').last()    
+        room=self.get_queryset().order_by('-base_price').last()    
         serializer = HotelRoomSerializer(room)
         return Response(serializer.data)
 
@@ -119,7 +119,7 @@ class RoomAvailabilityViewSet(viewsets.ModelViewSet):
     def get_queryset(self):
 #This view should return a list of all the booking for the currently authenticated user.
         user = self.request.user
-        return RoomAvailability.objects.filter(booked_by=user)
+        return RoomAvailability.objects.filter(booked_by=user).exclude(status='dd')
 
 '''
 class UpdateAvailability(generics.UpdateAPIView):
@@ -191,22 +191,22 @@ def search(request):
  
 
 #Get Supply (Room type-hotel level)
-    supply = HotelRoom.objects.filter(hotel__city_name__name=name).values('hotel__name', 'category__name', 'hotel__image_link', 'hotel__id','number_of_rooms', 'hotel__latitude', 'hotel__longitude','price')
+    supply = HotelRoom.objects.filter(hotel__city_name__name=name).values('hotel__name', 'category__name', 'hotel__image_link', 'hotel__id','number_of_rooms', 'hotel__latitude', 'hotel__longitude','base_price')
     
 #Get Demand from room availability table
     demand = RoomAvailability.objects.filter((q1 & q2) | (q3 & q4) | (q5 & q6)| (q7 & q8)).filter(room__hotel__city_name__name=name)
-    demand = demand.exclude(status='dd').values('room__hotel__name','room__category__name','status','room__price')
+    demand = demand.exclude(status='dd').values('room__hotel__name','room__category__name','status','room__base_price')
    
     if type_room is not None:
         supply=supply.filter(category__name__in=type_room)
         demand=demand.filter(room__category__name__in=type_room)
     
-    if min_price is not None and min_price !='null':
-        supply= supply.filter(Q(price__gte=min_price))
-        demand= demand.filter(Q(room__price__gte=min_price))
-    if max_price is not None and max_price !='null':
-        supply= supply.filter(Q(price__lte=max_price))
-        demand= demand.filter(Q(room__price__lte=max_price))
+    if min_price is not None and min_price !='null' and min_price !='undefined':
+        supply= supply.filter(Q(base_price__gte=min_price))
+        demand= demand.filter(Q(room__base_price__gte=min_price))
+    if max_price is not None and max_price !='null' and max_price !='undefined':
+        supply= supply.filter(Q(base_price__lte=max_price))
+        demand= demand.filter(Q(room__base_price__lte=max_price))
     
     #print('demand:',list(demand.values('room__hotel__name','room__category__name', 'status')) )
     demand = [x['room__hotel__name']+':'+x['room__category__name']+x['status'] for x in list(demand)]
@@ -279,11 +279,12 @@ def search(request):
     #return JsonResponse(response, safe=False)
     return JsonResponse(paginated_response, safe=False)
     #return Response({response_page})
+
 def check(request):
-    name=request.GET["name"]
-    st=request.GET["start"]
-    ed=request.GET["end"]
-    category=request.GET["category"]
+    name=request.GET.get("name",None)
+    st=request.GET.get("start",None)
+    ed=request.GET.get("end",None)
+    category=request.GET.get("category",None)
     st=st.strip()
     ed=ed.strip()
 
@@ -301,6 +302,7 @@ def check(request):
     
 #Get Demand from room availability table
     demand = RoomAvailability.objects.filter((q1 & q2) | (q3 & q4) | (q5 & q6)| (q7 & q8)).filter(room__hotel__id=name).filter(room__category__id=category)
+    demand = demand.exclude(status='dd').values('room__hotel__name','room__category__name','status','room__base_price')
 
     #print('checking',list(supply)[0]['id'],demand)
     if((list(supply)[0]['number_of_rooms']-len(list(demand)))>0):
@@ -317,7 +319,71 @@ class HotelPhotosViewSet(viewsets.ModelViewSet):
         'hotel': ['exact'],
     }
 
+def prices(request):
+    name=request.GET.get("name",None)
+    st=request.GET.get("start",None)
+    ed=request.GET.get("end",None)
+    category=request.GET.get("category",None)    
+    st=st.strip()
+    ed=ed.strip()
 
+    q1=Q(from_date__gte=st)
+    q2=Q(from_date__lte=ed) 
+    q3=Q(to_date__gte=st)
+    q4=Q(to_date__lte=ed)
+    q5=Q(from_date__lte=st)
+    q6=Q(to_date__gte=ed)
+    q7=Q(from_date__gte=st)
+    q8=Q(to_date__lte=ed)
+
+#Get Supply
+    supply = HotelRoom.objects.filter(hotel__id=name).values('hotel__name', 'category__name', 'hotel__image_link', 'hotel__id','number_of_rooms', 'hotel__latitude', 'hotel__longitude','base_price','max_price')
+    supply_type = supply.filter(category__id=category)
+
+    base_price = float(list(supply_type)[0]['base_price'])
+    max_price = float(list(supply_type)[0]['max_price'])
+
+    supply = list(supply)[0]['number_of_rooms']
+    supply_type = list(supply_type)[0]['number_of_rooms']
+
+#Get Demand from room availability table
+    demand = RoomAvailability.objects.filter((q1 & q2) | (q3 & q4) | (q5 & q6)| (q7 & q8)).filter(room__hotel__id=name)
+    demand = demand.exclude(status='dd').values('room__hotel__name','room__category__name','status','room__base_price')
+    demand_type = demand.filter(room__category__id=category)
+
+    demand = len(list(demand))
+    demand_type = len(list(demand_type))
+
+    #a is the number of days left
+    d0 = datetime.today().strftime('%Y-%m-%d')
+    d0 = datetime.strptime(d0, '%Y-%m-%d')
+    d1 = datetime.strptime(st, '%Y-%m-%d')
+    d2 = datetime.strptime(ed, '%Y-%m-%d')
+    delta1 = d1 - d0
+    a = delta1.days
+    if a<30:
+	    a = 1-(a/30)
+    else:
+    	a = 0
+
+    #b is total % of rooms of this type booked in this hotel
+    b = (supply_type-demand_type)/supply_type
+    b = 1-b
+
+    #c is total % of rooms of other types booked in this hotel
+    if supply-supply_type >0: 
+        c = ((supply-supply_type)-(demand-demand_type)/(supply-supply_type))
+        c = 1-c
+    else:
+        c = b
+
+    delta2 = d2-d1
+    num_of_days=max(delta2.days,1)
+    price = (0.3*(a)+0.4*(b)+0.3*(c))*(max_price-base_price)+base_price
+    print(base_price,max_price,a,b,c)
+    response={'price':(price*num_of_days)}
+
+    return JsonResponse(response, safe=False)
 
 from django.shortcuts import redirect	
 def register(request):
