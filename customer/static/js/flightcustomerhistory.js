@@ -34,9 +34,7 @@ window.onload=function(){
         url:"/api/seat_availability/",
         cache: false,
         success: function(data){
-            console.log(data);
             today= moment();
-            console.log(today);
             putTable('future-bookings');
             putTable('past-bookings');
             data.map(function(d){
@@ -45,7 +43,6 @@ window.onload=function(){
                         $('#future-bookings').show();
                     }
                     putData('future-bookings',d);
-                    console.log(d.on_date);
                 }
                 else{
                     if($('#past-bookings >tbody >tr').length==0){
@@ -56,12 +53,10 @@ window.onload=function(){
                 }
             });
             $(".clickable-row").click(function(e) {
-                console.log(e.currentTarget.id);
                 window.location.href=`/flight/bookingdetails/${e.currentTarget.id}`;
             });
         },
         error: function(error){
-            console.log(error);
         }
     });
 }
