@@ -9,31 +9,7 @@ class UserSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = User
         fields = ('url', 'username', 'email', 'groups')
-'''
-class UserSerializer(serializers.ModelSerializer):
 
-    class Meta:
-        model = User
-        fields = (
-            'id',
-            'username',
-            'password',
-            'email',
-        )
-        extra_kwargs = {
-            'password': {'write_only': True},
-        }
-
-    def create(self, validated_data):
-        user = User.objects.create_user(**validated_data)
-        return user
-
-    def update(self, instance, validated_data):
-        if 'password' in validated_data:
-            password = validated_data.pop('password')
-            instance.set_password(password)
-        return super(UserSerializer, self).update(instance, validated_data)
-'''
 class GroupSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = Group
@@ -67,9 +43,7 @@ class HotelRoomSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 class RoomAvailabilitySerializer(serializers.ModelSerializer):
-#    booked_by = serializers.ReadOnlyField(default=serializers.CurrentUserDefault())
     booked_by = serializers.PrimaryKeyRelatedField(read_only=True,default=serializers.CurrentUserDefault())
-#    booked_by = serializers.CreateOnlyDefault(serializers.CurrentUserDefault())
 
     hotel = serializers.ReadOnlyField(source="room.hotel.name")
     category = serializers.ReadOnlyField(source="room.category.name")
@@ -83,7 +57,6 @@ class RoomAvailabilitySerializer(serializers.ModelSerializer):
     class Meta:
         model = RoomAvailability
         fields = '__all__'
-        #depth = 2
 
 class HotelPhotosSerializer(serializers.ModelSerializer):
     class Meta:

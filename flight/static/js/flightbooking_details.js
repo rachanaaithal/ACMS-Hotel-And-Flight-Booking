@@ -11,7 +11,6 @@ function readCookie(name) {
 
 
 function initPage(transaction_id, gst, cancellation_charges){
-    console.log(gst, transaction_id, cancellation_charges);
 
     function putAboutData(data){
         var details=$('<div/>');
@@ -28,9 +27,6 @@ function initPage(transaction_id, gst, cancellation_charges){
         
         details.append(`<p><b>TakeoffTime: </b>${date} ${moment(takeoff_time, "HH:mm").format('hh:mm A')}</p>`);
         details.append(`<p><b>LandingTime: </b>${date} ${moment(landing_time, "HH:mm").format('hh:mm A')}</p>`);
-
-
-        console.log(data.status=='bk')
         
         if(data.status=='bk'){
             const tax=data.price*gst/100;
@@ -78,14 +74,12 @@ function initPage(transaction_id, gst, cancellation_charges){
 
             var csrftoken = readCookie('csrftoken');
             $('#confirm_cancel').click(function(e){
-                console.log(transaction_id);
                 $.ajax({
                     type: "PATCH",
                     url:`/api/seat_availability/${transaction_id}/`,
                     data:{'status':'dd'},
                     headers:{"X-CSRFToken": csrftoken},
                     success:function(newdata){
-                        console.log(newdata);
                         window.location.href=`/flight/bookingdetails/${transaction_id}`
                     }
                 });

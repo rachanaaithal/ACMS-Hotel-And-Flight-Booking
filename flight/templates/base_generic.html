@@ -12,6 +12,7 @@
     <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.min.js"></script>
     <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.css" />
     <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
+    
     {% load static %} 
     <link rel="stylesheet" href="/static/css/style.css">
 </head>
@@ -30,8 +31,10 @@
                 </div><div class="items">
                     {% if user.is_authenticated %}
                     <span class="nav-item navbar-text">User: {{ user.get_username }}</span>
-                    <a class="nav-item nav-link" href="{% url 'logout'%}?next={{request.path}}">Logout</a>   
+                    <a class="nav-item nav-link" href="{% url 'logout'%}?next={{request.path}}">Logout</a> 
+                    <a class="nav-item nav-link" href="{% url 'user_profile'%}?next={{request.path}}">Profile</a>               
                     {% else %}
+                    <a class="nav-item nav-link" href="{% url 'register'%}?next={{request.path}}">Register</a>
                     <a class="nav-item nav-link" href="{% url 'login'%}?next={{request.path}}">Login</a>   
                     {% endif %} 
                 </div>
@@ -42,6 +45,7 @@
         
         {% block content %} 
         {% endblock %}
+        
     </div>
 </body>
 </html>

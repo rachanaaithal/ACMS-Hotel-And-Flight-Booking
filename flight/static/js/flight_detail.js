@@ -1,5 +1,5 @@
 function initPage(id){
-    console.log(id);
+
     function putAboutData(data){
         var img=$('<div/>')
         img.append(`<img src=${data.image_link}>`);
@@ -35,8 +35,6 @@ function initPage(id){
     var fromdate = url.searchParams.get("startdate");
     var source = url.searchParams.get("source");
     var dest=url.searchParams.get("destination");
-    var seat_position=url.searchParams.get("seat_position");
-    console.log(seat_position)
 
     function readCookie(name) {
         var nameEQ = name + "=";
@@ -50,8 +48,6 @@ function initPage(id){
     }
     
     var csrftoken = readCookie('csrftoken');
-//    var csrftoken = $('[name="csrftoken"]').attr('value');
-    console.log(csrftoken)
     
     function putPricesData(d){
         $.ajax({
@@ -61,7 +57,16 @@ function initPage(id){
                 seattype=data.name;
                 d.map(function (da){
                 var tr=$('<tr/>')
-                tr.append(`<th scope="row">${da.id}</td>`)
+                if(da.seat_position=="a")
+                    tr.append(`<th scope="row">Aisle</td>`)
+                if(da.seat_position=="m")
+                    tr.append(`<th scope="row">Middle</td>`)
+                if(da.seat_position=="w")
+                    tr.append(`<th scope="row">Window</td>`)
+                if(da.seat_position=="p")
+                    tr.append(`<th scope="row">Private</td>`)
+                if(da.seat_position=="h")
+                    tr.append(`<th scope="row">Hemmingway</td>`)
                 tr.append(`<th scope="row">${data.name}</td>`)
                 tr.append(`<td>${da.price}</td><td><button id="seatid-${da.id}" class="btn btn-primary process">Book</button></td>`)
                 tr.appendTo('#prices-tab-bod')
@@ -95,7 +100,6 @@ function initPage(id){
                             }
                         },
                         error: function(error){
-                            console.log(error);
                         }
                     });
 
@@ -116,16 +120,14 @@ function initPage(id){
         url: `/api/flights/${id}`,
         cache: false,
         success: function(data){
-            console.log(data);
             id=`${data.id}`;
             putAboutData(data);
         },
         error: function(error){
-            console.log(error);
         }
     });
     $.ajax({
-        url: `/api/flight_seats/?flight=${id}&seat_position=${seat_position}`,
+        url: `/api/flight_seats/?flight=${id}`,
         cache: false,
         success: function(data){
             putTable();
@@ -136,7 +138,6 @@ function initPage(id){
             putPricesData(data);
         },
         error: function(error){
-            console.log(error);
         }
     });
 

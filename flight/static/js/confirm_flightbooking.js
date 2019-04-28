@@ -17,9 +17,6 @@ function initPage(flight_id, category){
     var gst=5;
 
     function putAboutData(data){
-     //function disableBack() { window.history.forward(); console.log("in disable"); }
-    //disableBack();
-    //window.onpageshow = function(evt) { if (evt.persisted) {disableBack();} }
 
     window.history.pushState(null, "", window.location.href);        
         window.onpopstate = function() {
@@ -30,7 +27,6 @@ function initPage(flight_id, category){
         var details=$('<div/>');
         details.append(`<h5>${data.airline}</h5>`);
         details.append(`<p>SeatType:${data.category}</p>`);
-        details.append(`<p>SeatNumber:${data.seat}</p>`);
         details.append(`<p><i class="fas fa-map-marked fa-2x"></i>${data.source}</p>`); 
         details.append(`<p><i class="fas fa-map-marked fa-2x"></i>${data.destination}</p>`); 
 
@@ -78,16 +74,13 @@ function initPage(flight_id, category){
 
 
         var csrftoken = readCookie('csrftoken');
-        console.log(transaction_id, flight_id, category);
         $('#pay').click(function(e){
-            console.log(transaction_id, flight_id);
             $.ajax({
                 type: "PATCH",
                 url:`/api/seat_availability/${transaction_id}/`,
                 data:{'status':'bk'},
                 headers:{"X-CSRFToken": csrftoken},
                 success:function(newdata){
-                    console.log(newdata);
                     window.location.href=`/flight/${flight_id}/${category}/booked/${transaction_id}`
                 }
             });
@@ -95,14 +88,12 @@ function initPage(flight_id, category){
         });
 
         $('#cancel').click(function(e){
-            console.log(transaction_id);
             $.ajax({
                 type: "PATCH",
                 url:`/api/seat_availability/${transaction_id}/`,
                 data:{'status':'dd'},
                 headers:{"X-CSRFToken": csrftoken},
                 success:function(newdata){
-                    console.log(newdata);
                     window.location.href=`/flight/${flight_id}/${category}/canceled`
                 }
             });
@@ -115,7 +106,6 @@ function initPage(flight_id, category){
         url: `/api/seat_availability/?id=${transaction_id}`,
         cache: false,
         success: function(data){
-            console.log(data);
             if(data[0].status=='pr'){
                 putAboutData(data[0]);
             }
@@ -127,7 +117,6 @@ function initPage(flight_id, category){
             }
         },
         error: function(error){
-            console.log(error);
         }
     });
 

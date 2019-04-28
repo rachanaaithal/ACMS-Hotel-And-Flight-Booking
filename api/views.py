@@ -1,12 +1,9 @@
 from django.contrib.auth.models import User, Group
 from rest_framework import viewsets
-
 from api.serializers import UserSerializer, GroupSerializer, HotelSerializer, CountrySerializer, CitySerializer, HotelRoomSerializer, RoomTypeSerializer, RoomAvailabilitySerializer, HotelPhotosSerializer
 from api.models import Country, City, Hotel, RoomType, HotelRoom, RoomAvailability, HotelPhotos, UserprofileInfo
-
 from api.serializers import Seat_AvailabilitySerializer, SeatTypeSerializer, FlightSerializer, Flight_SeatsSerializer
 from api.models import Seat_Availability, Flight, Flight_Seats, SeatType
-
 from rest_framework import filters
 from django_filters.rest_framework import DjangoFilterBackend
 from django.http import JsonResponse
@@ -23,20 +20,14 @@ from django.db.models import Max, Min
 import datetime
 from django.utils import timezone
 from django.contrib.auth import authenticate, login, logout, views
-
 import random
+
 class UserViewSet(viewsets.ModelViewSet):
-    """
-    API endpoint that allows users to be viewed or edited.
-    """
     queryset = User.objects.all().order_by('-date_joined')
     serializer_class = UserSerializer
 
 
 class GroupViewSet(viewsets.ModelViewSet):
-    """
-    API endpoint that allows groups to be viewed or edited.
-    """
     queryset = Group.objects.all()
     serializer_class = GroupSerializer
 
@@ -72,7 +63,6 @@ class HotelRoomViewSet(viewsets.ModelViewSet):
     }
 
 class MaxHotelRoomView(generics.ListCreateAPIView):
-    #queryset = HotelRoom.objects.all()
     serializer_class = HotelRoomSerializer
     def get_queryset(self):
         city = self.request.GET.get("name",None)
@@ -85,7 +75,6 @@ class MaxHotelRoomView(generics.ListCreateAPIView):
         serializer = HotelRoomSerializer(room)
         return Response(serializer.data)
 class MinHotelRoomView(generics.ListCreateAPIView):
-    #queryset = HotelRoom.objects.all()
     serializer_class = HotelRoomSerializer
     def get_queryset(self):
         city = self.request.GET.get("name",None)
@@ -96,17 +85,6 @@ class MinHotelRoomView(generics.ListCreateAPIView):
         room=self.get_queryset().order_by('-price').last()    
         serializer = HotelRoomSerializer(room)
         return Response(serializer.data)
-
-'''
-class Availability(generics.ListCreateAPIView):
-    queryset = RoomAvailability.objects.all()
-    serializer_class = RoomAvailabilitySerializer
-
-
-class AvailabilityDetail(generics.RetrieveUpdateDestroyAPIView):
-    queryset = RoomAvailability.objects.all()
-    serializer_class = RoomAvailabilitySerializer
-''' 
 
 @method_decorator(csrf_exempt, name='dispatch')
 class RoomAvailabilityViewSet(viewsets.ModelViewSet):
@@ -123,30 +101,9 @@ class RoomAvailabilityViewSet(viewsets.ModelViewSet):
         serializer.save(booked_by=self.request.user)
     
     def get_queryset(self):
-#This view should return a list of all the booking for the currently authenticated user.
         user = self.request.user
         return RoomAvailability.objects.filter(booked_by=user)
 
-'''
-class UpdateAvailability(generics.UpdateAPIView):
-    queryset = RoomAvailability.objects.all()
-    serializer_class = RoomAvailabilitySerializer
-
-    def update(self, request, *args, **kwargs):
-        instance = self.get_object()
-        instance.status = request.data.get("status")
-        instance.save()
-
-        serializer = self.get_serializer(instance)
-        serializer.is_valid(raise_exception=True)
-        self.perform_update(serializer)
-
-        return Response(serializer.data)
-
-class RoomAvailabilityDetail(generics.RetrieveUpdateDestroyAPIView):
-    queryset = RoomAvailability.objects.all()
-    serializer_class = RoomAvailabilitySerializer
-'''
 class RoomTypeViewSet(viewsets.ModelViewSet):
     queryset = RoomType.objects.all()
     serializer_class = RoomTypeSerializer
@@ -155,17 +112,6 @@ class RoomTypeViewSet(viewsets.ModelViewSet):
         'id': ['exact']
     }
 
-
-
-'''
-from rest_framework import generics
-class SearchSet(viewsets.ModelViewSet):
-    queryset = City.objects.all()
-    serializer_class = CitySerializer
-    filter_fields = {
-        'name': ['exact']
-    }
-'''
 def search(request):
     print(request.GET)
     name=request.GET.get("name",None)
@@ -184,7 +130,6 @@ def search(request):
         type_room=type_room.split('|')
     print("\n\n\n\n\n\n\n\n\n",name,st,ed, type_room,min_price,max_price,page)
     print(min_price=='null')
-    # city_results = Hotel.objects.filter(city_name__name=name)
 
     q1=Q(from_date__gte=st)
     q2=Q(from_date__lte=ed) 
@@ -195,11 +140,8 @@ def search(request):
     q7=Q(from_date__gte=st)
     q8=Q(to_date__lte=ed)
  
-
-#Get Supply (Room type-hotel level)
     supply = HotelRoom.objects.filter(hotel__city_name__name=name).values('hotel__name', 'category__name', 'hotel__image_link', 'hotel__id','number_of_rooms', 'hotel__latitude', 'hotel__longitude','price')
     
-#Get Demand from room availability table
     demand = RoomAvailability.objects.filter((q1 & q2) | (q3 & q4) | (q5 & q6)| (q7 & q8)).filter(room__hotel__city_name__name=name)
     demand = demand.exclude(status='dd').values('room__hotel__name','room__category__name','status','room__price')
    
@@ -213,8 +155,6 @@ def search(request):
     if max_price is not None and max_price !='null':
         supply= supply.filter(Q(price__lte=max_price))
         demand= demand.filter(Q(room__price__lte=max_price))
-    
-    #print('demand:',list(demand.values('room__hotel__name','room__category__name', 'status')) )
     demand = [x['room__hotel__name']+':'+x['room__category__name']+x['status'] for x in list(demand)]
     demand_dict = {}
     for dem in demand:
@@ -223,7 +163,6 @@ def search(request):
         else:
             demand_dict[dem]=1
 
-#To make the query set into a dictionary
     response = {}
     for result in list(supply):
         #if room exists to book
@@ -235,8 +174,6 @@ def search(request):
         else:
             rooms_actually_available = result['number_of_rooms']
 
-        
-        #if new hotel name
         if result['hotel__name'] not in response:
 
             images=HotelPhotos.objects.filter(hotel__name=result['hotel__name']).values('image_link')
@@ -244,7 +181,6 @@ def search(request):
             print("\n\n\n\n",images,"\n\n\n\n\n\n")
             
             response[result['hotel__name']] = {}
-            #response[result['hotel__name']]['image_link']=result['hotel__image_link']
             response[result['hotel__name']]['image_link']=random.choice(list(images))
             response[result['hotel__name']]['room_types']={}
             response[result['hotel__name']]['hotel_id']=result['hotel__id'] 
@@ -252,8 +188,6 @@ def search(request):
             response[result['hotel__name']]['longitude']=result['hotel__longitude']
         response[result['hotel__name']]['room_types'][result['category__name']] = rooms_actually_available
 
-    
-    #making into json
     response = [{'hotel':key, 'room_types':response[key]['room_types'], 'image_link':response[key]['image_link'], 'hotel_id':response[key]['hotel_id'], 'latitude': response[key]['latitude'], 'longitude': response[key]['longitude']} for key in response]
     print('\n\nresponse',response,len(response),type(response))
 
@@ -282,9 +216,8 @@ def search(request):
     else:
         prev_page=0
     paginated_response={'response':list(response_page),'has_next':response_page.has_next(),'next_page':next_page,'has_prev':response_page.has_previous(),'prev_page':prev_page}
-    #return JsonResponse(response, safe=False)
     return JsonResponse(paginated_response, safe=False)
-    #return Response({response_page})
+
 def check(request):
     name=request.GET["name"]
     st=request.GET["start"]
@@ -302,13 +235,10 @@ def check(request):
     q7=Q(from_date__gte=st)
     q8=Q(to_date__lte=ed)
 
-#Get Supply (Room type-hotel level)
     supply = HotelRoom.objects.filter(hotel__id=name).filter(category__id=category).values('id','hotel__name', 'category__id', 'hotel__image_link', 'hotel__id','number_of_rooms')
     
-#Get Demand from room availability table
     demand = RoomAvailability.objects.filter((q1 & q2) | (q3 & q4) | (q5 & q6)| (q7 & q8)).filter(room__hotel__id=name).filter(room__category__id=category)
 
-    #print('checking',list(supply)[0]['id'],demand)
     if((list(supply)[0]['number_of_rooms']-len(list(demand)))>0):
         response={'val':True, 'id':list(supply)[0]['id']}
     else:
@@ -347,7 +277,6 @@ from api.serializers import User1Serializer,UserProfileSerializer
 
 @method_decorator(csrf_exempt, name='dispatch')	
 class User1ViewSet(viewsets.ModelViewSet):
-    #queryset = User.objects.all().order_by('-date_joined')
 	serializer_class = User1Serializer
 	def perform_create(self, serializer):
 		serializer.save(username=self.request.user)
@@ -357,7 +286,6 @@ class User1ViewSet(viewsets.ModelViewSet):
 	
 @method_decorator(csrf_exempt, name='dispatch')	
 class UserProfileViewSet(viewsets.ModelViewSet):
-    #queryset = User.objects.all().order_by('-date_joined')
 	serializer_class = UserProfileSerializer
 	def perform_create(self, serializer):
 		serializer.save(user=self.request.user)
@@ -435,16 +363,16 @@ def sflights(request):
     st=request.GET.get("start",None)
     destination=request.GET.get("destination",None)
     type_seat= request.GET.get("type",None)
+    min_price= request.GET.get("minprice",None)
+    max_price= request.GET.get("maxprice",None)
+    page = request.GET.get('page', 1)
     st=st.strip()
-    #print(st)
     if source is None or st is None or destination is None:
         return JsonResponse([], safe=False)
 
     if type_seat is not None:
         type_seat=type_seat.split('|')
     st=datetime.datetime.strptime(st, "%Y-%m-%d").date()
-    #print(source,st.day,destination, type_seat)
-    # city_results = Hotel.objects.filter(city_name__name=name)
 
     q1=Q(flight__on_date__day=st.day)
     q2=Q(flight__source__name=source)
@@ -452,22 +380,22 @@ def sflights(request):
     q4=Q(seat__flight__source__name=source)
     q5=Q(seat__flight__destination__name=destination)
     q6=Q(on_date__day=st.day)
-    #print("helloooo")
-    #z=Flight_Seats.objects.values('category__name')
-    #print("z:", z)
-    supply = Flight_Seats.objects.filter(q2).filter(q3).filter(q1).values('flight__id','flight__airline_name', 'category__name', 'flight__image_link', 'flight__flightnumber','flight__on_date','seat_position','number_of_seats','flight__takeoff_time', 'flight__landing_time')
-    #print("Supply 1:", list(supply))
-#Get Demand from room availability table
+    supply = Flight_Seats.objects.filter(q2).filter(q3).filter(q1).values('flight__id','flight__airline_name', 'category__name', 'flight__image_link', 'flight__flightnumber','flight__on_date','seat_position','number_of_seats','flight__takeoff_time', 'flight__landing_time','price')
+    
     demand = Seat_Availability.objects.filter(q4).filter(q5).filter(q6)
-    #demand = [x['seat__flight__airline_name']+':'+x['seat__category__name']+x['seat__seat_position'] for x in list(demand.exclude(status='dd').values('seat__flight__name','seat__category__name','seat_position','status'))]
-    demand = demand.exclude(status='dd').values('seat__flight__airline_name','seat__category__name','seat__seat_position','status', 'on_date')
-    #print("Demand 1:", list(demand))
+    demand = demand.exclude(status='dd').values('seat__flight__airline_name','seat__category__name','seat__seat_position','status', 'on_date','seat__price')
+
     if type_seat is not None:
         supply=supply.filter(category__name__in=type_seat)
         demand=demand.filter(seat__category__name__in=type_seat)
-    #print("Demand 2:",list(demand))
-    #print("Supply 2:",list(supply))
-    #print('demand:',list(demand.values('room__hotel__name','room__category__name', 'status')) )
+
+    if min_price is not None and min_price !='null':
+        supply= supply.filter(Q(price__gte=min_price))
+        demand= demand.filter(Q(seat__price__gte=min_price))
+    if max_price is not None and max_price !='null':
+        supply= supply.filter(Q(price__lte=max_price))
+        demand= demand.filter(Q(seat__price__lte=max_price))
+
     demand = [x['seat__flight__airline_name']+':'+x['seat__category__name']+x['seat__seat_position'] for x in list(demand)]
     demand_dict = {}
     for dem in demand:
@@ -475,11 +403,8 @@ def sflights(request):
             demand_dict[dem]+=1
         else:
             demand_dict[dem]=1
-    #print(demand_dict)
-#To make the query set into a dictionary
     response = {}
     for result in list(supply):
-        #if room exists to book
         checkKey = result['flight__airline_name']+':'+result['category__name']+result['seat_position']
         if checkKey in demand_dict:
             seats_actually_available = result['number_of_seats'] - demand_dict[checkKey]
@@ -487,8 +412,7 @@ def sflights(request):
                 continue
         else:
             seats_actually_available = result['number_of_seats']
-        
-        #if new flight name
+
         if result['flight__airline_name'] not in response:
             response[result['flight__airline_name']] = {}
             response[result['flight__airline_name']]['image_link']=result['flight__image_link']
@@ -515,30 +439,26 @@ def sflights(request):
             response[result['flight__airline_name']]['destination']=destination
         response[result['flight__airline_name']]['seat_position'][result['seat_position']] = seats_actually_available
 
-    #print('\n\nresponse',response)
-    
-    #making into json
     response = [{'flight':key, 'seat_position':response[key]['seat_position'], 'source':response[key]['source'], 'destination':response[key]['destination'],'image_link':response[key]['image_link'], 'flight_id':response[key]['flight_id'],'on_date':response[key]['date'],'flightnumber':response[key]['flightnumber'], 'category':response[key]['category'], 'takeoff_time':response[key]['takeoff_time'], 'landing_time':response[key]['landing_time']} for key in response]
-    #print('\n\nresponse',response,len(response),type(response))
-
-    '''page = request.GET.get('page', 1)
-
     paginator = Paginator(response, 6)
     try:
-        print('try')
         response_page = paginator.page(page)
     except PageNotAnInteger:
-        print('except1')
         response_page = paginator.page(1)
     except EmptyPage:
-        print('except2')
         response_page = paginator.page(paginator.num_pages)
 
-    print(list(response_page))'''
-    return JsonResponse(response, safe=False)
-    #return JsonResponse(list(response_page), safe=False)
-    #return Response({response_page})
+    if response_page.has_next():
+        next_page=response_page.next_page_number()
+    else:
+        next_page=0
+    if response_page.has_previous():
+        prev_page=response_page.previous_page_number()
+    else:
+        prev_page=0
+    paginated_response={'response':list(response_page),'has_next':response_page.has_next(),'next_page':next_page,'has_prev':response_page.has_previous(),'prev_page':prev_page}
 
+    return JsonResponse(paginated_response, safe=False)
 
 
 def cflightstatus(request):
@@ -561,7 +481,6 @@ def cflightstatus(request):
 
     demand = Seat_Availability.objects.filter(q4).filter(q5).filter(q6).filter(seat__id=seat_id).filter(seat__flight__id=flight_id).filter(seat__category__id=category).values('seat__flight__airline_name','seat__category__name','seat__seat_position','status', 'on_date')
 
-    #print('checking',list(supply)[0]['id'],demand)
     if((list(supply)[0]['number_of_seats']-len(list(demand)))>0):
         response={'val':True, 'id':list(supply)[0]['id']}
     else:
@@ -569,15 +488,28 @@ def cflightstatus(request):
 
     return JsonResponse(response, safe=False)
 
-'''def s_flight_seats_find(request):
-    flightid=request.GET["flight"]
-    seatpos=request.GET["seatpos"]
-
-    total_count=Flight_Seats.objects.filter(flight__id=flightid).filter(seat_position=seatpos).count()
-    left_count=Flight_Seats.objects.filter(flight__id=flightid).filter(seat_position=seatpos).values('number_of_seats')
-    supply=Flight_Seats.objects.filter(flight__id=flight_id).filter(seat_position=seatpos).values('id','number_of_seats','seat_position','price','flight','category')
-
-    response={'total':total_count, 'left':left_count, 'supply': list(supply)}
-
-
-    return JsonResponse(response, safe=False)'''
+class MaximumSeatView(generics.ListCreateAPIView):
+    #queryset = HotelRoom.objects.all()
+    serializer_class = Flight_SeatsSerializer
+    def get_queryset(self):
+        source = self.request.GET.get("source",None)
+        destination=self.request.GET.get("destination",None)
+        seat_type= self.request.GET.get("type",None)
+        seat_type=seat_type.split('|')
+        return Flight_Seats.objects.filter(flight__source__name=source).filter(flight__destination__name=destination).filter(category__name__in=seat_type)
+    def get(self, request, format=None):
+        seat=self.get_queryset().order_by('-price').first()
+        serializer = Flight_SeatsSerializer(seat)
+        return Response(serializer.data)
+class MinimumSeatView(generics.ListCreateAPIView):
+    serializer_class = Flight_SeatsSerializer
+    def get_queryset(self):
+        source = self.request.GET.get("source",None)
+        destination=self.request.GET.get("destination",None)
+        seat_type= self.request.GET.get("type",None)
+        seat_type=seat_type.split('|')
+        return Flight_Seats.objects.filter(flight__source__name=source).filter(flight__destination__name=destination).filter(category__name__in=seat_type)
+    def get(self, request, format=None):
+        seat=self.get_queryset().order_by('-price').last()    
+        serializer = Flight_SeatsSerializer(seat)
+        return Response(serializer.data)

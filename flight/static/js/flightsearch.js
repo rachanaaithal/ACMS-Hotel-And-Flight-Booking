@@ -1,4 +1,67 @@
 window.onload = function () {
+	var url = new URL(window.location.href);
+    var start_url= url.searchParams.get("start");
+    var source_url=url.searchParams.get("source")
+	var destination_url = url.searchParams.get("destination");
+	var type_url = url.searchParams.get("type");
+	var min_url =url.searchParams.get("minprice");
+	var max_url =url.searchParams.get("maxprice");
+	var page_url = url.searchParams.get("page");
+
+	function psedoRefresh(nexturl){
+		var nexturl = new URL(window.location.href);
+		var nextstart_url= nexturl.searchParams.get("start");
+		var nextsource_url = nexturl.searchParams.get("source");
+		var nextdestination_url = nexturl.searchParams.get("destination");
+		var nexttype_url = nexturl.searchParams.get("type");
+		var nextmin_url = nexturl.searchParams.get("minprice");
+		var nextmax_url = nexturl.searchParams.get("maxprice");
+		$.ajax({
+			url: "/api/sflights/?source="+nextsource_url+"&destination="+nextdestination_url+"&start="+nextstart_url+"&type="+nexttype_url+"&minprice="+nextmin_url+"&maxprice="+nextmax_url,
+			cache: false,
+			success: function(data){
+				result=data;
+				$('#results').html('');
+
+				if(data['response'].length>0){
+					$('#noresults').hide();
+					$('.optional-filter').show();
+				}
+				else{
+					$('#noresults').show();
+					$('.optional-filter').show();
+				}
+
+				data['response'].map(function(d){
+					putResults(d);
+				});
+				paginate(data)	
+			}
+		});
+
+	}
+
+	function paginate(data){
+		var nexturl = new URL(window.location.href);
+		var nextstart_url= nexturl.searchParams.get("start");
+		var nextsource_url = nexturl.searchParams.get("source");
+		var nextdestination_url = nexturl.searchParams.get("destination");
+		var nexttype_url = nexturl.searchParams.get("type");
+		var nextmin_url = nexturl.searchParams.get("minprice");
+		var nextmax_url = nexturl.searchParams.get("maxprice");
+		$(`.pagination`).html('')
+		var span=$('<span/>')
+		span.addClass('page-links')
+		if(data['has_prev']){
+			span.append(`<a href="/flight/?source=${nextsource_url}&destination=${nextdestination_url}&start=${nextstart_url}&type=${nexttype_url}&minprice=${nextmin_url}&maxprice=${nextmax_url}&page=${data['prev_page']}">previous</a>`)
+		}
+		if(data['has_next']){
+			span.append(`<a href="/flight/?source=${nextsource_url}&destination=${nextdestination_url}&start=${nextstart_url}&type=${nexttype_url}&minprice=${nextmin_url}&maxprice=${nextmax_url}&page=${data['next_page']}">next</a>`)
+		}
+		span.appendTo(`.pagination`)
+	}
+
+
 	//function for the typeahead input.
 	function typeaheadInit(cityList){ 
 		var substringMatcher = function (strs) {
@@ -43,12 +106,9 @@ window.onload = function () {
 	    minDate: moment(),
 	    dateFormat: 'dd-mm-yyyy',
 	  }, function(start, end, label) {
-    	console.log("A new date selection was made: " + start.format('YYYY-MM-DD'));
-		startdate=start.format('YYYY-MM-DD'); //fromdate
-		console.log(startdate)
+		startdate=start.format('YYYY-MM-DD');
   });
 
-	//to get all the city names
 	$.ajax({
 		url: "/api/city/",
 		cache: false,
@@ -62,13 +122,10 @@ window.onload = function () {
 	});
 
 	let clicked=[]
-	//for checkboxes
 	$.ajax({
 		url: "/api/seattype/",
 		cache: false,
 		success: function(data){
-			console.log(data);
-			
 			data.map(function(d){
 				var div= $('<div/>');
 				div.addClass('form-check');
@@ -79,82 +136,103 @@ window.onload = function () {
 			});
 			//to change the result when checkboxes are clicked
 			$('.filter1').click(function(d){
-				// console.log($(this).val());
 				var source = $("#typeahead-source").val();
 				var destination = $("#typeahead-destination").val();
 				let clicked = [];
 				$('.filter1').each(function(i,d){
-					console.log("checked:",i,d);
 					if ($(this).is(':checked')) {
 						clicked.push($(this).val());
 					}
 				})
 				$('#results').html('');
-				console.log(clicked);
-				nexturl="/flight/"+"?source="+source+"&destination="+destination+"&start="+startdate+"&type="+clicked.join('|')
+				nexturl="/flight/"+"?source="+source+"&destination="+destination+"&start="+startdate+"&type="+clicked.join('|')+"&minprice="+min_url+"&maxprice="+max_url
 				history.pushState({}, null, nexturl);
-				
-				$.ajax({
-					url: "/api/sflights/?source="+source+"&destination="+destination+"&start="+start_url+"&type="+clicked.join('|'),
-					cache: false,
-					success: function(data){
-						result=data;
-						//$('#results').html('');
-		
-						if(data.length>0){
-							$('#noresults').hide();
-							$('.optional-filter').show();
-						}
-						else{
-							$('#noresults').show();
-							$('.optional-filter').hide();
-						}
-		
-						data.map(function(d){
-							//console.log(d.hotel, Object.keys(d.room_types));
-							console.log(d);
-							putResults(d);
-						});
-						
-					}
-				});
-				/*result.map(function(d){
-					var d_new={}
-					
-					d_new.seat_types={};
-					//console.log(d_new);
-					var count=0;
-					clicked.map(function(k){
-						//console.log(k,d.room_types[k]);
-						if(d.seat_types[k]!=undefined){ //to see if the required room type is present in the result
-							d_new.seat_types[k]=d.seat_types[k];
-							count+=1;
-						}
-					})
-					//console.log(d_new);
-					if(count>0){
-						d_new.flight=d.flight;
-						d_new.image_link=d.image_link;
-						d_new.flight_id=d.flight_id;
-						newResult.push(d_new);
-						putResults(d_new);
-					}
-				});
-				console.log(newResult);
-				
-				$('.filter1').attr('checked','true');*/
+				priceRefresh(clicked);
 			})
 		}
 	});
-
-	//dates
-	var startdate=moment().format('YYYY-MM-DD');
+	var tooltip = $('<div id="tooltip" />').css({
+		position: 'absolute',
+		top: -25,
+		left: -10
+	}).hide();
 	
-	var result;
+	var max_price;
+	var min_price;
+	var lower;
+	var higher;
+
+	function priceRefresh(para_clicked){
+		if(para_clicked==undefined){
+			type_to_use=type_url
+		}
+		else{
+			type_to_use=para_clicked.join('|')
+		}
+		$.ajax({
+			url:`/api/maximumseatcharge/?source=${source_url}&destination=${destination_url}&type=${type_to_use}`,
+			cache: false,
+			success: function(data){
+				max_price=data.price
+				$.ajax({
+					url:`/api/minimumseatcharge/?source=${source_url}&destination=${destination_url}&type=${type_to_use}`,
+					cache: false,
+					success: function(data){
+						min_price=data.price
+						if(max_url!=null && min_url!=null){
+							higher=max_url
+							lower=min_url
+						}
+						else if(max_url==null || min_url==null){
+							higher=max_price
+							lower=min_price
+						}
+						else{
+							higher=max_url
+							lower=min_url
+						}
+						
+						$( "#slider" ).slider({
+							range:true,
+							min: parseFloat(min_price),
+							max: parseFloat(max_price),
+							values: [ parseFloat(lower),parseFloat(higher) ],
+							step: 10,
+							create: function(event,ui){
+								$(`#changevalue`).val("$" + lower + " - $" + higher)
+							},
+							change: function( event, ui ) {
+								lower= ui.values[ 0 ] 
+								higher= ui.values[ 1 ]
+								$(`#changevalue`).val("$" + ui.values[ 0 ] + " - $" + ui.values[ 1 ])
+								$('#results').html('');
+								nexturl="/flight/"+"?source="+source_url+"&destination="+destination_url+"&start="+start_url+"&type="+type_to_use+"&minprice="+ui.values[ 0 ]+"&maxprice="+ui.values[ 1 ]
+								history.pushState({}, null, nexturl);
+								psedoRefresh(nexturl)
+							},
+							slide: function( event, ui ) {
+								tooltip.text(ui.value);
+							}
+						}).find(".ui-slider-handle").append(tooltip).hover(function() {
+							tooltip.show()
+						}, function() {
+							tooltip.hide()
+						});
+					
+						
+					}
+				});
+			}
+		});
+	}
+
+	priceRefresh();
+
+	var startdate=moment().format('YYYY-MM-DD');
+	var result;	
 
 	//to append results in the body in bootstrap card format
 	function putResults(d){
-		console.log(d)
 		var out= $('<div/>')
 		var div= $('<div/>');
 		div.addClass('card');    
@@ -169,20 +247,7 @@ window.onload = function () {
 		cardbody.addClass('card-body flightbody');
 		cardbody.append(`<p><b>Takeoff time:</b> ${d.takeoff_time}</p>`)
 		cardbody.append(`<p><b>Landing time:</b> ${d.landing_time}</p>`)
-		if(d.category=="Economy"){
-			cardbody.append(`<a href='/flight/${d.flight_id}/?startdate=${startdate}&source=${d.source}&destination=${d.destination}&seat_position=a' class="btn btn-primary book-btn">Book Aisle Seat</a>`)
-			cardbody.append(`<p></p>`)
-			cardbody.append(`<a href='/flight/${d.flight_id}/?startdate=${startdate}&source=${d.source}&destination=${d.destination}&seat_position=m' class="btn btn-primary book-btn">Book Middle Seat</a>`)
-			cardbody.append(`<p></p>`)
-			cardbody.append(`<a href='/flight/${d.flight_id}/?startdate=${startdate}&source=${d.source}&destination=${d.destination}&seat_position=w' class="btn btn-primary book-btn">Book Window Seat</a>`)			
-		}
-		if(d.category=="Business"){
-			cardbody.append(`<a href='/flight/${d.flight_id}/?startdate=${startdate}&source=${d.source}&destination=${d.destination}&seat_position=h' class="btn btn-primary book-btn">Book Herringbone Seat</a>`)
-		}
-		if(d.category=="First Class"){
-		//cardbody.append(`<p class='card-text'><span class='chiptext'>Seat Position</span> ${Object.keys(d.seat_position)}</p>`);
-			cardbody.append(`<a href='/flight/${d.flight_id}/?startdate=${startdate}&source=${d.source}&destination=${d.destination}&seat_position=p' class="btn btn-primary book-btn">Book Private Seat</a>`)
-		}
+		cardbody.append(`<a href='/flight/${d.flight_id}/?startdate=${startdate}&source=${d.source}&destination=${d.destination}' class="btn btn-primary book-btn">Book Seat</a>`)
 		div.append(cardbody);
 		out.append(div);
 		out.addClass('col-md-4 carddiv')
@@ -194,53 +259,22 @@ window.onload = function () {
 		const source = $("#typeahead-source").val();
 		const destination = $("#typeahead-destination").val();
 		const dateRange = $("#date-range").val();
-		console.log(window.location)
-		window.location.href="/flight/"+"?source="+source+"&destination="+destination+"&start="+startdate+"&type="+clicked.join('|')
-		console.log(source,destination, startdate);
-/*		$.ajax({
-            url: "/api/search/?name="+cityVal+"&start="+fromdate+"&end="+todate,
-            cache: false,
-            success: function(data){
-				console.log(data);
-				result=data;
-				$('#results').html('');
-
-				if(data.length>0){
-					$('#noresults').hide();
-					$('.optional-filter').show();
-				}
-
-				data.map(function(d){
-					//console.log(d.hotel, Object.keys(d.room_types));
-					//console.log(d);
-					putResults(d);
-				});
-				$('.filter1').attr('checked','true');
-            }
-		  });
-		  */
+		window.location.href="/flight/"+"?source="+source+"&destination="+destination+"&start="+startdate+"&type="+clicked.join('|')+"&minprice="+min_price+"&maxprice="+max_price
 	});
 
-	var url = new URL(window.location.href);
-    var start_url= url.searchParams.get("start");
-    var source_url=url.searchParams.get("source")
-	var destination_url = url.searchParams.get("destination");
-	var type_url = url.searchParams.get("type");
-	console.log(moment(start_url), source_url, destination_url, type_url)
-	console.log(type_url)
+	
 	if(type_url == null){
 		type_url="Economy|Business|First Class";
-		nexturl="/flight/"+"?source="+source_url+"&destination="+destination_url+"&start="+start_url+"&type="+type_url;
+		nexturl="/flight/"+"?source="+source_url+"&destination="+destination_url+"&start="+start_url+"&type="+type_url+"&minprice="+min_url+"&maxprice="+max_url+"&page="+page_url;
 		history.pushState({}, null, nexturl);
 	}
 	if(source_url!=null & destination_url!=null & start_url!=null){
 		$.ajax({
-            url: "/api/sflights/?source="+source_url+"&destination="+destination_url+"&start="+start_url+"&type="+type_url,
+            url: "/api/sflights/?source="+source_url+"&destination="+destination_url+"&start="+start_url+"&type="+type_url+"&minprice="+min_url+"&maxprice="+max_url+"&page="+page_url,
             cache: false,
             success: function(data){
 				$('#typeahead-source').val(source_url)
 				$('#typeahead-destination').val(destination_url)
-				console.log(source_url, destination_url)
 
 				//datepicker as daterange picker
 					$('input[name="daterange"]').daterangepicker({
@@ -250,30 +284,21 @@ window.onload = function () {
 					    startDate:moment(start_url),
 					    dateFormat: 'dd-mm-yyyy',
 					  }, function(start, end, label) {
-				    	console.log("A new date selection was made: " + start.format('YYYY-MM-DD'));
 						startdate=start.format('YYYY-MM-DD');
-						console.log(startdate);
 				  });
-				type_url=type_url.split('|')
+				type_url_arr=type_url.split('|')
 				$('.filter1').each(function(i,d){
-					console.log(i,d);
-					if ($.inArray(d.id, type_url)>-1) {
-						console.log(d.id)
+					if ($.inArray(d.id, type_url_arr)>-1) {
 						$(this).prop("checked",true);
-						console.log(d,$(this).prop("checked"))
 					}
 					else{
-						console.log($.inArray(d.id, type_url),d.id,type_url)
 						$(this).prop("checked",false);
-						console.log(d,$(this).prop("checked"))
 					}
 				})
 				startdate=moment(start_url).format('YYYY-MM-DD')
-				console.log(data);
 				result=data;
-				//$('#results').html('');
 
-				if(data.length>0){
+				if(data['response'].length>0){
 					$('#noresults').hide();
 					$('.optional-filter').show();		
 				}
@@ -281,13 +306,10 @@ window.onload = function () {
 					$('#noresults').show();
 					$('.optional-filter').hide();
 				}
-				//$('.filter1').attr('checked','true');
-				console.log(data)
-				data.map(function(d){
-					//console.log(d.hotel, Object.keys(d.room_types));
-					//console.log(d);
+				data['response'].map(function(d){
 					putResults(d);
 				});	
+				paginate(data)
             }
         });
 	}

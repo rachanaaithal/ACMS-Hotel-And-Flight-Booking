@@ -1,7 +1,4 @@
 function initPage(flight_id, category, transaction_id, gst){
-    console.log(flight_id, category, transaction_id, gst);
-
-//    var gst=5;
 
     function putAboutData(data){
         var details=$('<div/>');
@@ -64,12 +61,10 @@ function initPage(flight_id, category, transaction_id, gst){
         url: `/api/seat_availability/?id=${transaction_id}`,
         cache: false,
         success: function(data){
-            console.log(data);
             id=`${data.id}`;
             putAboutData(data[0]);
         },
         error: function(error){
-            console.log(error);
         }
     });
 
