@@ -374,3 +374,136 @@ def edit(request):
 	pro.phone_number=phno
 	pro.save()
 	return redirect('/hotel/')
+	
+class CityListViewSet(viewsets.ModelViewSet):
+    queryset = City.objects.all()
+    serializer_class = CitySerializer
+	
+from api.models import Registered_Hotel,Registered_HotelPhotos , Registered_Rooms
+from datetime import datetime
+def oper_register(request):
+	name = request.GET["name"]
+	city = request.GET["city"]
+	add = request.GET["add"]
+	ct = request.GET["ct"]
+	et =request.GET["et"]
+	lat = request.GET["lat"]
+	long = request.GET['long']
+	email = request.GET['email']
+	phno = request.GET['phno']
+	count = request.GET['count']
+	room_count = request.GET['room_count']
+	room_count = int(room_count)
+	count = int(count)
+	print (city)
+	city_name = City.objects.get(name=city)
+	#c = city_name.values("id")
+	#print(c[0]['id'])
+	t = datetime.strptime(ct, '%H:%M')
+	print(t)
+	et =int(et)
+	et = timedelta(minutes=et)
+	print(et)
+	hotel = Registered_Hotel(name=name ,city_name=city_name,address = add,checkintime=t,extratime=et, latitude = lat, longitude=long,email=email,phone_number=phno,count = count)
+	hotel.save()
+	for i in range(1,count+1):
+		j = "img"+str(i)
+		photos = Registered_HotelPhotos(hotel=hotel,image_link = request.GET[j])
+		photos.save()
+	for i in range(1,room_count+1):
+		room_type = RoomType.objects.get(name=request.GET['roomtype'+str(i)])
+		room = Registered_Rooms(hotel=hotel,capacity = request.GET['capacity'+str(i)],description = request.GET['description'+str(i)],category=room_type,price=request.GET['price'+str(i)],number_of_rooms=request.GET['no_rooms'+str(i)])
+		room.save();
+	return redirect('/hotel/')
+
+from api.serializers import NewHotelSerializer, Hotel_Serializer
+
+class NewHotelViewSet(viewsets.ModelViewSet):
+    queryset = Registered_Hotel.objects.all()
+    serializer_class = NewHotelSerializer
+	
+class Hotels_ViewSet(viewsets.ModelViewSet):
+	queryset = Hotel.objects.all()
+	serializer_class = Hotel_Serializer
+	
+import random
+import string
+def randomString(stringLength=8):
+    """Generate a random string of fixed length """
+    letters = string.ascii_lowercase
+    return ''.join(random.choice(letters) for i in range(stringLength))
+	
+from api.models import Operator,HotelPhotos
+
+def add_oper(request):
+	'''name = request.GET["name"]
+	city = request.GET["city"]
+	add = request.GET["add"]
+	ct = request.GET["ct"]
+	hr=request.GET["hr"]
+	min = request.GET["min"]
+	sec = request.GET["sec"]
+	lat = request.GET["lat"]
+	long = request.GET["longi"]
+	email = request.GET["email"]
+	phno = request.GET["phno"]
+	count = request.GET["count"]
+	count = int(count)'''
+	id = request.GET['id'];
+	hotel1 = Registered_Hotel.objects.filter(id=id).values('id','name','city_name','address','checkintime','extratime','latitude','longitude','email','phone_number','count')
+	#Add to hotel Table
+	print (hotel1[0])
+	#print()
+	c =City.objects.get(id=hotel1[0]['city_name'])
+	name = hotel1[0]['name']
+	email = hotel1[0]['email']
+	hotel =Hotel(name=hotel1[0]['name'] ,city_name=c,address = hotel1[0]['address'],checkintime=hotel1[0]['checkintime'],extratime=hotel1[0]['extratime'], latitude = hotel1[0]['latitude'], longitude=hotel1[0]['longitude'])
+	hotel.save()
+	password = randomString()
+	print(password)
+	#delete from the registered table
+	#hotel2 = Registered_Hotel.objects.filter(name=name).values('id')
+	new_photos = Registered_HotelPhotos.objects.filter(hotel=hotel1[0]['id']).values('image_link')
+	print(new_photos)
+	for i in range(0,hotel1[0]['count']):
+		print("what")
+		print(new_photos[i])
+		photo = HotelPhotos(hotel = hotel,image_link = new_photos[i]['image_link'])
+		photo.save()
+	new_rooms  = Registered_Rooms.objects.filter(hotel=hotel1[0]['id']).values('capacity','description','category','price','number_of_rooms')
+	for i in range(0,len(new_rooms)):
+		t = RoomType.objects.get(id=new_rooms[i]['category'])
+		rooms = HotelRoom(hotel=hotel,capacity = new_rooms[i]['capacity'],description=new_rooms[i]['description'],category = t,price = new_rooms[i]['price'],number_of_rooms=new_rooms[i]['number_of_rooms'])
+		rooms.save()
+	user = User(username=hotel1[0]['email'],password=password,email=hotel1[0]['email'])
+	user.set_password(user.password)
+	user.save()
+	role = "Hotel Operator"
+	profile = Operator(user=user,hotel=hotel,phone_number=hotel1[0]['phone_number'],role=role)
+	profile.save()
+	hotel2 = Registered_Hotel.objects.get(id=id)
+	hotel2.delete()
+	email_operator(name,email,password)
+	return redirect('/customer/verify/')
+
+import smtplib, ssl
+
+def email_operator(name,email,password):
+	message = """Subject: Registration Successful
+
+	Hi {name}, your hotel is successfully registered for Book Now!!
+	Username : {email}
+	Password : {password}
+	Now you can update your detail @ Book Now
+	Please do not share your password"""
+	from_address = "acmsbooknow@gmail.com"
+	sender_password = "acms1234"
+	
+	context = ssl.create_default_context()
+	with smtplib.SMTP_SSL("smtp.gmail.com", 465, context=context) as server:
+		server.login(from_address, sender_password)
+		server.sendmail(
+			from_address,
+			email,
+			message.format(name=name,email=email,password=password),
+		)
