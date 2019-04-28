@@ -4,6 +4,7 @@ from django.conf.urls import url,include
 
 urlpatterns = [
     path('', views.history, name='history'),
+    path('flighthistory',views.flighthistory,name='flighthistory'),
 	url(r'register',views.user_register, name = 'user_register'),
 ]
 

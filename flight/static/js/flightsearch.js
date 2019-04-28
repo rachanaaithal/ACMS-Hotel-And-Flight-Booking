@@ -182,14 +182,14 @@ window.onload = function () {
 						if(max_url!=null && min_url!=null){
 							higher=max_url
 							lower=min_url
-						}
-						else if(max_url==null || min_url==null){
-							higher=max_price
-							lower=min_price
+							if(higher=='null')
+								higher=max_price
+							if(lower=='null')
+								lower=min_price
 						}
 						else{
-							higher=max_url
-							lower=min_url
+							higher=max_price
+							lower=min_price
 						}
 						
 						$( "#slider" ).slider({
