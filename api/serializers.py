@@ -120,3 +120,9 @@ class OperatorSerializer(serializers.ModelSerializer):
     class Meta:
         model = Operator
         fields = '__all__'
+
+
+class HotelOperator_Serializer(serializers.HyperlinkedModelSerializer):
+    class Meta:
+        model = Operator
+        fields = ('id','phone_number')

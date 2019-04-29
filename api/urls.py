@@ -27,6 +27,8 @@ router.register(r'hotels12', views.Hotels_ViewSet)
 
 router.register(r'operator',views.OperatorViewSet)
 
+router.register(r'hotelprofile',views.HotelOperator_ViewSet,base_name='hotelprofile')
+
 #router.register(r'roomavailability', views.RoomAvailabilityViewSet)
 #router.register(r'roomavailabilitycreate', views.Availability)
 #router.register(r'availabilitydetail',views.AvailabilityDetail)
@@ -53,6 +55,7 @@ urlpatterns = [
     url(r'bookings', views.bookings, name="bookings")
 ]
 
+urlpatterns +=[url(r'hoteledit',views.hotelprofile_edit,name="hoteledit"),]
 
 
 urlpatterns +=[url(r'edit',views.edit,name="edit"),]

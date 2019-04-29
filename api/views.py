@@ -439,7 +439,7 @@ def edit(request):
 	pro = UserprofileInfo.objects.get(user=request.user)
 	pro.phone_number=phno
 	pro.save()
-	return redirect('/hotel/')
+	return redirect('/customer/profile')
 	
 class CityListViewSet(viewsets.ModelViewSet):
     queryset = City.objects.all()
@@ -623,3 +623,25 @@ def bookings(request):
 
     return JsonResponse(response, safe=False)
 
+from api.serializers import HotelOperator_Serializer
+@method_decorator(csrf_exempt, name='dispatch')	
+class HotelOperator_ViewSet(viewsets.ModelViewSet):
+    #queryset = User.objects.all().order_by('-date_joined')
+	serializer_class = HotelOperator_Serializer
+	def perform_create(self, serializer):
+		serializer.save(user=self.request.user)
+	def get_queryset(self):
+		user=self.request.user
+		return Operator.objects.filter(user=user)
+		
+def hotelprofile_edit(request):
+	email = request.GET["email"]
+	phno = request.GET["phno"]
+	
+	u = User.objects.get(id=request.user.id)
+	u.email=email
+	u.save()
+	pro = Operator.objects.get(user=request.user)
+	pro.phone_number=phno
+	pro.save()
+	return redirect('/customer/profile')
