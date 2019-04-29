@@ -30,3 +30,7 @@ def verify(request):
 
 def oper_view(request):
 	return render(request,'oper_view.html')
+	
+def enter(request):
+	print("hi")
+	return render(request,'enter.html')

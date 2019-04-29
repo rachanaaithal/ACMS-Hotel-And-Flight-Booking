@@ -320,7 +320,10 @@ window.onload = function(){
 								console.log(roomurl);
 								console.log(roomsurl);
 								if(sum<1){
-									window.location.replace(url);
+									console.log(url);
+									url1 = url.replace("#",'No');
+									//alert(url1);
+									window.location.replace(url1);
 									sum = 1;
 								}	
 							}

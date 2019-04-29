@@ -16,3 +16,5 @@ urlpatterns+=[url(r'profile',views.user_profile,name='user_profile'),]
 
 
 urlpatterns+=[url(r'verify',views.verify,name='verify'),]
+
+urlpatterns+=[url(r'enter',views.enter,name='enter'),]
