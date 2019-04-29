@@ -209,8 +209,10 @@ class Registered_Rooms(models.Model):
     description = models.TextField(max_length=1000, help_text='Enter description of the room.')
 
     category = models.ForeignKey('RoomType', on_delete=models.SET_NULL, null=True)#use when hotels can add new types of rooms
-
-    price = models.DecimalField(max_digits=6, decimal_places=2, default=0)
+    '''change is here'''
+    base_price = models.DecimalField(max_digits=6, decimal_places=2, default=0)
+	
+    max_price = models.DecimalField(max_digits=6, decimal_places=2, default=0)
 
     number_of_rooms = models.IntegerField(default=1,validators=[MinValueValidator(1)])
 
