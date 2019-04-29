@@ -50,6 +50,7 @@ urlpatterns = [
     url(r'oper_register',views.oper_register,name="oper_register"),
     url(r'register',views.register,name="register"),
 
+    url(r'bookings', views.bookings, name="bookings")
 ]
 
 

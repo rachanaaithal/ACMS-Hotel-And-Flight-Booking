@@ -590,6 +590,36 @@ class OperatorViewSet(viewsets.ModelViewSet):
     queryset = Operator.objects.all()
     serializer_class = OperatorSerializer
     filter_fields = {
-        'hotel': ['exact']
+        'hotel': ['exact'],
+        'user':['exact']
     }
+
+def bookings(request):
+    date=request.GET.get("date",datetime.today().strftime('%Y-%m-%d'))
+    user=request.user
+    oper=Operator.objects.filter(user=user).values('hotel')
+    hotelid=list(oper)[0]['hotel']
+
+    q1=Q(from_date__lte=date)
+    q2=Q(to_date__gte=date)
+
+    supply=HotelRoom.objects.filter(hotel=hotelid)
+    #supply=[i for i in supply]
+    booked=RoomAvailability.objects.filter(room__in=supply).filter(q1 & q2).filter(status='bk')
+    booked=booked.values('room__category__name','from_date','to_date','booked_by__first_name','price')
+    supply=[i for i in supply.values('category__name','number_of_rooms')]
+    print(supply,booked)
+
+    response=[]
+    x=0
+    for i in supply:
+        category=i['category__name']
+        temp=booked.filter(room__category__name=category)
+        tosend={}
+        tosend['category']=category
+        tosend['total']=i['number_of_rooms']
+        tosend['booked']=[i for i in temp]
+        response.append(tosend)
+
+    return JsonResponse(response, safe=False)
 
