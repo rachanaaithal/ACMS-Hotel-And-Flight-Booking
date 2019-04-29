@@ -4,6 +4,8 @@ from api.serializers import UserSerializer, GroupSerializer, HotelSerializer, Co
 from api.models import Country, City, Hotel, RoomType, HotelRoom, RoomAvailability, HotelPhotos, UserprofileInfo
 from api.serializers import Seat_AvailabilitySerializer, SeatTypeSerializer, FlightSerializer, Flight_SeatsSerializer
 from api.models import Seat_Availability, Flight, Flight_Seats, SeatType
+from api.serializers import UserSerializer, GroupSerializer, HotelSerializer, CountrySerializer, CitySerializer, HotelRoomSerializer, RoomTypeSerializer, RoomAvailabilitySerializer, HotelPhotosSerializer, OperatorSerializer
+from api.models import Country, City, Hotel, RoomType, HotelRoom, RoomAvailability, HotelPhotos, UserprofileInfo, Operator
 from rest_framework import filters
 from django_filters.rest_framework import DjangoFilterBackend
 from django.http import JsonResponse
@@ -17,8 +19,6 @@ from datetime import *
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from rest_framework.response import Response
 from django.db.models import Max, Min
-import datetime
-from django.utils import timezone
 from django.contrib.auth import authenticate, login, logout, views
 import random
 import math
@@ -72,7 +72,7 @@ class MaxHotelRoomView(generics.ListCreateAPIView):
         print("\n\n\n\n\n\n\n\n\n\nn\nhere:",HotelRoom.objects.filter(category__name__in=room_type),"\n\nnow:",HotelRoom.objects.filter(hotel__city_name__name=city).filter(category__name__in=room_type),"\n\n")
         return HotelRoom.objects.filter(hotel__city_name__name=city).filter(category__name__in=room_type)
     def get(self, request, format=None):
-        room=self.get_queryset().order_by('-price').first()
+        room=self.get_queryset().order_by('-base_price').first()
         serializer = HotelRoomSerializer(room)
         return Response(serializer.data)
 class MinHotelRoomView(generics.ListCreateAPIView):
@@ -83,7 +83,7 @@ class MinHotelRoomView(generics.ListCreateAPIView):
         room_type=room_type.split('|')
         return HotelRoom.objects.filter(hotel__city_name__name=city).filter(category__name__in=room_type)
     def get(self, request, format=None):
-        room=self.get_queryset().order_by('-price').last()    
+        room=self.get_queryset().order_by('-base_price').last()    
         serializer = HotelRoomSerializer(room)
         return Response(serializer.data)
 
@@ -103,7 +103,7 @@ class RoomAvailabilityViewSet(viewsets.ModelViewSet):
     
     def get_queryset(self):
         user = self.request.user
-        return RoomAvailability.objects.filter(booked_by=user)
+        return RoomAvailability.objects.filter(booked_by=user).exclude(status='dd')
 
 class RoomTypeViewSet(viewsets.ModelViewSet):
     queryset = RoomType.objects.all()
@@ -140,22 +140,33 @@ def search(request):
     q6=Q(to_date__gte=ed)
     q7=Q(from_date__gte=st)
     q8=Q(to_date__lte=ed)
- 
+
     supply = HotelRoom.objects.filter(hotel__city_name__name=name).values('hotel__name', 'category__name', 'hotel__image_link', 'hotel__id','number_of_rooms', 'hotel__latitude', 'hotel__longitude','price')
+
+#Get Supply (Room type-hotel level)
+    supply = HotelRoom.objects.filter(hotel__city_name__name=name).values('hotel__name', 'category__name', 'hotel__image_link', 'hotel__id','number_of_rooms', 'hotel__latitude', 'hotel__longitude','base_price')
     
     demand = RoomAvailability.objects.filter((q1 & q2) | (q3 & q4) | (q5 & q6)| (q7 & q8)).filter(room__hotel__city_name__name=name)
-    demand = demand.exclude(status='dd').values('room__hotel__name','room__category__name','status','room__price')
+    demand = demand.exclude(status='dd').values('room__hotel__name','room__category__name','status','room__base_price')
    
     if type_room is not None:
         supply=supply.filter(category__name__in=type_room)
         demand=demand.filter(room__category__name__in=type_room)
-    
     if min_price is not None and min_price !='null':
         supply= supply.filter(Q(price__gte=min_price))
         demand= demand.filter(Q(room__price__gte=min_price))
     if max_price is not None and max_price !='null':
         supply= supply.filter(Q(price__lte=max_price))
         demand= demand.filter(Q(room__price__lte=max_price))
+    if min_price is not None and min_price !='null' and min_price !='undefined':
+        supply= supply.filter(Q(base_price__gte=min_price))
+        demand= demand.filter(Q(room__base_price__gte=min_price))
+    if max_price is not None and max_price !='null' and max_price !='undefined':
+        supply= supply.filter(Q(base_price__lte=max_price))
+        demand= demand.filter(Q(room__base_price__lte=max_price))
+    
+    #print('demand:',list(demand.values('room__hotel__name','room__category__name', 'status')) )
+
     demand = [x['room__hotel__name']+':'+x['room__category__name']+x['status'] for x in list(demand)]
     demand_dict = {}
     for dem in demand:
@@ -218,12 +229,13 @@ def search(request):
         prev_page=0
     paginated_response={'response':list(response_page),'has_next':response_page.has_next(),'next_page':next_page,'has_prev':response_page.has_previous(),'prev_page':prev_page}
     return JsonResponse(paginated_response, safe=False)
+    #return Response({response_page})
 
 def check(request):
-    name=request.GET["name"]
-    st=request.GET["start"]
-    ed=request.GET["end"]
-    category=request.GET["category"]
+    name=request.GET.get("name",None)
+    st=request.GET.get("start",None)
+    ed=request.GET.get("end",None)
+    category=request.GET.get("category",None)
     st=st.strip()
     ed=ed.strip()
 
@@ -239,6 +251,7 @@ def check(request):
     supply = HotelRoom.objects.filter(hotel__id=name).filter(category__id=category).values('id','hotel__name', 'category__id', 'hotel__image_link', 'hotel__id','number_of_rooms')
     
     demand = RoomAvailability.objects.filter((q1 & q2) | (q3 & q4) | (q5 & q6)| (q7 & q8)).filter(room__hotel__id=name).filter(room__category__id=category)
+    demand = demand.exclude(status='dd').values('room__hotel__name','room__category__name','status','room__base_price')
 
     if((list(supply)[0]['number_of_rooms']-len(list(demand)))>0):
         response={'val':True, 'id':list(supply)[0]['id']}
@@ -254,7 +267,71 @@ class HotelPhotosViewSet(viewsets.ModelViewSet):
         'hotel': ['exact'],
     }
 
+def prices(request):
+    name=request.GET.get("name",None)
+    st=request.GET.get("start",None)
+    ed=request.GET.get("end",None)
+    category=request.GET.get("category",None)    
+    st=st.strip()
+    ed=ed.strip()
 
+    q1=Q(from_date__gte=st)
+    q2=Q(from_date__lte=ed) 
+    q3=Q(to_date__gte=st)
+    q4=Q(to_date__lte=ed)
+    q5=Q(from_date__lte=st)
+    q6=Q(to_date__gte=ed)
+    q7=Q(from_date__gte=st)
+    q8=Q(to_date__lte=ed)
+
+#Get Supply
+    supply = HotelRoom.objects.filter(hotel__id=name).values('hotel__name', 'category__name', 'hotel__image_link', 'hotel__id','number_of_rooms', 'hotel__latitude', 'hotel__longitude','base_price','max_price')
+    supply_type = supply.filter(category__id=category)
+
+    base_price = float(list(supply_type)[0]['base_price'])
+    max_price = float(list(supply_type)[0]['max_price'])
+
+    supply = list(supply)[0]['number_of_rooms']
+    supply_type = list(supply_type)[0]['number_of_rooms']
+
+#Get Demand from room availability table
+    demand = RoomAvailability.objects.filter((q1 & q2) | (q3 & q4) | (q5 & q6)| (q7 & q8)).filter(room__hotel__id=name)
+    demand = demand.exclude(status='dd').values('room__hotel__name','room__category__name','status','room__base_price')
+    demand_type = demand.filter(room__category__id=category)
+
+    demand = len(list(demand))
+    demand_type = len(list(demand_type))
+
+    #a is the number of days left
+    d0 = datetime.today().strftime('%Y-%m-%d')
+    d0 = datetime.strptime(d0, '%Y-%m-%d')
+    d1 = datetime.strptime(st, '%Y-%m-%d')
+    d2 = datetime.strptime(ed, '%Y-%m-%d')
+    delta1 = d1 - d0
+    a = delta1.days
+    if a<30:
+	    a = 1-(a/30)
+    else:
+    	a = 0
+
+    #b is total % of rooms of this type booked in this hotel
+    b = (supply_type-demand_type)/supply_type
+    b = 1-b
+
+    #c is total % of rooms of other types booked in this hotel
+    if supply-supply_type >0: 
+        c = ((supply-supply_type)-(demand-demand_type)/(supply-supply_type))
+        c = 1-c
+    else:
+        c = b
+
+    delta2 = d2-d1
+    num_of_days=max(delta2.days,1)
+    price = (0.3*(a)+0.4*(b)+0.3*(c))*(max_price-base_price)+base_price
+    print(base_price,max_price,a,b,c)
+    response={'price':(price*num_of_days)}
+
+    return JsonResponse(response, safe=False)
 
 from django.shortcuts import redirect	
 def register(request):
@@ -309,8 +386,161 @@ def edit(request):
 	pro.phone_number=phno
 	pro.save()
 	return redirect('/hotel/')
+	
+class CityListViewSet(viewsets.ModelViewSet):
+    queryset = City.objects.all()
+    serializer_class = CitySerializer
+	
+from api.models import Registered_Hotel,Registered_HotelPhotos , Registered_Rooms
+from datetime import datetime
+def oper_register(request):
+	name = request.GET["name"]
+	city = request.GET["city"]
+	add = request.GET["add"]
+	ct = request.GET["ct"]
+	et =request.GET["et"]
+	lat = request.GET["lat"]
+	long = request.GET['long']
+	email = request.GET['email']
+	phno = request.GET['phno']
+	count = request.GET['count']
+	room_count = request.GET['room_count']
+	room_count = int(room_count)
+	count = int(count)
+	print (city)
+	city_name = City.objects.get(name=city)
+	#c = city_name.values("id")
+	#print(c[0]['id'])
+	t = datetime.strptime(ct, '%H:%M')
+	print(t)
+	et =int(et)
+	et = timedelta(minutes=et)
+	print(et)
+	hotel = Registered_Hotel(name=name ,city_name=city_name,address = add,checkintime=t,extratime=et, latitude = lat, longitude=long,email=email,phone_number=phno,count = count)
+	hotel.save()
+	for i in range(1,count+1):
+		j = "img"+str(i)
+		photos = Registered_HotelPhotos(hotel=hotel,image_link = request.GET[j])
+		photos.save()
+	for i in range(1,room_count+1):
+		room_type = RoomType.objects.get(name=request.GET['roomtype'+str(i)])
+		
+		#here
+		room = Registered_Rooms(hotel=hotel,capacity = request.GET['capacity'+str(i)],description = request.GET['description'+str(i)],category=room_type,base_price=request.GET['bprice'+str(i)],max_price=request.GET['mprice'+str(i)],number_of_rooms=request.GET['no_rooms'+str(i)])
+		
+		
+		room.save();
+	return redirect('/hotel/')
+
+from api.serializers import NewHotelSerializer, Hotel_Serializer
+
+class NewHotelViewSet(viewsets.ModelViewSet):
+    queryset = Registered_Hotel.objects.all()
+    serializer_class = NewHotelSerializer
+	
+class Hotels_ViewSet(viewsets.ModelViewSet):
+	queryset = Hotel.objects.all()
+	serializer_class = Hotel_Serializer
+	
+import random
+import string
+def randomString(stringLength=8):
+    """Generate a random string of fixed length """
+    letters = string.ascii_lowercase
+    return ''.join(random.choice(letters) for i in range(stringLength))
+	
+from api.models import Operator,HotelPhotos
+
+def add_oper(request):
+	'''name = request.GET["name"]
+	city = request.GET["city"]
+	add = request.GET["add"]
+	ct = request.GET["ct"]
+	hr=request.GET["hr"]
+	min = request.GET["min"]
+	sec = request.GET["sec"]
+	lat = request.GET["lat"]
+	long = request.GET["longi"]
+	email = request.GET["email"]
+	phno = request.GET["phno"]
+	count = request.GET["count"]
+	count = int(count)'''
+	id = request.GET['id'];
+	hotel1 = Registered_Hotel.objects.filter(id=id).values('id','name','city_name','address','checkintime','extratime','latitude','longitude','email','phone_number','count')
+	#Add to hotel Table
+	print (hotel1[0])
+	#print()
+	c =City.objects.get(id=hotel1[0]['city_name'])
+	name = hotel1[0]['name']
+	email = hotel1[0]['email']
+	hotel =Hotel(name=hotel1[0]['name'] ,city_name=c,address = hotel1[0]['address'],checkintime=hotel1[0]['checkintime'],extratime=hotel1[0]['extratime'], latitude = hotel1[0]['latitude'], longitude=hotel1[0]['longitude'])
+	hotel.save()
+	password = randomString()
+	print(password)
+	#delete from the registered table
+	#hotel2 = Registered_Hotel.objects.filter(name=name).values('id')
+	new_photos = Registered_HotelPhotos.objects.filter(hotel=hotel1[0]['id']).values('image_link')
+	print(new_photos)
+	for i in range(0,hotel1[0]['count']):
+		print("what")
+		print(new_photos[i])
+		photo = HotelPhotos(hotel = hotel,image_link = new_photos[i]['image_link'])
+		photo.save()
+	
+	#here
+	new_rooms  = Registered_Rooms.objects.filter(hotel=hotel1[0]['id']).values('capacity','description','category','base_price','max_price','number_of_rooms')
+	
+	
+	for i in range(0,len(new_rooms)):
+		t = RoomType.objects.get(id=new_rooms[i]['category'])
+		
+		#here
+		rooms = HotelRoom(hotel=hotel,capacity = new_rooms[i]['capacity'],description=new_rooms[i]['description'],category = t,base_price = new_rooms[i]['base_price'],max_price = new_rooms[i]['max_price'],number_of_rooms=new_rooms[i]['number_of_rooms'])
+		
+		rooms.save()
+	user = User(username=hotel1[0]['email'],password=password,email=hotel1[0]['email'])
+	user.set_password(user.password)
+	user.save()
+	role = "Hotel Operator"
+	profile = Operator(user=user,hotel=hotel,phone_number=hotel1[0]['phone_number'],role=role)
+	profile.save()
+	hotel2 = Registered_Hotel.objects.get(id=id)
+	hotel2.delete()
+	email_operator(name,email,password)
+	return redirect('/customer/verify/')
+
+import smtplib, ssl
+
+def email_operator(name,email,password):
+	message = """Subject: Registration Successful
+
+	Hi {name}, your hotel is successfully registered for Book Now!!
+	Username : {email}
+	Password : {password}
+	Now you can update your detail @ Book Now
+	Please do not share your password"""
+	from_address = "acmsbooknow@gmail.com"
+	sender_password = "acms1234"
+	
+	context = ssl.create_default_context()
+	with smtplib.SMTP_SSL("smtp.gmail.com", 465, context=context) as server:
+		server.login(from_address, sender_password)
+		server.sendmail(
+			from_address,
+			email,
+			message.format(name=name,email=email,password=password),
+		)
 
 
+class OperatorViewSet(viewsets.ModelViewSet):
+    queryset = Operator.objects.all()
+    serializer_class = OperatorSerializer
+    filter_fields = {
+        'hotel': ['exact'],
+        'user':['exact']
+    }
+    def perform_create(self, serializer):
+        serializer.save(booked_by=self.request.user)
 
 class FlightViewSet(viewsets.ModelViewSet):
     queryset = Flight.objects.all()
@@ -373,7 +603,7 @@ def sflights(request):
 
     if type_seat is not None:
         type_seat=type_seat.split('|')
-    st=datetime.datetime.strptime(st, "%Y-%m-%d").date()
+    st=datetime.strptime(st, "%Y-%m-%d").date()
 
     q1=Q(flight__on_date__day=st.day)
     q2=Q(flight__source__name=source)
@@ -470,7 +700,7 @@ def cflightstatus(request):
     flight_id=request.GET["flightid"]
     category=request.GET["category"]
     st=st.strip()
-    st=datetime.datetime.strptime(st, "%Y-%m-%d").date()
+    st=datetime.strptime(st, "%Y-%m-%d").date()
 
     q4=Q(seat__flight__source__name=source)
     q5=Q(seat__flight__destination__name=destination)
@@ -496,7 +726,7 @@ def flightcharges(request):
     destination=request.GET.get("destination",None)
     category=request.GET.get("category",None)    
     st=st.strip()
-    st=datetime.datetime.strptime(st, "%Y-%m-%d").date()
+    st=datetime.strptime(st, "%Y-%m-%d").date()
 
     q1=Q(flight__on_date__day=st.day)
     q2=Q(flight__source__name=source)
@@ -523,9 +753,9 @@ def flightcharges(request):
     demand_type = len(list(demand_type))
 
     #a is the number of days left
-    d0 = datetime.datetime.today().strftime('%Y-%m-%d')
-    d0 = datetime.datetime.strptime(d0, '%Y-%m-%d')
-    d1 = datetime.datetime.strptime(str(st), '%Y-%m-%d')
+    d0 = datetime.today().strftime('%Y-%m-%d')
+    d0 = datetime.strptime(d0, '%Y-%m-%d')
+    d1 = datetime.strptime(str(st), '%Y-%m-%d')
     delta1 = d1 - d0
     a = delta1.days
     if a<30:
@@ -574,3 +804,32 @@ class MinimumSeatView(generics.ListCreateAPIView):
         seat=self.get_queryset().order_by('-base_price').last()    
         serializer = Flight_SeatsSerializer(seat)
         return Response(serializer.data)
+
+def bookings(request):
+    date=request.GET.get("date",datetime.today().strftime('%Y-%m-%d'))
+    user=request.user
+    oper=Operator.objects.filter(user=user).values('hotel')
+    hotelid=list(oper)[0]['hotel']
+
+    q1=Q(from_date__lte=date)
+    q2=Q(to_date__gte=date)
+
+    supply=HotelRoom.objects.filter(hotel=hotelid)
+    #supply=[i for i in supply]
+    booked=RoomAvailability.objects.filter(room__in=supply).filter(q1 & q2).filter(status='bk')
+    booked=booked.values('room__category__name','from_date','to_date','booked_by__first_name','price')
+    supply=[i for i in supply.values('category__name','number_of_rooms')]
+    print(supply,booked)
+
+    response=[]
+    x=0
+    for i in supply:
+        category=i['category__name']
+        temp=booked.filter(room__category__name=category)
+        tosend={}
+        tosend['category']=category
+        tosend['total']=i['number_of_rooms']
+        tosend['booked']=[i for i in temp]
+        response.append(tosend)
+
+    return JsonResponse(response, safe=False)

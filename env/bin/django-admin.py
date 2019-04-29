@@ -1,4 +1,4 @@
-#!/home/mukesh/ACMS-Hotel-And-Flight-Booking/env/bin/python
+#!/home/mukesh/ACMS-Hotel-And-Flight-Booking/env/bin/python3
 from django.core import management
 
 if __name__ == "__main__":

@@ -29,8 +29,7 @@ function initPage(transaction_id, gst, cancellation_charges){
         console.log(data.status=='bk')
         
         if(data.status=='bk'){
-            const days= Math.max(moment(data.to_date).diff(moment(data.from_date), "days"),1);
-            const cost=data.price*days;
+            const cost=data.price
             const tax=cost*gst/100;
                 
             const tot=tax+parseFloat(cost);

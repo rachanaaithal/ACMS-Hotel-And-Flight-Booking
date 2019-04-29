@@ -1,5 +1,4 @@
-#!/home/mukesh/ACMS-Hotel-And-Flight-Booking/env/bin/python
-
+#!/home/mukesh/ACMS-Hotel-And-Flight-Booking/env/bin/python3
 # -*- coding: utf-8 -*-
 import re
 import sys

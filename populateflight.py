@@ -11,7 +11,7 @@ import datetime
 from decimal import Decimal
 application = get_wsgi_application()
 from api.models import Flight, Flight_Seats, City, Seat_Availability, SeatType, Country
-'''
+
 p=SeatType(name="Economy")
 try:
 	p.save()
@@ -58,7 +58,7 @@ with open('/home/mukesh/ACMS-Hotel-And-Flight-Booking/data/airline.csv') as csvf
 		if row['airline_name'] not in airlines:
 			m={}
 			m[row['airline_name']]=row['image_link']
-			airlines.append(m)'''
+			airlines.append(m)
 
 '''with open('/home/mukesh/ACMS-Hotel-And-Flight-Booking/data/flight.csv') as csvfile:
 	reader=csv.DictReader(csvfile)
@@ -120,7 +120,7 @@ with open('/home/mukesh/ACMS-Hotel-And-Flight-Booking/data/airline.csv') as csvf
 			i=i+3
 		p=Flight_Seats(flight=Flight.objects.filter(flightnumber=int(row['FlightNum'])), number_of_seats=80, category=SeatType.objects.filter(name='Economy'), )
 '''
-'''with open('/home/mukesh/ACMS-Hotel-And-Flight-Booking/data/flight.csv') as csvfile:
+with open('/home/mukesh/ACMS-Hotel-And-Flight-Booking/data/flight.csv') as csvfile:
 	reader=csv.DictReader(csvfile)
 	for row in reader:
 		#print(cities[row['source']])
@@ -131,7 +131,6 @@ with open('/home/mukesh/ACMS-Hotel-And-Flight-Booking/data/airline.csv') as csvf
 			p.save()
 		except Exception as e:
 			print(e)
-'''
 
 with open('/home/mukesh/ACMS-Hotel-And-Flight-Booking/data/flightseats.csv') as csvfile:
 	reader=csv.DictReader(csvfile)
