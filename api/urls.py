@@ -30,7 +30,7 @@ urlpatterns = [
     url(r'sflights', views.sflights,name="searchflight"),
     url(r'check', views.check, name="check"),
     url(r'cflightstatus', views.cflightstatus, name="cflightstatus"),
-
+    url(r'^flightcharges/$', views.flightcharges, name="flightcharges"),
     url(r'^roomavailability/$',views.RoomAvailabilityViewSet.as_view({'get': 'list', 'post': 'create'}),name='roomavailability-list',),
     url(r'^roomavailability/(?P<pk>[^/.]+)/$',views.RoomAvailabilityViewSet.as_view({'get': 'retrieve', 'put': 'update', 'patch': 'partial_update', 'delete': 'destroy'}),name='roomavailability-detail',),
     url(r'^maxroomprice/$', views.MaxHotelRoomView.as_view()),

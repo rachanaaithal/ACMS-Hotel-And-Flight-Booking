@@ -21,6 +21,7 @@ import datetime
 from django.utils import timezone
 from django.contrib.auth import authenticate, login, logout, views
 import random
+import math
 
 class UserViewSet(viewsets.ModelViewSet):
     queryset = User.objects.all().order_by('-date_joined')
@@ -356,7 +357,7 @@ class Seat_AvailabilityViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
         user=self.request.user
-        return Seat_Availability.objects.filter(booked_by=user).exclude(status=='dd').exclude(status=='pr')
+        return Seat_Availability.objects.filter(booked_by=user)
 
 def sflights(request):
     source=request.GET.get("source",None)
@@ -380,21 +381,21 @@ def sflights(request):
     q4=Q(seat__flight__source__name=source)
     q5=Q(seat__flight__destination__name=destination)
     q6=Q(on_date__day=st.day)
-    supply = Flight_Seats.objects.filter(q2).filter(q3).filter(q1).values('flight__id','flight__airline_name', 'category__name', 'flight__image_link', 'flight__flightnumber','flight__on_date','seat_position','number_of_seats','flight__takeoff_time', 'flight__landing_time','price')
+    supply = Flight_Seats.objects.filter(q2).filter(q3).filter(q1).values('flight__id','flight__airline_name', 'category__name', 'flight__image_link', 'flight__flightnumber','flight__on_date','seat_position','number_of_seats','flight__takeoff_time', 'flight__landing_time','base_price')
     
     demand = Seat_Availability.objects.filter(q4).filter(q5).filter(q6)
-    demand = demand.exclude(status='dd').values('seat__flight__airline_name','seat__category__name','seat__seat_position','status', 'on_date','seat__price')
+    demand = demand.exclude(status='dd').values('seat__flight__airline_name','seat__category__name','seat__seat_position','status', 'on_date','seat__base_price')
 
     if type_seat is not None:
         supply=supply.filter(category__name__in=type_seat)
         demand=demand.filter(seat__category__name__in=type_seat)
 
-    if min_price is not None and min_price !='null':
-        supply= supply.filter(Q(price__gte=min_price))
-        demand= demand.filter(Q(seat__price__gte=min_price))
-    if max_price is not None and max_price !='null':
-        supply= supply.filter(Q(price__lte=max_price))
-        demand= demand.filter(Q(seat__price__lte=max_price))
+    if min_price is not None and min_price !='null' and min_price !='undefined':
+        supply= supply.filter(Q(base_price__gte=min_price))
+        demand= demand.filter(Q(seat__base_price__gte=min_price))
+    if max_price is not None and max_price !='null' and max_price !='undefined':
+        supply= supply.filter(Q(base_price__lte=max_price))
+        demand= demand.filter(Q(seat__base_price__lte=max_price))
 
     demand = [x['seat__flight__airline_name']+':'+x['seat__category__name']+x['seat__seat_position'] for x in list(demand)]
     demand_dict = {}
@@ -479,12 +480,72 @@ def cflightstatus(request):
     supply = Flight_Seats.objects.filter(id=seat_id).filter(flight__id=flight_id).filter(category__id=category).values('id','flight__id','flight__airline_name', 'category__name', 'flight__image_link', 'flight__flightnumber','flight__on_date','seat_position','number_of_seats','flight__takeoff_time', 'flight__landing_time')
     
 
-    demand = Seat_Availability.objects.filter(q4).filter(q5).filter(q6).filter(seat__id=seat_id).filter(seat__flight__id=flight_id).filter(seat__category__id=category).values('seat__flight__airline_name','seat__category__name','seat__seat_position','status', 'on_date')
+    demand = Seat_Availability.objects.filter(q4).filter(q5).filter(q6).filter(seat__id=seat_id).filter(seat__flight__id=flight_id).filter(seat__category__id=category).values('seat__flight__airline_name','seat__category__name','seat__seat_position','status', 'on_date','seat__base_price')
 
     if((list(supply)[0]['number_of_seats']-len(list(demand)))>0):
         response={'val':True, 'id':list(supply)[0]['id']}
     else:
         response={'val':False}
+
+    return JsonResponse(response, safe=False)
+
+def flightcharges(request):
+    flight_id=request.GET.get("flightid",None)
+    source=request.GET.get("source",None)
+    st=request.GET.get("start",None)
+    destination=request.GET.get("destination",None)
+    category=request.GET.get("category",None)    
+    st=st.strip()
+    st=datetime.datetime.strptime(st, "%Y-%m-%d").date()
+
+    q1=Q(flight__on_date__day=st.day)
+    q2=Q(flight__source__name=source)
+    q3=Q(flight__destination__name=destination)
+    q4=Q(seat__flight__source__name=source)
+    q5=Q(seat__flight__destination__name=destination)
+    q6=Q(on_date__day=st.day)
+ 
+#Get Supply
+    supply = Flight_Seats.objects.filter(q1).filter(q2).filter(q3).filter(flight__id=flight_id).values('flight__id','flight__airline_name', 'category__name', 'flight__flightnumber','flight__on_date','seat_position','number_of_seats','flight__takeoff_time', 'flight__landing_time','base_price','max_price')
+    supply_type = supply.filter(category__id=category)
+
+    base_price = float(list(supply_type)[0]['base_price'])
+    max_price = float(list(supply_type)[0]['max_price'])
+
+    supply = list(supply)[0]['number_of_seats']
+    supply_type = list(supply_type)[0]['number_of_seats']
+
+    demand = Seat_Availability.objects.filter((q6) | (q5)| (q4)).filter(seat__flight__id=flight_id)
+    demand = demand.exclude(status='dd').values('seat__flight__airline_name','seat__category__name','seat__seat_position','status', 'on_date','seat__base_price')
+    demand_type = demand.filter(seat__category__id=category)
+
+    demand = len(list(demand))
+    demand_type = len(list(demand_type))
+
+    #a is the number of days left
+    d0 = datetime.datetime.today().strftime('%Y-%m-%d')
+    d0 = datetime.datetime.strptime(d0, '%Y-%m-%d')
+    d1 = datetime.datetime.strptime(str(st), '%Y-%m-%d')
+    delta1 = d1 - d0
+    a = delta1.days
+    if a<30:
+        a = 1-(a/30)
+    else:
+        a = 0
+
+    #b is total % of seats of this type booked in this flight
+    b = (supply_type-demand_type)/supply_type
+    b = 1-b
+
+    #c is total % of seats of other types booked in this flight
+    if supply-supply_type >0: 
+        c = ((supply-supply_type)-(demand-demand_type)/(supply-supply_type))
+        c = 1-c
+    else:
+        c = b
+    price = (0.3*(a)+0.4*(b)+0.3*(c))*(max_price-base_price)+base_price
+    price = round(price, 2)
+    response={'price':(price)}
 
     return JsonResponse(response, safe=False)
 
@@ -498,7 +559,7 @@ class MaximumSeatView(generics.ListCreateAPIView):
         seat_type=seat_type.split('|')
         return Flight_Seats.objects.filter(flight__source__name=source).filter(flight__destination__name=destination).filter(category__name__in=seat_type)
     def get(self, request, format=None):
-        seat=self.get_queryset().order_by('-price').first()
+        seat=self.get_queryset().order_by('-base_price').first()
         serializer = Flight_SeatsSerializer(seat)
         return Response(serializer.data)
 class MinimumSeatView(generics.ListCreateAPIView):
@@ -510,6 +571,6 @@ class MinimumSeatView(generics.ListCreateAPIView):
         seat_type=seat_type.split('|')
         return Flight_Seats.objects.filter(flight__source__name=source).filter(flight__destination__name=destination).filter(category__name__in=seat_type)
     def get(self, request, format=None):
-        seat=self.get_queryset().order_by('-price').last()    
+        seat=self.get_queryset().order_by('-base_price').last()    
         serializer = Flight_SeatsSerializer(seat)
         return Response(serializer.data)

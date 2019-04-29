@@ -21,7 +21,7 @@ function initPage(id){
         table.addClass('table table-hover')
         var thead=$('<thead/>')
         var tr=$('<tr/>')
-        tr.append(`<th scope="col">SeatType</th><th scope="col">Price</th><th></th>`)
+        tr.append(`<th scope="col">SeatType</th><th scope="col">Category</th><th scope="col">Price</th><th></th>`)
         thead.append(tr)
         table.append(thead)
         var body=$('<tbody/>')
@@ -56,62 +56,72 @@ function initPage(id){
             success: function( data){
                 seattype=data.name;
                 d.map(function (da){
-                var tr=$('<tr/>')
-                if(da.seat_position=="a")
-                    tr.append(`<th scope="row">Aisle</td>`)
-                if(da.seat_position=="m")
-                    tr.append(`<th scope="row">Middle</td>`)
-                if(da.seat_position=="w")
-                    tr.append(`<th scope="row">Window</td>`)
-                if(da.seat_position=="p")
-                    tr.append(`<th scope="row">Private</td>`)
-                if(da.seat_position=="h")
-                    tr.append(`<th scope="row">Hemmingway</td>`)
-                tr.append(`<th scope="row">${data.name}</td>`)
-                tr.append(`<td>${da.price}</td><td><button id="seatid-${da.id}" class="btn btn-primary process">Book</button></td>`)
-                tr.appendTo('#prices-tab-bod')
-                $(`#seatid-${da.id}`).click(function(e){
                     $.ajax({
-                        url: `/api/cflightstatus/?seat_id=${da.id}&flightid=${id}&category=${da.category}&start=${fromdate}&source=${source}&destination=${dest}`,
+                        url:`/api/flightcharges/?flightid=${id}&category=${da.category}&start=${fromdate}&source=${source}&destination=${dest}`,
                         cache: false,
-                        success: function(data){
-                            if(data.val){
+                        success: function(price){
+                            var tr=$('<tr/>')
+                            if(da.seat_position=="a")
+                                tr.append(`<th scope="row">Aisle</td>`)
+                            if(da.seat_position=="m")
+                                tr.append(`<th scope="row">Middle</td>`)
+                            if(da.seat_position=="w")
+                                tr.append(`<th scope="row">Window</td>`)
+                            if(da.seat_position=="p")
+                                tr.append(`<th scope="row">Private</td>`)
+                            if(da.seat_position=="h")
+                                tr.append(`<th scope="row">Hemmingway</td>`)
+                            tr.append(`<th scope="row">${data.name}</td>`)
+
+                            tr.append(`<td>${price.price}</td><td><button id="seatid-${da.id}" class="btn btn-primary process">Book</button></td>`)
+                            tr.appendTo('#prices-tab-bod')
+                            $(`#seatid-${da.id}`).click(function(e){
                                 $.ajax({
-                                    type: "POST",
-                                    url: `/api/seat_availability/`,
-                                    data:{'on_date': fromdate ,'seat':data.id, 'status': 'pr'},
-                                    headers:{"X-CSRFToken": csrftoken},
-                                    success:function(newdata){
-                                        url=`/flight/`+id+`/${d[0].category}/?id=${newdata.id}`;
-                                        window.location.replace(url);
-                                        return (false);
+                                    url: `/api/cflightstatus/?seat_id=${da.id}&flightid=${id}&category=${da.category}&start=${fromdate}&source=${source}&destination=${dest}`,
+                                    cache: false,
+                                    success: function(data){
+                                    	console.log(data)
+                                        if(data.val){
+                                            $.ajax({
+                                                type: "POST",
+                                                url: `/api/seat_availability/`,
+                                                data:{'on_date': fromdate ,'seat':data.id, 'status': 'pr', 'price':price.price},
+                                                headers:{"X-CSRFToken": csrftoken},
+                                                success:function(newdata){
+                                                    url=`/flight/`+id+`/${d[0].category}/?id=${newdata.id}`;
+                                                    window.location.replace(url);
+                                                    return (false);
+                                                }
+                                            });
+                                        
+                
+                                        }
+                                        else{
+                                            var m=$('<tr/>');
+                                            m.attr('id', 'alreadybooked');
+                                            m.append(`This Seat has already been booked.`);
+                                            if($("#prices-tab-bod").find("#alreadybooked").length==0){
+                                                m.appendTo('#prices-tab-bod');
+                                            }
+                                        }
+                                    },
+                                    error: function(error){
                                     }
                                 });
-                            
-    
-                            }
-                            else{
-                                var m=$('<tr/>');
-                                m.attr('id', 'alreadybooked');
-                                m.append(`This Seat has already been booked.`);
-                                if($("#prices-tab-bod").find("#alreadybooked").length==0){
-                                    m.appendTo('#prices-tab-bod');
-                                }
-                            }
+
+
+
+                                return false;
+                            });
                         },
                         error: function(error){
                         }
                     });
-
-
-
-                    return false;
                 });
-            });
             }
-        });
         
 
+        });
     }
 
   
@@ -131,10 +141,6 @@ function initPage(id){
         cache: false,
         success: function(data){
             putTable();
-            //i=0;
-            //data.map(function (d){
-              //  putPricesData(d, i++);
-            //});
             putPricesData(data);
         },
         error: function(error){

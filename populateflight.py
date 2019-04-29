@@ -137,13 +137,13 @@ with open('/home/mukesh/ACMS-Hotel-And-Flight-Booking/data/flightseats.csv') as 
 	reader=csv.DictReader(csvfile)
 	for row in reader:
 		if(row['category']=='Business'):
-			p=Flight_Seats(flight=Flight.objects.filter(flightnumber=row['flight'])[0], number_of_seats=int(row['numberofseats']), category=SeatType.objects.filter(name=row['category'])[0], seat_position=row['seatposition'], price=Decimal(row['price']))
+			p=Flight_Seats(flight=Flight.objects.filter(flightnumber=row['flight'])[0], number_of_seats=int(row['numberofseats']), category=SeatType.objects.filter(name=row['category'])[0], seat_position=row['seatposition'], base_price=Decimal(row['base_price']), max_price=Decimal(row['max_price']))
 			try:
 				p.save()
 			except Exception as e:
 				print("Exception in business: ", e)
 		elif (row['category']=='First Class'):
-			p=Flight_Seats(flight=Flight.objects.filter(flightnumber=row['flight'])[0], number_of_seats=int(row['numberofseats']), category=SeatType.objects.filter(name=row['category'])[0], seat_position=row['seatposition'], price=Decimal(row['price']))
+			p=Flight_Seats(flight=Flight.objects.filter(flightnumber=row['flight'])[0], number_of_seats=int(row['numberofseats']), category=SeatType.objects.filter(name=row['category'])[0], seat_position=row['seatposition'], base_price=Decimal(row['base_price']), max_price=Decimal(row['max_price']))
 			print(row['category'])
 			try:
 				p.save()
@@ -151,17 +151,17 @@ with open('/home/mukesh/ACMS-Hotel-And-Flight-Booking/data/flightseats.csv') as 
 				print("Exception in first class: ", e)
 		else:
 			print(row['category'])
-			p=Flight_Seats(flight=Flight.objects.filter(flightnumber=row['flight'])[0], number_of_seats=int(int(row['numberofseats'])/3),category=SeatType.objects.filter(name=row['category'])[0], seat_position='a', price=Decimal(row['price'])+700)
+			p=Flight_Seats(flight=Flight.objects.filter(flightnumber=row['flight'])[0], number_of_seats=int(int(row['numberofseats'])/3),category=SeatType.objects.filter(name=row['category'])[0], seat_position='a', base_price=Decimal(row['base_price'])+700, max_price=Decimal(row['max_price'])+700)
 			try:
 				p.save()
 			except Exception as e:
 				print(e)
-			p=Flight_Seats(flight=Flight.objects.filter(flightnumber=row['flight'])[0], number_of_seats=int(int(row['numberofseats'])/3),category=SeatType.objects.filter(name=row['category'])[0], seat_position='w', price=Decimal(row['price'])+1000)
+			p=Flight_Seats(flight=Flight.objects.filter(flightnumber=row['flight'])[0], number_of_seats=int(int(row['numberofseats'])/3),category=SeatType.objects.filter(name=row['category'])[0], seat_position='w', base_price=Decimal(row['base_price'])+1000, max_price=Decimal(row['max_price'])+1000)
 			try:
 				p.save()
 			except Exception as e:
 				print(e)
-			p=Flight_Seats(flight=Flight.objects.filter(flightnumber=row['flight'])[0], number_of_seats=int(int(row['numberofseats'])/3),category=SeatType.objects.filter(name=row['category'])[0], seat_position='m', price=Decimal(row['price']))
+			p=Flight_Seats(flight=Flight.objects.filter(flightnumber=row['flight'])[0], number_of_seats=int(int(row['numberofseats'])/3),category=SeatType.objects.filter(name=row['category'])[0], seat_position='m', base_price=Decimal(row['base_price']), max_price=Decimal(row['max_price']))
 			try:
 				p.save()
 			except Exception as e:

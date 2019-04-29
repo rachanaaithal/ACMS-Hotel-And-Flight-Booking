@@ -88,6 +88,7 @@ class FlightSerializer(serializers.ModelSerializer):
         model = Flight
         
 class Flight_SeatsSerializer(serializers.ModelSerializer):
+    price = serializers.ReadOnlyField(source="base_price")
     class Meta:
         fields = '__all__'
         model = Flight_Seats
@@ -103,8 +104,9 @@ class Seat_AvailabilitySerializer(serializers.ModelSerializer):
     date=serializers.ReadOnlyField(source="seat.flight.date")
     takeoff_time=serializers.ReadOnlyField(source="seat.flight.takeoff_time")
     landing_time=serializers.ReadOnlyField(source="seat.flight.landing_time")
-    price=serializers.ReadOnlyField(source="seat.price")
+    #price=serializers.ReadOnlyField(source="seat.price")
     seat_id=serializers.ReadOnlyField(source="seat.id")
+    status_name = serializers.SerializerMethodField()
     def get_status_name(self, obj):
         return obj.get_status_display()
     class Meta:

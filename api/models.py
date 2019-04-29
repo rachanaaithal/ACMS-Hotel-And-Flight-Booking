@@ -146,9 +146,9 @@ class Flight_Seats(models.Model):
     number_of_seats = models.IntegerField(default=1)
     category=models.ForeignKey('SeatType', on_delete=models.SET_NULL, null=True)
     seat_position=models.CharField( max_length=1, choices=POSITION, blank=False, default='m', help_text='position of seats')
-    '''    base_price = models.DecimalField(max_digits=6, decimal_places=2, default=0)
-    max_price = models.DecimalField(max_digits=6, decimal_places=2, default=0)'''
-    price = models.DecimalField(max_digits=8, decimal_places=2, default=0)
+    base_price = models.DecimalField(max_digits=8, decimal_places=2, default=0)
+    max_price = models.DecimalField(max_digits=8, decimal_places=2, default=0)
+    #price = models.DecimalField(max_digits=8, decimal_places=2, default=0)
     def __str__(self):
         return '%s, %s'%(self.category, self.seat_position)
 
@@ -162,6 +162,7 @@ class Seat_Availability(models.Model):
     seat = models.ForeignKey('Flight_Seats', on_delete=models.CASCADE)
     status = models.CharField(max_length=2, choices=StatusTypes, help_text='Status')
     on_date=models.DateField(default=timezone.now)
+    price = models.DecimalField(max_digits=8, decimal_places=2, default=0)
     booked_by = models.ForeignKey(User,null=False,on_delete=models.CASCADE)
     def __str__(self):
         return '%s,%s'%(self.status, self.seat.category)
