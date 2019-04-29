@@ -27,8 +27,8 @@
             <div class="navbar-nav">
                 <div class="items">
                     <a class="nav-item nav-link active" href="#">Home <span class="sr-only">(current)</span></a>
-                    <a class="nav-item nav-link" href="#"><i class="fas fa-hotel"></i>Hotels</a>
-                    <a class="nav-item nav-link" href="#"><i class="fas fa-plane"></i>Flights</a>    
+                    <a class="nav-item nav-link" href="/hotel/"><i class="fas fa-hotel"></i>Hotels</a>
+                    <a class="nav-item nav-link" href="/flight/"><i class="fas fa-plane"></i>Flights</a>    
                 </div><div class="items">
                     {% if user.is_authenticated %}
                     <span class="nav-item navbar-text">User: {{ user.get_username }}</span>

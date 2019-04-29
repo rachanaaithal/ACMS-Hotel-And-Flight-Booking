@@ -54,11 +54,21 @@ window.onload = function () {
 		$(`.pagination`).html('')
 		var span=$('<span/>')
 		span.addClass('page-links')
-		if(data['has_prev']){
-			span.append(`<a href="/hotel/?name=${nextname_url}&start=${nextstart_url}&end=${nextend_url}&type=${nexttype_url}&minprice=${nextmin_url}&maxprice=${nextmax_url}&page=${data['prev_page']}">previous</a>`)
+		console.log('here')
+		if(!data['has_prev']){
+			console.log('prev',!data['has_prev'])
+			span.append(`<a id="prev_link" class="btn btn-primary disabled" href="/hotel/?name=${nextname_url}&start=${nextstart_url}&end=${nextend_url}&type=${nexttype_url}&minprice=${nextmin_url}&maxprice=${nextmax_url}&page=${data['prev_page']}">previous</a>`)
+		}else{
+			span.append(`<a id="prev_link" class="btn btn-primary" href="/hotel/?name=${nextname_url}&start=${nextstart_url}&end=${nextend_url}&type=${nexttype_url}&minprice=${nextmin_url}&maxprice=${nextmax_url}&page=${data['prev_page']}">previous</a>`)
+		
 		}
-		if(data['has_next']){
-			span.append(`<a href="/hotel/?name=${nextname_url}&start=${nextstart_url}&end=${nextend_url}&type=${nexttype_url}&minprice=${nextmin_url}&maxprice=${nextmax_url}&page=${data['next_page']}">next</a>`)
+		if(!data['has_next']){
+			console.log('next',!data['has_next'])
+			span.append(`<a id="next_link" class="btn btn-primary disabled" href="/hotel/?name=${nextname_url}&start=${nextstart_url}&end=${nextend_url}&type=${nexttype_url}&minprice=${nextmin_url}&maxprice=${nextmax_url}&page=${data['next_page']}">next</a>`);
+		
+		}
+		else{
+			span.append(`<a id="next_link" class="btn btn-primary" href="/hotel/?name=${nextname_url}&start=${nextstart_url}&end=${nextend_url}&type=${nexttype_url}&minprice=${nextmin_url}&maxprice=${nextmax_url}&page=${data['next_page']}">next</a>`);
 		}
 		span.appendTo(`.pagination`)
 	}

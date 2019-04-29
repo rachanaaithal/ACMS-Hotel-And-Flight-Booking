@@ -3,7 +3,7 @@ function initPage(id){
     function putAboutData(data){
         
         var details=$('<div/>');
-        details.append(`<h5>${data.name}</h5>`);
+        $('#name').append(`<h2>${data.name}</h2>`);
         details.append(`<p><i class="fas fa-map-marked fa-2x"></i>${data.address}</p>`); 
 
         const checkIn  = data.checkintime;

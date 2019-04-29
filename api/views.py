@@ -91,16 +91,6 @@ class MinHotelRoomView(generics.ListCreateAPIView):
         serializer = HotelRoomSerializer(room)
         return Response(serializer.data)
 
-'''
-class Availability(generics.ListCreateAPIView):
-    queryset = RoomAvailability.objects.all()
-    serializer_class = RoomAvailabilitySerializer
-
-
-class AvailabilityDetail(generics.RetrieveUpdateDestroyAPIView):
-    queryset = RoomAvailability.objects.all()
-    serializer_class = RoomAvailabilitySerializer
-''' 
 
 @method_decorator(csrf_exempt, name='dispatch')
 class RoomAvailabilityViewSet(viewsets.ModelViewSet):
@@ -121,26 +111,6 @@ class RoomAvailabilityViewSet(viewsets.ModelViewSet):
         user = self.request.user
         return RoomAvailability.objects.filter(booked_by=user).exclude(status='dd')
 
-'''
-class UpdateAvailability(generics.UpdateAPIView):
-    queryset = RoomAvailability.objects.all()
-    serializer_class = RoomAvailabilitySerializer
-
-    def update(self, request, *args, **kwargs):
-        instance = self.get_object()
-        instance.status = request.data.get("status")
-        instance.save()
-
-        serializer = self.get_serializer(instance)
-        serializer.is_valid(raise_exception=True)
-        self.perform_update(serializer)
-
-        return Response(serializer.data)
-
-class RoomAvailabilityDetail(generics.RetrieveUpdateDestroyAPIView):
-    queryset = RoomAvailability.objects.all()
-    serializer_class = RoomAvailabilitySerializer
-'''
 class RoomTypeViewSet(viewsets.ModelViewSet):
     queryset = RoomType.objects.all()
     serializer_class = RoomTypeSerializer
@@ -151,15 +121,6 @@ class RoomTypeViewSet(viewsets.ModelViewSet):
 
 
 
-'''
-from rest_framework import generics
-class SearchSet(viewsets.ModelViewSet):
-    queryset = City.objects.all()
-    serializer_class = CitySerializer
-    filter_fields = {
-        'name': ['exact']
-    }
-'''
 def search(request):
     print(request.GET)
     name=request.GET.get("name",None)
@@ -380,6 +341,7 @@ def prices(request):
     delta2 = d2-d1
     num_of_days=max(delta2.days,1)
     price = (0.3*(a)+0.4*(b)+0.3*(c))*(max_price-base_price)+base_price
+    price=(price/50)*50
     print(base_price,max_price,a,b,c)
     response={'price':(price*num_of_days)}
 
