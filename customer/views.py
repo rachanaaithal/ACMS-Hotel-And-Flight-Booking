@@ -27,3 +27,6 @@ def verify(request):
 		return render(request,'verify.html')
 	else:
 		return redirect('/hotel/')
+
+def oper_view(request):
+	return render(request,'oper_view.html')

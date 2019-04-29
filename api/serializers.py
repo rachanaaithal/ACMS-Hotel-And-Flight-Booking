@@ -1,7 +1,7 @@
 from django.contrib.auth.models import User, Group
 from rest_framework import serializers
 from api.models import Country, City, Hotel, RoomType, HotelRoom, RoomAvailability, HotelPhotos
-
+from api.models import Operator
 
 class UserSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
@@ -115,3 +115,8 @@ class Hotel_Serializer(serializers.ModelSerializer):
 	class Meta:
 		model = Hotel
 		fields = '__all__'
+
+class OperatorSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Operator
+        fields = '__all__'

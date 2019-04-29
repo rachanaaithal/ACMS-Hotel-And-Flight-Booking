@@ -1,0 +1,20 @@
+{% extends "base_generic2.html" %}
+
+{% block content %}
+    <script src="/static/js/oper_view.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.24.0/locale/en-gb.js"></script>
+    <link href = "https://code.jquery.com/ui/1.10.4/themes/ui-lightness/jquery-ui.css"rel = "stylesheet">
+    <script src = "https://code.jquery.com/ui/1.10.4/jquery-ui.js"></script>
+    
+    {% load static %} 
+    <link rel="stylesheet" href="/static/css/style2.css">
+    <div>
+        <input type="text" name="date" id="date"/>
+        <button id="check-button" type="button" class="btn btn-primary">Check</button>
+    </div>
+    <div id="bookings">
+
+    </div>
+
+
+{% endblock %}

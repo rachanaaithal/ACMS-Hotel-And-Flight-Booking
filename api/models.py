@@ -217,9 +217,7 @@ class Registered_Rooms(models.Model):
     max_price = models.DecimalField(max_digits=6, decimal_places=2, default=0)
 
     
-	
-	
-	number_of_rooms = models.IntegerField(default=1,validators=[MinValueValidator(1)])
+    number_of_rooms = models.IntegerField(default=1,validators=[MinValueValidator(1)])
 
     def __str__(self):
         """String for representing the Model object."""

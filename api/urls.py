@@ -25,6 +25,7 @@ router.register(r'citylist',views.CityListViewSet,base_name='citylist')
 router.register(r'newhotels',views.NewHotelViewSet,base_name='new_hotels')
 router.register(r'hotels12', views.Hotels_ViewSet)
 
+router.register(r'operator',views.OperatorViewSet)
 
 #router.register(r'roomavailability', views.RoomAvailabilityViewSet)
 #router.register(r'roomavailabilitycreate', views.Availability)
@@ -49,6 +50,7 @@ urlpatterns = [
     url(r'oper_register',views.oper_register,name="oper_register"),
     url(r'register',views.register,name="register"),
 
+    url(r'bookings', views.bookings, name="bookings")
 ]
 
 
