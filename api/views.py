@@ -478,7 +478,11 @@ def oper_register(request):
 		photos.save()
 	for i in range(1,room_count+1):
 		room_type = RoomType.objects.get(name=request.GET['roomtype'+str(i)])
-		room = Registered_Rooms(hotel=hotel,capacity = request.GET['capacity'+str(i)],description = request.GET['description'+str(i)],category=room_type,price=request.GET['price'+str(i)],number_of_rooms=request.GET['no_rooms'+str(i)])
+		
+		#here
+		room = Registered_Rooms(hotel=hotel,capacity = request.GET['capacity'+str(i)],description = request.GET['description'+str(i)],category=room_type,base_price=request.GET['bprice'+str(i)],max_price=request.GET['mprice'+str(i)],number_of_rooms=request.GET['no_rooms'+str(i)])
+		
+		
 		room.save();
 	return redirect('/hotel/')
 
@@ -536,10 +540,17 @@ def add_oper(request):
 		print(new_photos[i])
 		photo = HotelPhotos(hotel = hotel,image_link = new_photos[i]['image_link'])
 		photo.save()
-	new_rooms  = Registered_Rooms.objects.filter(hotel=hotel1[0]['id']).values('capacity','description','category','price','number_of_rooms')
+	
+	#here
+	new_rooms  = Registered_Rooms.objects.filter(hotel=hotel1[0]['id']).values('capacity','description','category','base_price','max_price','number_of_rooms')
+	
+	
 	for i in range(0,len(new_rooms)):
 		t = RoomType.objects.get(id=new_rooms[i]['category'])
-		rooms = HotelRoom(hotel=hotel,capacity = new_rooms[i]['capacity'],description=new_rooms[i]['description'],category = t,price = new_rooms[i]['price'],number_of_rooms=new_rooms[i]['number_of_rooms'])
+		
+		#here
+		rooms = HotelRoom(hotel=hotel,capacity = new_rooms[i]['capacity'],description=new_rooms[i]['description'],category = t,base_price = new_rooms[i]['base_price'],max_price = new_rooms[i]['max_price'],number_of_rooms=new_rooms[i]['number_of_rooms'])
+		
 		rooms.save()
 	user = User(username=hotel1[0]['email'],password=password,email=hotel1[0]['email'])
 	user.set_password(user.password)
