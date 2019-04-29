@@ -11,7 +11,7 @@ window.onload = function(){
 	{
 		console.log(data);
 		var city = document.getElementById("city");
-		var htm = "<select id='cty'>";
+		var htm = "<select class='form-control' id='cty'>";
 		var htm1 = "";
 		data.forEach(new_fun)
 		htm +=htm1;
@@ -34,7 +34,7 @@ window.onload = function(){
 	function add_type(data){
 		console.log(data);
 		var rt = document.getElementById("rt"+type);
-		var htm = "<select id='type"+type+"'>";
+		var htm = "<select class='form-control' id='type"+type+"'>";
 		var htm1 = "";
 		data.forEach(new_fun)
 		htm +=htm1;
@@ -65,7 +65,7 @@ window.onload = function(){
 			console.log(id);
 			var div = document.getElementById("next_img");
 			var new_div = document.createElement("div");
-			var inner = "<b>Image Url "+img_count+":</b> <br><input id='img"+img_count+"' type='url' name='img"+img_count+"'placeholder='Provide public url of image'><br><br><br>"
+			var inner = "<b>Image Url "+img_count+":</b> <br><input class='form-control' id='img"+img_count+"' type='url' name='img"+img_count+"'placeholder='Provide public url of image'><br><br><br>"
 			//new_div.innerHTML = innerHTML;
 			new_div.setAttribute("id",id);
 			div.appendChild(new_div);
@@ -81,10 +81,11 @@ window.onload = function(){
 			roomtypes[type] = roomtype;
 			capacity = document.getElementById("capacity"+type).value;
 			description = document.getElementById("description"+type).value;
-			price =  document.getElementById("price"+type).value;
+			bprice =  document.getElementById("bprice"+type).value;
+			mprice =  document.getElementById("mprice"+type).value;
 			no_rooms =document.getElementById("no_rooms"+type).value;
 			console.log(roomtype);
-			if( roomtype=""||capacity=="" || description==""||price==""||no_rooms==""){
+			if( roomtype=""||capacity=="" || description==""||bprice==""||mprice==""||no_rooms==""){
 				fillthis = document.getElementById("fillthis");
 				var rm ="rd";
 				if (type==1)
@@ -104,10 +105,11 @@ window.onload = function(){
 				var div = document.getElementById("new_types");
 				var new_div = document.createElement("div");
 				var id = "roomtype"+type;
-				var inner = "<b>Room Type:</b><br><div id='rt"+type+"'></div><br><br><b>Capacity :</b><br><input id='capacity"+type+"' type = 'number' name = 'capacity' max ='5' min='1'>";
-				inner=inner+"</input><br><br><br><b>Description :<b><br><textarea id='description"+type+"' rows='4' cols='50'></textarea><br><br><br>"
-				inner=inner+"<b>Price :</b><br><input id='price"+type+"' type='number' min = '0.00'/><br><br><br>"
-				inner = inner+"<b>Number of Rooms :</b><br><input id='no_rooms"+type+"' type='number' name='no_rooms'/><br><br><br>"
+				var inner = "<b>Room Type:</b><br><div id='rt"+type+"'></div><br><br><b>Capacity :</b><br><input class='form-control' id='capacity"+type+"' type = 'number' name = 'capacity' max ='5' min='1'>";
+				inner=inner+"</input><br><br><br><b>Description :<b><br><textarea class='form-control' id='description"+type+"' rows='4' cols='50'></textarea><br><br><br>"
+				inner=inner+"<b>Base Price :</b><br><input class='form-control' id='bprice"+type+"' type='number' min = '0.00'/><br><br><br>"
+				inner=inner+"<b>Max Price :</b><br><input class='form-control' id='mprice"+type+"' type='number' min = '0.00'/><br><br><br>"
+				inner = inner+"<b>Number of Rooms :</b><br><input class='form-control' id='no_rooms"+type+"' type='number' name='no_rooms'/><br><br><br>"
 				new_div.setAttribute("id",id);
 				div.appendChild(new_div);
 				var d = document.getElementById(id);
@@ -172,9 +174,10 @@ window.onload = function(){
 				roomtypes[type] = roomtype;
 				capacity = document.getElementById("capacity"+i).value;
 				description = document.getElementById("description"+i).value;
-				price =  document.getElementById("price"+i).value;
+				bprice =  document.getElementById("bprice"+i).value;
+				mprice =  document.getElementById("mprice"+i).value;
 				no_rooms =document.getElementById("no_rooms"+i).value;
-				if(roomtype=""||capacity=="" || description==""||price==""||no_rooms==""){
+				if(roomtype=""||capacity=="" || description==""||bprice==""||mprice==""||no_rooms==""){
 					var er = document.getElementById("error")
 					var htm = "<p>Fields cannot be empty </p>"
 					er.innerHTML = htm;
@@ -187,7 +190,7 @@ window.onload = function(){
 						capacity=1;
 					}
 					console.log(roomtype);
-					var str = "&roomtype"+i+"="+roomtypes[i]+"&capacity"+i+"="+capacity+"&description"+i+"="+description+"&price"+i+"="+price+"&no_rooms"+i+"="+no_rooms;
+					var str = "&roomtype"+i+"="+roomtypes[i]+"&capacity"+i+"="+capacity+"&description"+i+"="+description+"&bprice"+i+"="+bprice+"&mprice"+i+"="+mprice+"&no_rooms"+i+"="+no_rooms;
 					roomsurl[i] = str;
 				}
 			}			

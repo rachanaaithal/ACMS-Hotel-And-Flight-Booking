@@ -210,9 +210,16 @@ class Registered_Rooms(models.Model):
 
     category = models.ForeignKey('RoomType', on_delete=models.SET_NULL, null=True)#use when hotels can add new types of rooms
 
-    price = models.DecimalField(max_digits=6, decimal_places=2, default=0)
+	
+	#here
+    base_price = models.DecimalField(max_digits=6, decimal_places=2, default=0)
 
-    number_of_rooms = models.IntegerField(default=1,validators=[MinValueValidator(1)])
+    max_price = models.DecimalField(max_digits=6, decimal_places=2, default=0)
+
+    
+	
+	
+	number_of_rooms = models.IntegerField(default=1,validators=[MinValueValidator(1)])
 
     def __str__(self):
         """String for representing the Model object."""
