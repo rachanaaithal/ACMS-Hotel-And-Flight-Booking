@@ -25,6 +25,7 @@ router.register(r'citylist',views.CityListViewSet,base_name='citylist')
 router.register(r'newhotels',views.NewHotelViewSet,base_name='new_hotels')
 router.register(r'hotels12', views.Hotels_ViewSet)
 
+router.register(r'operator',views.OperatorViewSet)
 
 #router.register(r'roomavailability', views.RoomAvailabilityViewSet)
 #router.register(r'roomavailabilitycreate', views.Availability)
