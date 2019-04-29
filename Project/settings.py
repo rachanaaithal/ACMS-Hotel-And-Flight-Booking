@@ -161,6 +161,6 @@ REST_FRAMEWORK = {
 }
 
 # Redirect to home URL after login (Default redirects to /accounts/profile/)
-LOGIN_REDIRECT_URL = '/hotel/'
+LOGIN_REDIRECT_URL = '/customer/enter/'
 
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
