@@ -16,18 +16,16 @@ window.onload=function(){
     }
 
     function putData(id,d){
-        var tr=$('<tr/>')
-        tr.append(`<th scope="row">${d.airline}(${d.category})</td>`)
-        tr.append(`<td>${d.source}</td><td>${d.destination}</td><td>${d.on_date}</td><td>${d.price}</td>`)
-        if(d.status=='pr')
-            tr.append(`<td>Processing</td>`)
-        else if (d.status=="bk")
+        if(d.status=='bk')
+        {
+            var tr=$('<tr/>')
+            tr.append(`<th scope="row">${d.airline}(${d.category})</td>`)
+            tr.append(`<td>${d.source}</td><td>${d.destination}</td><td>${d.on_date}</td><td>${d.price}</td>`)
             tr.append(`<td>Booked</td>`)
-        else
-            tr.append(`<td>Dead</td>`)
-        tr.addClass('clickable-row')
-        tr.attr('id',`${d.id}`);
-        tr.appendTo(`#${id} >tbody`)
+            tr.addClass('clickable-row')
+            tr.attr('id',`${d.id}`);
+            tr.appendTo(`#${id} >tbody`)
+        }
     }
 
     $.ajax({

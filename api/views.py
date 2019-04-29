@@ -356,7 +356,7 @@ class Seat_AvailabilityViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
         user=self.request.user
-        return Seat_Availability.objects.filter(booked_by=user)
+        return Seat_Availability.objects.filter(booked_by=user).exclude(status=='dd').exclude(status=='pr')
 
 def sflights(request):
     source=request.GET.get("source",None)

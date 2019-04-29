@@ -146,6 +146,8 @@ class Flight_Seats(models.Model):
     number_of_seats = models.IntegerField(default=1)
     category=models.ForeignKey('SeatType', on_delete=models.SET_NULL, null=True)
     seat_position=models.CharField( max_length=1, choices=POSITION, blank=False, default='m', help_text='position of seats')
+    '''    base_price = models.DecimalField(max_digits=6, decimal_places=2, default=0)
+    max_price = models.DecimalField(max_digits=6, decimal_places=2, default=0)'''
     price = models.DecimalField(max_digits=8, decimal_places=2, default=0)
     def __str__(self):
         return '%s, %s'%(self.category, self.seat_position)
