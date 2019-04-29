@@ -129,8 +129,6 @@ def search(request):
 
     if type_room is not None:
         type_room=type_room.split('|')
-    print("\n\n\n\n\n\n\n\n\n",name,st,ed, type_room,min_price,max_price,page)
-    print(min_price=='null')
 
     q1=Q(from_date__gte=st)
     q2=Q(from_date__lte=ed) 
@@ -141,9 +139,6 @@ def search(request):
     q7=Q(from_date__gte=st)
     q8=Q(to_date__lte=ed)
 
-    supply = HotelRoom.objects.filter(hotel__city_name__name=name).values('hotel__name', 'category__name', 'hotel__image_link', 'hotel__id','number_of_rooms', 'hotel__latitude', 'hotel__longitude','price')
-
-#Get Supply (Room type-hotel level)
     supply = HotelRoom.objects.filter(hotel__city_name__name=name).values('hotel__name', 'category__name', 'hotel__image_link', 'hotel__id','number_of_rooms', 'hotel__latitude', 'hotel__longitude','base_price')
     
     demand = RoomAvailability.objects.filter((q1 & q2) | (q3 & q4) | (q5 & q6)| (q7 & q8)).filter(room__hotel__city_name__name=name)
@@ -152,12 +147,6 @@ def search(request):
     if type_room is not None:
         supply=supply.filter(category__name__in=type_room)
         demand=demand.filter(room__category__name__in=type_room)
-    if min_price is not None and min_price !='null':
-        supply= supply.filter(Q(price__gte=min_price))
-        demand= demand.filter(Q(room__price__gte=min_price))
-    if max_price is not None and max_price !='null':
-        supply= supply.filter(Q(price__lte=max_price))
-        demand= demand.filter(Q(room__price__lte=max_price))
     if min_price is not None and min_price !='null' and min_price !='undefined':
         supply= supply.filter(Q(base_price__gte=min_price))
         demand= demand.filter(Q(room__base_price__gte=min_price))
