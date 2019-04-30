@@ -87,6 +87,17 @@ function initPage(transaction_id, gst, cancellation_charges){
                     }
                 });
             });
+             $('#download').click(function (e) {
+            var pdf = new jsPDF('p','pt','a4');
+            $("#download").attr("style", "display:none");
+            $("#cancel").attr("style", "display:none");
+            pdf.addHTML(document.body,function() {
+                pdf.save('Flight-ticket.pdf');
+                $("#download").attr("style", "display");
+                $("#cancel").attr("style", "display");
+            });
+        });
+
         }
         else if(data.status=='dd'){
             details.append(`<p>Booking was cancelled.<\p>`)

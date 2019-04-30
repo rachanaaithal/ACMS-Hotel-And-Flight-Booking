@@ -521,6 +521,44 @@ def email_operator(name,email,password):
 			message.format(name=name,email=email,password=password),
 		)
 
+def email_hotel_booking(name,email,hotel_name,address,in_date,out_date,total,type):
+    message = """Subject: Booking Successful
+
+    Hi {name}, your hotel booking is successfully!!
+    Hotel Name : {hotel_name}
+    Address: {address}
+    Checkin Date : {in_date}
+    Checkout Date :{out_date}
+    Price : {total}
+    Room Type : {type}
+    Thank you for booking"""
+    from_address = "acmsbooknow@gmail.com"
+    sender_password = "acms1234"
+    
+    context = ssl.create_default_context()
+    with smtplib.SMTP_SSL("smtp.gmail.com", 465, context=context) as server:
+        server.login(from_address, sender_password)
+        server.sendmail(
+            from_address,
+            email,
+            message.format(name=name,email=email,hotel_name=hotel_name,address=address,in_date=in_date,out_date=out_date,total=total,type=type),
+        )
+
+def booking_mail(request):
+    id = request.GET['id']
+    sts = RoomAvailability.objects.filter(id=id).values('room__category__name','room__hotel__name','room__hotel__address','from_date','to_date','booked_by__first_name','booked_by__email')
+    in_date = sts[0]['from_date']
+    out_date = sts[0]['to_date']
+    type = sts[0]['room__category__name']
+    hotel_name = sts[0]['room__hotel__name']
+    address = sts[0]['room__hotel__address']
+    total = request.GET['total']
+    name = sts[0]['booked_by__first_name']
+    email=sts[0]['booked_by__email']
+    email_hotel_booking(name,email,hotel_name,address,in_date,out_date,total,type)
+    response = {'val':True}
+    return JsonResponse(response,safe=False)
+
 
 class OperatorViewSet(viewsets.ModelViewSet):
     queryset = Operator.objects.all()
