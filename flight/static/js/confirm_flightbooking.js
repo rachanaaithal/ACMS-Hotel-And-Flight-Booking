@@ -81,7 +81,16 @@ function initPage(flight_id, category){
                 data:{'status':'bk'},
                 headers:{"X-CSRFToken": csrftoken},
                 success:function(newdata){
-                    window.location.href=`/flight/${flight_id}/${category}/booked/${transaction_id}`
+                    $.ajax({
+                        url:`/api/flightmail_confirmations/?id=${transaction_id}&total=${tot.toFixed(2)}`,
+                        cache: false,
+                        success: function(data){
+                            window.location.href=`/flight/${flight_id}/${category}/booked/${transaction_id}`
+                        },
+                        error: function(error){
+                            console.log(error);
+                        }
+                    })
                 }
             });
 

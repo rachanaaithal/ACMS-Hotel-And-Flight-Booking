@@ -544,6 +544,30 @@ def email_hotel_booking(name,email,hotel_name,address,in_date,out_date,total,typ
             message.format(name=name,email=email,hotel_name=hotel_name,address=address,in_date=in_date,out_date=out_date,total=total,type=type),
         )
 
+def email_flight_booking(name,email,airline_name,source,destination,takeoff_time,landing_time,on_date,total,type):
+    message = """Subject: Booking Successful
+    Hi {name}, your flight booking is successfully!!
+    Airline : {airline_name}
+    From: {source}
+    To: {destination}
+    Takeoff: {takeoff_time}
+    Landing: {landing_time}
+    Date :{on_date}
+    Price : {total}
+    Seat Type : {type}
+    Thank you for booking"""
+    from_address = "acmsbooknow@gmail.com"
+    sender_password = "acms1234"
+    
+    context = ssl.create_default_context()
+    with smtplib.SMTP_SSL("smtp.gmail.com", 465, context=context) as server:
+        server.login(from_address, sender_password)
+        server.sendmail(
+            from_address,
+            email,
+            message.format(name=name,email=email,airline_name=airline_name,source=source,destination=destination,takeoff_time=takeoff_time,landing_time=landing_time,on_date=on_date,total=total,type=type),
+        )
+
 def booking_mail(request):
     id = request.GET['id']
     sts = RoomAvailability.objects.filter(id=id).values('room__category__name','room__hotel__name','room__hotel__address','from_date','to_date','booked_by__first_name','booked_by__email')
@@ -559,6 +583,22 @@ def booking_mail(request):
     response = {'val':True}
     return JsonResponse(response,safe=False)
 
+def flights_mails(request):
+    id = request.GET['id']
+    sts = Seat_Availability.objects.filter(id=id).values('seat__flight__airline_name','seat__category__name','seat__flight__source__name','seat__flight__takeoff_time','seat__flight__landing_time','seat__flight__destination__name','on_date','booked_by__first_name','booked_by__email','seat__flight__flightnumber')
+    on_date = sts[0]['on_date']
+    type = sts[0]['seat__category__name']
+    airline_name = sts[0]['seat__flight__airline_name']
+    source = sts[0]['seat__flight__source__name']
+    destination=sts[0]['seat__flight__destination__name']
+    takeoff_time=sts[0]['seat__flight__takeoff_time']
+    landing_time=sts[0]['seat__flight__landing_time']
+    total = request.GET['total']
+    name = sts[0]['booked_by__first_name']
+    email=sts[0]['booked_by__email']
+    email_flight_booking(name,email,airline_name,source,destination,takeoff_time,landing_time,on_date,total,type)
+    response = {'val':True}
+    return JsonResponse(response,safe=False)
 
 class OperatorViewSet(viewsets.ModelViewSet):
     queryset = Operator.objects.all()
