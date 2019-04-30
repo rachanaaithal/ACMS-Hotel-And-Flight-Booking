@@ -317,7 +317,7 @@ def prices(request):
     delta2 = d2-d1
     num_of_days=max(delta2.days,1)
     price = (0.3*(a)+0.4*(b)+0.3*(c))*(max_price-base_price)+base_price
-    price=(price/50)*50
+    price=round(price/50)*50
     print(base_price,max_price,a,b,c)
     response={'price':(price*num_of_days)}
 
