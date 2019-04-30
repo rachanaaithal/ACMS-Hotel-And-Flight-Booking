@@ -1,0 +1,22 @@
+{% extends "base_generic.html" %}
+
+{% block content %}
+    <script src="/static/js/flight_detail.js"></script>
+    <script src="/static/js/typeahead.jquery.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.24.0/locale/en-gb.js"></script>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.4.0/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.4.0/dist/leaflet.js"></script>
+    {% load static %} 
+    <link rel="stylesheet" href="/static/css/style2.css">
+    <div id="about">
+        <div id="details">
+            <div id="data"></div>    
+            <div id="map" style="width:300px;height:300px;"></div>
+        </div>
+    </div>
+    <div id="prices">
+    </div>
+    <script>
+        initPage("{{id}}");
+    </script>
+{% endblock %}
