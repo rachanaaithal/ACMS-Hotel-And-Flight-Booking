@@ -11,7 +11,8 @@ urlpatterns = [
 	url(r'oper_register',views.oper_register,name='oper_register'),
 	url(r'register',views.register, name = 'register'),
 
-	url(r'oper_view', views.oper_view, name="oper_view")
+	url(r'oper_view', views.oper_view, name="oper_view"),
+	url(r'home',views.home, name="home")
 ]
 
 urlpatterns+=[url(r'profile',views.user_profile,name='user_profile'),]

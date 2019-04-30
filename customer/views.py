@@ -34,3 +34,6 @@ def verify(request):
 
 def oper_view(request):
 	return render(request,'oper_view.html')
+
+def home(request):
+	return render(request,'home.html')

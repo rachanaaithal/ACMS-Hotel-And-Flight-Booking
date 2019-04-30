@@ -17,10 +17,11 @@ from django.contrib import admin
 from django.urls import path
 from django.urls import include
 from django.conf.urls import url,include
-
+from django.views.generic import RedirectView
 urlpatterns = [
     path('admin/', admin.site.urls),
 
+    path('', RedirectView.as_view(url='/customer/home', permanent=True)),
     url(r'hotel/', include('hotel.urls')),
     url(r'flight/',include('flight.urls')),
     url(r'^api-auth/', include('rest_framework.urls')),

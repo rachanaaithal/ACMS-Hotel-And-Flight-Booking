@@ -1,0 +1,23 @@
+{% extends "base_generic.html" %}
+
+{% block content %}
+    <script src="/static/js/home.js"></script>
+    <script src="/static/js/typeahead.jquery.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.24.0/locale/en-gb.js"></script>
+    {%load static%}
+    <style>
+        body{
+            background : url({% static 'back.png' %});
+            background-repeat: no-repeat;
+            background-size:cover;
+        }
+        div{
+            border-radius: 25px;
+            background-color: rgba(0,0,0,0.8);
+            font-family: Verdana, Geneva, Tahoma, sans-serif;
+            color: white;
+        }
+    </style>
+    <div id="title">Description</div>
+    <div id="description">One stop destination for all you travel needs. Book flights and hotels in one place.</div>
+{% endblock %}
