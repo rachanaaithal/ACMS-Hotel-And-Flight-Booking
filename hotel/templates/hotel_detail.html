@@ -10,6 +10,7 @@
     {% load static %} 
     <link rel="stylesheet" href="/static/css/style2.css">
     <div id="about">
+        <div id="name"></div>
         <div id="carouselHotelIndicators" class="carousel slide" data-ride="carousel">
             <ol class="carousel-indicators" id="indec">
             </ol>
@@ -24,14 +25,14 @@
                 <span class="sr-only">Next</span>
             </a>
         </div>
+        
         <div id="details">
             <div id="data"></div>    
-            <div id="map" style="width:300px;height:300px;"></div>
+            <div id="map" style="width:100%;height:auto;"></div>
         </div>
-    </div>
-    <div id="prices">
-    </div>
-
+        <div id="prices">
+        </div>
+    </div>  
     <script>
         initPage("{{id}}");
     </script>

@@ -119,3 +119,31 @@
     display: flex;
     flex-direction: row;
 }
+
+#prev_link,#next_link {
+    color: white;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+}  
+.page-links{
+    display: flex;
+
+    flex-direction: row;
+
+    justify-content: space-between;
+
+    width: 100%;
+}
+
+#about{
+    flex-direction: column;
+}
+
+#details{
+    widows: 60%;
+}
+
+#prices{
+    width:100%;
+}
