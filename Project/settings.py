@@ -45,6 +45,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'hotel.apps.HotelConfig',
+    'flight.apps.FlightConfig',
     'api.apps.ApiConfig',
     'rest_framework',
     'django_filters',

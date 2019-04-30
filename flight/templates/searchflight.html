@@ -1,0 +1,37 @@
+{% extends "base_generic.html" %}
+
+{% block content %}
+    <script src="/static/js/flightsearch.js"></script>
+    <script src="/static/js/typeahead.jquery.js"></script>
+    <link rel="stylesheet" href="/static/css/typeahead.css">
+    <link href = "https://code.jquery.com/ui/1.10.4/themes/ui-lightness/jquery-ui.css"rel = "stylesheet">
+    <script src = "https://code.jquery.com/ui/1.10.4/jquery-ui.js"></script>
+
+    <div id="main-filter">
+        <div id="the-basics">
+            <input id='typeahead-source' class="typeahead" type="text" placeholder="Enter source city name">
+            <input id='typeahead-destination' class="typeahead" type="text" placeholder="Enter destination city name">
+        </div>
+        <div>
+            <input id="date-range" type="text" name="daterange" />
+            <button id="main-filter-button" type="button" class="btn btn-primary">Search</button>
+        </div>
+    </div>
+    <div id='res-body'>
+        
+        <div id='results' class="row">
+            <p id='noresults'>No Results to Show</p>
+        </div>    
+        <div class="optional-filter" style="display: none">
+            <div id="seattype-filter"></div>
+            <div id = "slider"></div>
+            
+            <p>
+                <label for = "changevalue">Price Range:</label>
+                <input type = "text" id = "changevalue" 
+                    style = "border:0; color:#b9cd6d; font-weight:bold;">
+            </p>
+        </div>
+    </div>
+    <div class="pagination"></div>
+{% endblock %}
