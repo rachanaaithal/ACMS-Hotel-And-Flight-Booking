@@ -21,7 +21,6 @@ window.onload = function () {
 			url: "/api/search/?name="+nextname_url+"&start="+nextstart_url+"&end="+nextend_url+"&type="+nexttype_url+"&minprice="+nextmin_url+"&maxprice="+nextmax_url,
 			cache: false,
 			success: function(data){
-//				console.log(data);
 				result=data;
 				$('#results').html('');
 
@@ -54,16 +53,13 @@ window.onload = function () {
 		$(`.pagination`).html('')
 		var span=$('<span/>')
 		span.addClass('page-links')
-		console.log('here')
 		if(!data['has_prev']){
-			console.log('prev',!data['has_prev'])
 			span.append(`<a id="prev_link" class="btn btn-primary disabled" href="/hotel/?name=${nextname_url}&start=${nextstart_url}&end=${nextend_url}&type=${nexttype_url}&minprice=${nextmin_url}&maxprice=${nextmax_url}&page=${data['prev_page']}">previous</a>`)
 		}else{
 			span.append(`<a id="prev_link" class="btn btn-primary" href="/hotel/?name=${nextname_url}&start=${nextstart_url}&end=${nextend_url}&type=${nexttype_url}&minprice=${nextmin_url}&maxprice=${nextmax_url}&page=${data['prev_page']}">previous</a>`)
 		
 		}
 		if(!data['has_next']){
-			console.log('next',!data['has_next'])
 			span.append(`<a id="next_link" class="btn btn-primary disabled" href="/hotel/?name=${nextname_url}&start=${nextstart_url}&end=${nextend_url}&type=${nexttype_url}&minprice=${nextmin_url}&maxprice=${nextmax_url}&page=${data['next_page']}">next</a>`);
 		
 		}
@@ -118,10 +114,8 @@ window.onload = function () {
 		minDate: moment(),
 		dateFormat: 'dd-mm-yyyy',
 	}, function (start, end, label) {
-		console.log("A new date selection was made: " + start.format('YYYY-MM-DD') + ' to ' + end.format('YYYY-MM-DD'));
 		fromdate=start.format('YYYY-MM-DD');
 		todate=end.format('YYYY-MM-DD');
-		console.log( fromdate, todate);
 	});
 
 	//to get all the city names
@@ -143,7 +137,6 @@ window.onload = function () {
 		url: "/api/roomtype/",
 		cache: false,
 		success: function(data){
-			console.log(data);
 			
 			data.map(function(d){
 				var div= $('<div/>');
@@ -157,7 +150,6 @@ window.onload = function () {
 			$('.filter1').click(function(d){
 				let clicked = [];
 				$('.filter1').each(function(i,d){
-					console.log(i,d);
 					if ($(this).is(':checked')) {
 						clicked.push($(this).val());
 					}
@@ -166,7 +158,6 @@ window.onload = function () {
 				$('#results').html('');
 				nexturl="/hotel/"+"?name="+name_url+"&start="+start_url+"&end="+end_url+"&type="+clicked.join('|')+"&minprice="+min_url+"&maxprice="+max_url
 				history.pushState({}, null, nexturl);
-				console.log(clicked);
 				priceRefresh(clicked);
 				//psedoRefresh(nexturl)
 			})
@@ -195,16 +186,12 @@ window.onload = function () {
 			url:`/api/maxroomprice/?name=${name_url}&type=${type_to_use}`,
 			cache: false,
 			success: function(data){
-				console.log(data)
-				console.log(para_clicked,para_clicked==undefined)
 				max_price=data.price
 				$.ajax({
 					url:`/api/minroomprice/?name=${name_url}&type=${type_to_use}`,
 					cache: false,
 					success: function(data){
-						console.log(data)
 						min_price=data.price
-						console.log(max_price,min_price, max_url, min_url=='undefined')
 						if(!(max_url=='null' || max_url=='undefined') && (min_url=='null' || min_url=='undefined')){
 							higher=max_url
 							lower=min_url
@@ -228,11 +215,8 @@ window.onload = function () {
 								higher= ui.values[ 1 ]
 								$(`#changevalue`).val("$" + ui.values[ 0 ] + " - $" + ui.values[ 1 ])
 								$('#results').html('');
-								console.log(type_url)
 								nexturl="/hotel/"+"?name="+name_url+"&start="+start_url+"&end="+end_url+"&type="+type_to_use+"&minprice="+ui.values[ 0 ]+"&maxprice="+ui.values[ 1 ]
-								console.log(nexturl, para_clicked)
 								history.pushState({}, null, nexturl);
-								console.log(ui.values[ 0 ],ui.values[ 1 ])
 								psedoRefresh(nexturl)
 							},
 							slide: function( event, ui ) {
@@ -263,7 +247,6 @@ window.onload = function () {
 
 	//to append results in the body in bootstrap card format
 	function putResults(d){
-		console.log(d)
 		var out= $('<div/>')
 		var div= $('<div/>');
 		div.addClass('card');    
@@ -289,13 +272,9 @@ window.onload = function () {
 	$("#main-filter-button").click(function(e){
 		const cityVal = $("#typeahead").val();
 		const dateRange = $("#date-range").val();
-		console.log(window.location)
 		window.location.href="/hotel/"+"?name="+cityVal+"&start="+fromdate+"&end="+todate+"&type="+clicked.join('|')+"&minprice="+min_price+"&maxprice="+max_price
 	});
 
-	
-	console.log(moment(start_url), moment(end_url), name_url, type_url)
-	console.log('\n\n\n\n',min_url,max_url)
 	if(type_url == null){
 		type_url="AC|Non-AC|Delux";
 		nexturl="/hotel/"+"?name="+name_url+"&start="+start_url+"&end="+end_url+"&type="+type_url+"&minprice="+min_url+"&maxprice="+max_url+"&page="+page_url;
@@ -315,9 +294,6 @@ window.onload = function () {
             cache: false,
             success: function(data){
 				$('#typeahead').val(name_url)
-
-				
-//				console.log(start_url, end_url)
 				$('input[name="daterange"]').daterangepicker({
 					opens: 'right',
 					startDate: moment(start_url), 
@@ -325,31 +301,23 @@ window.onload = function () {
 					minDate: moment(),
 					dateFormat: 'dd-mm-yyyy',
 				}, function (start, end, label) {
-//					console.log("A new date selection was made: " + start.format('YYYY-MM-DD') + ' to ' + end.format('YYYY-MM-DD'));
 					fromdate=start.format('YYYY-MM-DD');
 					todate=end.format('YYYY-MM-DD');
-//					console.log( fromdate, todate);
 				});
 
 				type_url_arr=type_url.split('|')
 				$('.filter1').each(function(i,d){
-//					console.log(i,d);
 					if ($.inArray(d.id, type_url_arr)>-1) {
-//						console.log(d.id)
 						$(this).prop("checked",true);
-//						console.log(d,$(this).prop("checked"))
 					}
 					else{
-//						console.log($.inArray(d.id, type_url_arr),d.id,type_url_arr)
 						$(this).prop("checked",false);
-//						console.log(d,$(this).prop("checked"))
 					}
 				})
 				
 
 				fromdate=moment(start_url).format('YYYY-MM-DD')
 				todate=moment(end_url).format('YYYY-MM-DD')
-				console.log(data);
 				result=data;
 				//$('#results').html('');
 
@@ -358,7 +326,6 @@ window.onload = function () {
 					$('.optional-filter').show();	
 				}
 				else{
-					console.log("hi")
 					$('#noresults').show();
 					$('.optional-filter').hide();
 				}

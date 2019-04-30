@@ -1,5 +1,4 @@
 function initPage(hotel_id, category, transaction_id, gst){
-    console.log(hotel_id, category, transaction_id, gst);
 
 //    var gst=5;
 
@@ -62,12 +61,10 @@ function initPage(hotel_id, category, transaction_id, gst){
         url: `/api/roomavailability/?id=${transaction_id}`,
         cache: false,
         success: function(data){
-            //console.log(data);
             id=`${data.id}`;
             putAboutData(data[0]);
         },
         error: function(error){
-            console.log(error);
         }
     });
 

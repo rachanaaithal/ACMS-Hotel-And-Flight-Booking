@@ -9,7 +9,6 @@ window.onload = function(){
 	get.send(null);
 	function do1(data)
 	{
-		console.log(data);
 		var city = document.getElementById("city");
 		var htm = "<select class='form-control' id='cty'>";
 		var htm1 = "";
@@ -32,7 +31,6 @@ window.onload = function(){
 	get_roomtype.open("GET","/api/roomtype");
 	get_roomtype.send(null);
 	function add_type(data){
-		console.log(data);
 		var rt = document.getElementById("rt"+type);
 		var htm = "<select class='form-control' id='type"+type+"'>";
 		var htm1 = "";
@@ -56,13 +54,11 @@ window.onload = function(){
 	get.open("GET",url1);
 	get.send(null);
 	function do2(data){
-		console.log(data);
 		var img_count =3
 		var add = document.getElementById("add_img");
 		add.addEventListener("click",function(){
 			img_count = img_count+1;
 			var id = "next_img"+img_count;
-			console.log(id);
 			var div = document.getElementById("next_img");
 			var new_div = document.createElement("div");
 			var inner = "<b>Image Url "+img_count+":</b> <br><input class='form-control' id='img"+img_count+"' type='url' name='img"+img_count+"'placeholder='Provide public url of image'><br><br><br>"
@@ -84,7 +80,6 @@ window.onload = function(){
 			bprice =  document.getElementById("bprice"+type).value;
 			mprice =  document.getElementById("mprice"+type).value;
 			no_rooms =document.getElementById("no_rooms"+type).value;
-			console.log(roomtype);
 			if( roomtype=""||capacity=="" || description==""||bprice==""||mprice==""||no_rooms==""){
 				fillthis = document.getElementById("fillthis");
 				var rm ="rd";
@@ -98,7 +93,6 @@ window.onload = function(){
 				}
 				h = "<p>Fill the details of "+ type +rm+ " room</p>";
 				fillthis.innerHTML = h;
-				console.log(h);
 			}
 			else if(type<3){
 				type=type+1;
@@ -148,18 +142,13 @@ window.onload = function(){
 			var img3 = document.getElementById("img3").value;
 			var i;
 			var roomurl="&room_count="+type;
-			console.log(roomurl);
 			imgs = new Array();
 			for(var i=4;i<=img_count;i++){
 				var j ="img"+i;
-				//console.log("blah2");
 				if(document.getElementById(j)){
-					//console.log("blah1");
 					im = document.getElementById(j).value;
-					//console.log(im);
 					if(im==""){
 						var er = document.getElementById("error")
-						//console.log(er.innerHTML)
 						var htm = "<p>Fields cannot be empty </p>"
 						er.innerHTML = htm;
 					}
@@ -189,7 +178,6 @@ window.onload = function(){
 					if(capacity<1){
 						capacity=1;
 					}
-					console.log(roomtype);
 					var str = "&roomtype"+i+"="+roomtypes[i]+"&capacity"+i+"="+capacity+"&description"+i+"="+description+"&bprice"+i+"="+bprice+"&mprice"+i+"="+mprice+"&no_rooms"+i+"="+no_rooms;
 					roomsurl[i] = str;
 				}
@@ -199,7 +187,6 @@ window.onload = function(){
 				n=data.length;
 				var i=0;
 				for(i=0;i<n;i=i+1){
-					//console.log(data[i]['name']);
 					if (data[i]['name']==name && data[i]['city']==city){
 						flag=1;
 					}
@@ -207,39 +194,32 @@ window.onload = function(){
 				return flag;
 			}
 			var flag = check_hotel(data,name,city);
-			//console.log(flag);
 			if(name=="" || city=="" || add=="" || ctime=="" || etime==""|| lat=="" || longi==""|| email=="" || phno=="" || img1=="" ||img2==""||img3=="")
 			{
 				var er = document.getElementById("error")
-				console.log(er.innerHTML)
 				var htm = "<p>Fields cannot be empty </p>"
-				console.log (flag);
 				er.innerHTML = htm;
 			}
 			else if(email.indexOf("@",0)< 0 || email.indexOf(".",0) < 0 )
 			{
 				var er = document.getElementById("error")
-				console.log(er.innerHTML)
 				var htm = "<p>Please enter a vaild E-mail ID </p>"
 				er.innerHTML = htm;
 			}
 			else if(!(phno.match(phone)))
 			{
 				var er = document.getElementById("error")
-				console.log(er.innerHTML)
 				var htm = "<p>Please enter a vaild Phone Number </p>"
 				er.innerHTML = htm;
 			}
 			else if("true"==isValidURL(img1) && "true"==isValidURL(img2) && "true"==isValidURL(img3))
 			{
 				var er = document.getElementById("error")
-				console.log(er.innerHTML)
 				var htm = "<p>Please enter a vaild URL </p>"
 				er.innerHTML = htm;
 			}
 			else if(flag==1){
 				var er = document.getElementById("error")
-				console.log(er.innerHTML)
 				var htm = "<p>Hotel already exits</p>"
 				er.innerHTML = htm;
 			}
@@ -252,7 +232,6 @@ window.onload = function(){
 				get.open("GET","/api/users");
 				get.send(null);
 				function do3(data1,email){
-					console.log(email);
 					function check_user(data,email){
 						var flag=0;
 						n=data.length;
@@ -267,7 +246,6 @@ window.onload = function(){
 					var flag= check_user(data1,email);
 					if(flag ==1){
 						var er = document.getElementById("error")
-						console.log(er.innerHTML)
 						var htm = "<p>Email already exits</p>"
 						er.innerHTML = htm;
 					}
@@ -286,8 +264,6 @@ window.onload = function(){
 								var i=0;
 								
 								for(i=0;i<n;i=i+1){	
-									//console.log(data1[i]['email']);
-									//console.log(email);
 									if(data1[i]['email']==email){
 										f=1;
 									}
@@ -295,14 +271,11 @@ window.onload = function(){
 										f=1;
 									}
 								}
-								console.log(f);
 								return f;
 							}
 							var flag3= check_hotel(data1,name,city,email);	
-							console.log(flag3);
 							if(flag3==1){
 								var er = document.getElementById("error")
-								console.log(er.innerHTML)
 								var htm = "<p>Hotel already registered</p>"
 								er.innerHTML = htm;
 							}
@@ -311,14 +284,11 @@ window.onload = function(){
 								for(i=4;i<=img_count;i++){
 									imag = imag+"&img"+i+"="+imgs[i];
 								}
-								console.log(imag);
 								var url = "/api/oper_register?name="+name+"&city="+city+"&add="+add+"&ct="+ctime+"&et="+etime+"&lat="+lat+"&long="+longi+"&email="+email+"&phno="+phno;
 								url =url +imag+roomurl;
 								for (i=1;i<=type;i++){
 									url=url+roomsurl[i];
 								}
-								console.log(roomurl);
-								console.log(roomsurl);
 								if(sum<1){
 									window.location.replace(url);
 									sum = 1;

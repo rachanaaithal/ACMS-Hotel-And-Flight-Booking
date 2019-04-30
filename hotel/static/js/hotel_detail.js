@@ -1,5 +1,4 @@
 function initPage(id){
-    console.log(id);
     function putAboutData(data){
         
         var details=$('<div/>');
@@ -13,7 +12,6 @@ function initPage(id){
         details.append(`<p>CheckinTime:${moment(checkIn, "HH:mm:ss").format('hh:mm A')}</p>`);
         details.append(`<p>CheckoutBefore:${checkOut}</p>`);
         details.appendTo('#data');
-        console.log(`${data.checkintime}-${data.extratime}`)
         
     }
     function putTable(){
@@ -49,7 +47,6 @@ function initPage(id){
     }
     
     var csrftoken = readCookie('csrftoken');
-    console.log(csrftoken)
     function putPricesData(d){
         
         $.ajax({
@@ -62,7 +59,6 @@ function initPage(id){
                     url:`/api/prices/?name=${id}&category=${d.category}&start=${fromdate}&end=${todate}`,
                     cache: false,
                     success: function(price){
-                        console.log(price);
 
 
 
@@ -79,8 +75,6 @@ function initPage(id){
                                 url: `/api/check/?name=${id}&category=${d.category}&start=${fromdate}&end=${todate}`,
                                 cache: false,
                                 success: function(data){
-                                    console.log(data.id);
-                                    console.log(fromdate,todate);
                                     if(data.val){
                                         $.ajax({
                                             type: "POST",
@@ -88,7 +82,6 @@ function initPage(id){
                                             data:{'from_date': fromdate, 'to_date': todate, 'room':data.id, 'status': 'pr', 'price': price.price},
                                             headers:{"X-CSRFToken": csrftoken},
                                             success:function(newdata){
-                                                console.log(newdata);
                                                 window.location.href=`/hotel/`+id+`/${d.category}/?id=${newdata.id}`;
                                             }
                                         });
@@ -97,7 +90,6 @@ function initPage(id){
                                     }
                                 },
                                 error: function(error){
-                                    console.log(error);
                                 }
                             });
 
@@ -109,7 +101,6 @@ function initPage(id){
 
                     },
                     error: function(error){
-                        console.log(error);
                     }
                 });
 
@@ -132,7 +123,6 @@ function initPage(id){
         url: `/api/hotels/${id}`,
         cache: false,
         success: function(data){
-            console.log(data);
             id=`${data.id}`;
             putAboutData(data);
 
@@ -147,14 +137,12 @@ function initPage(id){
 
         },
         error: function(error){
-            console.log(error);
         }
     });
     $.ajax({
         url: `/api/hotelroom/?hotel=${id}`,
         cache: false,
         success: function(data){
-            console.log(data);
             putTable();
             data.map(function (d){
                 putPricesData(d);
@@ -162,12 +150,10 @@ function initPage(id){
             
         },
         error: function(error){
-            console.log(error);
         }
     });
 
     function putImage(d){
-        console.log("here")
         $(`<li data-target="#carouselHotelIndicators" data-slide-to="${d.id-1}"></li>`).appendTo('.carousel-indicators')
         $(`<div class="carousel-item"><img class="d-block w-100" src="${d.image_link}" alt="${d.id-1}"></div>`).appendTo('.carousel-inner')
     }
@@ -176,7 +162,6 @@ function initPage(id){
         url:`/api/hotelphotos/?hotel=${id}`,
         cache: false,
         success: function(data){
-            console.log(data);
             data.map(function(d){
                 putImage(d);
             });
@@ -184,7 +169,6 @@ function initPage(id){
             $('.carousel-indicators > li').first().addClass('active');
         },
         error: function(error){
-            console.log(error);
         }
     })
 

@@ -11,7 +11,6 @@ function readCookie(name) {
 
 
 function initPage(transaction_id, gst, cancellation_charges){
-    console.log(transaction_id, gst, cancellation_charges);
 
     function putAboutData(data){
         var details=$('<div/>');
@@ -26,7 +25,6 @@ function initPage(transaction_id, gst, cancellation_charges){
         details.append(`<p>Checkin: ${moment(data.from_date).format('DD-MM-YYYY')} ${moment(checkIn, "HH:mm:ss").format('hh:mm A')}</p>`);
         details.append(`<p>CheckoutBefore: ${moment(data.to_date).format('DD-MM-YYYY')} ${checkOut}</p>`);
         
-        console.log(data.status=='bk')
         
         if(data.status=='bk'){
             const cost=data.price
@@ -75,14 +73,12 @@ function initPage(transaction_id, gst, cancellation_charges){
 
             var csrftoken = readCookie('csrftoken');
             $('#confirm_cancel').click(function(e){
-                console.log(transaction_id);
                 $.ajax({
                     type: "PATCH",
                     url:`/api/roomavailability/${transaction_id}/`,
                     data:{'status':'dd'},
                     headers:{"X-CSRFToken": csrftoken},
                     success:function(newdata){
-                        console.log(newdata);
                         window.location.href=`/hotel/bookingdetails/${transaction_id}`
                     }
                 });
@@ -110,7 +106,6 @@ function initPage(transaction_id, gst, cancellation_charges){
         url:`/api/roomavailability/?id=${transaction_id}`,
         cache: false,
         success: function(data){
-            console.log(data);
             putAboutData(data[0])
         },
 

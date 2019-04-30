@@ -52,8 +52,9 @@ urlpatterns = [
     url(r'^seat_availability/(?P<pk>[^/.]+)/$',views.Seat_AvailabilityViewSet.as_view({'get': 'retrieve', 'put': 'update', 'patch': 'partial_update', 'delete': 'destroy'}),name='seat_availability-detail',),
 
     url(r'bookings', views.bookings, name="bookings"),
-    url(r'flightmail_confirmations',views.flights_mails,name="flightmail_confirmations"),
     url(r'mail_confirmation',views.booking_mail, name="mail_confirmation"),
+    url(r'flightmail_confirmations',views.flights_mails,name="flightmail_confirmations"),
+    
 ]
 
 

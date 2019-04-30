@@ -26,14 +26,16 @@
         <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
             <div class="navbar-nav">
                 <div class="items">
-                    <a class="nav-item nav-link active" href="#">Home <span class="sr-only">(current)</span></a>
+                    <a class="nav-item nav-link active" href="/">Home <span class="sr-only">(current)</span></a>
                     <a class="nav-item nav-link" href="/hotel/"><i class="fas fa-hotel"></i>Hotels</a>
                     <a class="nav-item nav-link" href="/flight/"><i class="fas fa-plane"></i>Flights</a>    
                 </div><div class="items">
                     {% if user.is_authenticated %}
                     <span class="nav-item navbar-text">User: {{ user.get_username }}</span>
                     <a class="nav-item nav-link" href="{% url 'logout'%}?next={{request.path}}">Logout</a> 
-					<a class="nav-item nav-link" href="{% url 'user_profile'%}?next={{request.path}}">Profile</a>				
+                    <a class="nav-item nav-link" href="{% url 'user_profile'%}?next={{request.path}}">Profile</a>
+                    <a class="nav-item nav-link" href="/customer/">Hotel History</a>
+                    <a class="nav-item nav-link" href="/customer/flighthistory">Flight History</a>
                     {% else %}
                     <a class="nav-item nav-link" href="{% url 'register'%}?next={{request.path}}">Register</a>
                     <a class="nav-item nav-link" href="{% url 'login'%}?next={{request.path}}">Login</a>   

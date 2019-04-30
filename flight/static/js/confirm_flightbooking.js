@@ -88,7 +88,6 @@ function initPage(flight_id, category){
                             window.location.href=`/flight/${flight_id}/${category}/booked/${transaction_id}`
                         },
                         error: function(error){
-                            console.log(error);
                         }
                     })
                 }

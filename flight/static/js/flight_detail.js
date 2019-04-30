@@ -80,7 +80,6 @@ function initPage(id){
                                     url: `/api/cflightstatus/?seat_id=${da.id}&flightid=${id}&category=${da.category}&start=${fromdate}&source=${source}&destination=${dest}`,
                                     cache: false,
                                     success: function(data){
-                                    	console.log(data)
                                         if(data.val){
                                             $.ajax({
                                                 type: "POST",
