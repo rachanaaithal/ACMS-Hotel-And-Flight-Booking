@@ -51,7 +51,9 @@ urlpatterns = [
     url(r'^seat_availability/$',views.Seat_AvailabilityViewSet.as_view({'get': 'list', 'post': 'create'}),name='seat_availability-list',),
     url(r'^seat_availability/(?P<pk>[^/.]+)/$',views.Seat_AvailabilityViewSet.as_view({'get': 'retrieve', 'put': 'update', 'patch': 'partial_update', 'delete': 'destroy'}),name='seat_availability-detail',),
 
-    url(r'bookings', views.bookings, name="bookings")
+    url(r'bookings', views.bookings, name="bookings"),
+
+    url(r'mail_confirmation',views.booking_mail, name="mail_confirmation")
 ]
 
 

@@ -18,6 +18,11 @@ function initPage(hotel_id, category){
     var gst=5;
 
     function putAboutData(data){
+        window.history.pushState(null, "", window.location.href);        
+        window.onpopstate = function() {
+            alert("Please do not press back button during transaction!");
+            window.history.pushState(null, "", window.location.href);
+        };
         var details=$('<div/>');
         details.append(`<h5>${data.hotel}</h5>`);
         details.append(`<p>Address: ${data.address}</p>`); 
@@ -59,6 +64,12 @@ function initPage(hotel_id, category){
         tr.append(`<td><button id="cancel" class="btn btn-danger">Cancel</button></td><td><button id="pay" class="btn btn-primary">Pay</button></td>`)
         tr.appendTo('#finalprices')  
 
+        clicked=["AC", "Non-AC", ""]
+        function redirect(){
+        window.location.href = "/hotel/"
+        }
+        setTimeout(redirect, 60000); 
+
         var csrftoken = readCookie('csrftoken');
         console.log(transaction_id, hotel_id, category);
         $('#pay').click(function(e){
@@ -70,7 +81,18 @@ function initPage(hotel_id, category){
                 headers:{"X-CSRFToken": csrftoken},
                 success:function(newdata){
                     console.log(newdata);
-                    window.location.href=`/hotel/${hotel_id}/${category}/booked/${transaction_id}`
+                    $.ajax({
+                        url:`/api/mail_confirmation/?id=${transaction_id}&total=${tot.toFixed(2)}`,
+                        cache: false,
+                        success: function(data){
+                            console.log(data)
+                            window.location.href=`/hotel/${hotel_id}/${category}/booked/${transaction_id}`
+                        },
+                        error: function(error){
+                            console.log(error);
+                        }
+                    })
+                    //window.location.href=`/hotel/${hotel_id}/${category}/booked/${transaction_id}`
                 }
             });
 
@@ -85,7 +107,7 @@ function initPage(hotel_id, category){
                 headers:{"X-CSRFToken": csrftoken},
                 success:function(newdata){
                     console.log(newdata);
-                    window.location.href=`/hotel/${hotel_id}/${category}/canceled`
+                    //window.location.href=`/hotel/${hotel_id}/${category}/canceled`
                 }
             });
 

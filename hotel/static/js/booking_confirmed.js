@@ -41,7 +41,20 @@ function initPage(hotel_id, category, transaction_id, gst){
         var tr=$('<tr/>')
         tr.append(`<th scope="row">Total</td><td>${tot.toFixed(2)}</td>`);
         tr.appendTo('#finalprices')
-
+        var extra=$('<div/>')
+        extra.attr('id', 'editor');
+        extra.appendTo(body)
+        var print=$('<div/>')
+        print.append(`<td><button id="Ticket" class="btn btn-danger" style="display">Download Ticket</button>`)
+        print.appendTo(body)
+        $('#Ticket').click(function (e) {
+            var pdf = new jsPDF('p','pt','a4');
+            $("#Ticket").attr("style", "display:none");
+            pdf.addHTML(document.body,function() {
+            pdf.save('Flight-ticket.pdf');
+            $("#Ticket").attr("style", "display");
+            });
+        });
     }
 
 
