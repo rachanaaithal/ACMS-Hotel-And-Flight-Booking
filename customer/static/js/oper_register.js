@@ -9,6 +9,7 @@ window.onload = function(){
 	get.send(null);
 	function do1(data)
 	{
+		console.log(data);
 		var city = document.getElementById("city");
 		var htm = "<select id='cty'>";
 		var htm1 = "";
@@ -43,6 +44,7 @@ window.onload = function(){
 	get.onreadystatechange = function(flag){
 		var data = JSON.parse(this.responseText);
 		flag=do2(data,name,add);
+		console.log(flag);
 		
 	}
 	get.open("GET",url1);
@@ -66,42 +68,53 @@ window.onload = function(){
 	if(name=="" || city=="" || add=="" || ctime=="" || etime==""|| lat=="" || longi==""|| img1=="" || email=="" || phno=="" || img2=="" ||img3=="")
 	{
 		var er = document.getElementById("error")
+		console.log(er.innerHTML)
 		var htm = "<p>Fields cannot be empty </p>"
+		console.log (flag);
 		er.innerHTML = htm;
 	}
 	else if(email.indexOf("@",0)< 0 || email.indexOf(".",0) < 0 )
 	{
 		var er = document.getElementById("error")
+		console.log(er.innerHTML)
 		var htm = "<p>Please enter a vaild E-mail ID </p>"
 		er.innerHTML = htm;
 	}
 	else if(!(phno.match(phone)))
 	{
 		var er = document.getElementById("error")
+		console.log(er.innerHTML)
 		var htm = "<p>Please enter a vaild Phone Number </p>"
 		er.innerHTML = htm;
 	}
 	else if (flag ==3){
 		var er = document.getElementById("error")
+		console.log(er.innerHTML)
 		var htm = "<p>Hotel already registered</p>"
 		er.innerHTML = htm;
 	}
 	else if(flag==1){
 		var er = document.getElementById("error")
+		console.log(er.innerHTML)
 		var htm = "<p>Hotel already exits</p>"
 		er.innerHTML = htm;
 	}
 	else if (flag ==2){
 		var er = document.getElementById("error")
+		console.log(er.innerHTML)
 		var htm = "<p>Email already exits</p>"
 		er.innerHTML = htm;
 	}
 	else{
+		
 		var url = "/api/oper_register?name="+name+"&city="+city+"&add="+add+"&ct="+ctime+"&et="+etime+"&img="+img+"&lat="+lat+"&long="+longi+"&email="+email+"&phno="+phno;
-		window.location.replace(url);
+		//window.location.replace(url);
 	}
 });
 	function do2(data,name,city){
+		console.log("do 2");
+		console.log(data);
+		console.log(name);
 		data.forEach(check_hotel);
 		function check_hotel(item){
 			if(name==item['name'] && city==item['city']){
@@ -112,6 +125,7 @@ window.onload = function(){
 	}
 	
 	function do3(data1,email){
+		console.log(data1);
 		data1.forEach(check_username);
 		function check_username(item){
 			if(email == item['username']){
@@ -121,6 +135,8 @@ window.onload = function(){
 		return flag;
 	}
 	function do4(data,name,city){
+		console.log(data);
+		console.log(name);
 		data.forEach(check_hotel);
 		function check_hotel(item){
 			if(name==item['name'] && city==item['city']){

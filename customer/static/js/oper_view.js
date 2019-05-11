@@ -50,11 +50,13 @@ window.onload=function(){
             cache: false,
             success: function(data){
                 $(`#bookings`).html('');
+                console.log(data);
                 data.map(function(d){
                     putResults(d);
                 });
             },
             error: function(error){
+                console.log(error);
             }
         })
     });

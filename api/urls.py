@@ -30,6 +30,15 @@ router.register(r'flight_seats', views.Flight_SeatsViewSet)
 router.register(r'seattype', views.SeatTypeViewSet)
 router.register(r'operator',views.OperatorViewSet)
 
+
+router.register(r'seattype1',views.SeatType_ViewSet)
+router.register(r'flights1',views.Flight_ViewSet)
+router.register(r'newflights',views.NewFlight_ViewSet)
+
+router.register(r'hotelprofile',views.HotelOperator_ViewSet,base_name='hotelprofile')
+router.register(r'flightprofile',views.FlightOperator_ViewSet,base_name='flightprofile')
+
+
 urlpatterns = [
     path('', include(router.urls)),
     url(r'search', views.search, name="search"),
@@ -46,6 +55,9 @@ urlpatterns = [
     url(r'^minimumseatcharge/$', views.MinimumSeatView.as_view()),
     url(r'^prices/$', views.prices, name="prices"),
 
+    url(r'flightregister',views.flight_register,name='flightregister'),
+	
+	
     url(r'oper_register',views.oper_register,name="oper_register"),
     url(r'register',views.register,name="register"),
     url(r'^seat_availability/$',views.Seat_AvailabilityViewSet.as_view({'get': 'list', 'post': 'create'}),name='seat_availability-list',),
@@ -56,6 +68,13 @@ urlpatterns = [
     url(r'flightmail_confirmations',views.flights_mails,name="flightmail_confirmations"),
     
 ]
+
+
+urlpatterns +=[url(r'flight_add_oper',views.flight_add_oper,name="flight_add_oper"),]
+
+urlpatterns +=[url(r'hoteledit',views.hotelprofile_edit,name="hoteledit"),]
+urlpatterns +=[url(r'flightedit',views.flightprofile_edit,name="flightedit"),]
+
 
 
 

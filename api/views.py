@@ -496,15 +496,15 @@ def add_oper(request):
 	profile.save()
 	hotel2 = Registered_Hotel.objects.get(id=id)
 	hotel2.delete()
-	email_operator(name,email,password)
+	email_operator(name,email,password,"hotel")
 	return redirect('/customer/verify/')
 
 import smtplib, ssl
 
-def email_operator(name,email,password):
+def email_operator(name,email,password,type):
 	message = """Subject: Registration Successful
 
-	Hi {name}, your hotel is successfully registered for Book Now!!
+	Hi {name}, your {type} is successfully registered for Book Now!!
 	Username : {email}
 	Password : {password}
 	Now you can update your detail @ Book Now
@@ -518,7 +518,7 @@ def email_operator(name,email,password):
 		server.sendmail(
 			from_address,
 			email,
-			message.format(name=name,email=email,password=password),
+			message.format(name=name,email=email,password=password,type=type),
 		)
 
 def email_hotel_booking(name,email,hotel_name,address,in_date,out_date,total,type):
@@ -901,3 +901,141 @@ def bookings(request):
         response.append(tosend)
 
     return JsonResponse(response, safe=False)
+
+	
+class SeatType_ViewSet(viewsets.ModelViewSet):
+    queryset = SeatType.objects.all()
+    serializer_class = SeatTypeSerializer
+	
+class Flight_ViewSet(viewsets.ModelViewSet):
+    queryset = Flight.objects.all()
+    serializer_class = FlightSerializer
+   
+from api.serializers import NewFlightSerializer
+from api.models import NewFlight, NewFlight_Seats
+
+class NewFlight_ViewSet(viewsets.ModelViewSet):
+    queryset = NewFlight.objects.all()
+    serializer_class = NewFlightSerializer
+	
+def flight_register(request):
+	flight_no = request.GET['flight_no']
+	name = request.GET['name']
+	email = request.GET['email']
+	phno = request.GET['phno']
+	day = request.GET['date']
+	takeoff =request.GET['take']
+	land = request.GET['land']
+	src = request.GET['src']
+	des=request.GET['des']
+	img = request.GET['img']
+	category = request.GET['category']
+	tail_id = request.GET['tailId']
+	next = request.GET['next']
+	print(des)
+	source = City.objects.get(name=src)
+	print(source)
+	destination = City.objects.get(name=des)
+	tk = datetime.strptime(takeoff, '%H:%M:%S')
+	landing = datetime.strptime(land, '%H:%M:%S')
+	flight_no=int(flight_no)
+	print(day)
+	day= datetime.strptime(day,'%Y-%m-%d').date()
+	
+	flight = NewFlight(flightnumber=flight_no,airline_name=name,on_date=day,takeoff_time=tk,landing_time=landing,source=source,destination=destination,image_link=img,tail_id=tail_id,email=email,phone_number=phno)
+	flight.save()
+	
+	cate = SeatType.objects.get(name=category)
+	
+	if(category == 'Economy'):
+		
+		seats1 = NewFlight_Seats(flight=flight,number_of_seats=request.GET['no_a'],category=cate,seat_position='a',base_price=request.GET['bprice_a'],max_price=request.GET['mprice_a'])							
+		seats1.save()
+		seats2 = NewFlight_Seats(flight=flight,number_of_seats=request.GET['no_m'],category=cate,seat_position='m',base_price=request.GET['bprice_m'],max_price=request.GET['mprice_m'])
+		seats2.save()
+		seats3 = NewFlight_Seats(flight=flight,number_of_seats=request.GET['no_w'],category=cate,seat_position='w',base_price=request.GET['bprice_w'],max_price=request.GET['mprice_w'])
+		seats3.save()
+	elif(category=='Business'):
+		seats = NewFlight_Seats(flight=flight,number_of_seats=request.GET['no'],category=cate,seat_position='h',base_price=request.GET['bprice'],max_price=request.GET['mprice'])
+		seats.save()
+	else:
+		seats = NewFlight_Seats(flight=flight,number_of_seats=request.GET['no'],category=cate,seat_position='p',base_price=request.GET['bprice'],max_price=request.GET['mprice'])
+		seats.save()
+	return redirect(next)
+	
+from api.models import Flight_Operator	
+def flight_add_oper(request):
+	id = request.GET['id'];
+	flight1 = NewFlight.objects.filter(id=id).values('id','flightnumber','airline_name','takeoff_time','landing_time','source','destination','on_date','image_link','phone_number','tail_id','email')
+	print (flight1[0])
+	src =City.objects.get(id=flight1[0]['source'])
+	des =City.objects.get(id=flight1[0]['destination'])
+	name = str(flight1[0]['flightnumber'])+" "+str(flight1[0]['airline_name'])
+	email = flight1[0]['email']
+	flight = Flight(flightnumber=flight1[0]['flightnumber'],airline_name=flight1[0]['airline_name'],on_date=flight1[0]['on_date'],takeoff_time=flight1[0]['takeoff_time'],landing_time=flight1[0]['landing_time'],source=src,destination=des,image_link=flight1[0]['image_link'],tail_id=flight1[0]['tail_id'])
+	flight.save()
+	password = randomString()
+	print(password)
+	#delete from the registered table
+	#hotel2 = Registered_Hotel.objects.filter(name=name).values('id')
+	new_seats  = NewFlight_Seats.objects.filter(flight=flight1[0]['id']).values('number_of_seats','category','base_price','max_price','seat_position')
+	for i in range(0,len(new_seats)):
+		t = SeatType.objects.get(id=new_seats[i]['category'])
+		seats = Flight_Seats(flight=flight,category = t,base_price = new_seats[i]['base_price'],max_price = new_seats[i]['max_price'],number_of_seats=new_seats[i]['number_of_seats'],seat_position=new_seats[i]['seat_position'])
+		seats.save()
+	user = User(username=flight1[0]['email'],password=password,email=flight1[0]['email'])
+	user.set_password(user.password)
+	user.save()
+	role = "Flight Operator"
+	profile = Flight_Operator(user=user,flight=flight,phone_number=flight1[0]['phone_number'],role=role)
+	profile.save()
+	flight2 = NewFlight.objects.get(id=id)
+	flight2.delete()
+	email_operator(name,email,password,"flight")
+	return redirect('/customer/flight_verify/')
+	 
+	
+from api.serializers import HotelOperator_Serializer, FlightOperator_Serializer
+@method_decorator(csrf_exempt, name='dispatch')	
+class HotelOperator_ViewSet(viewsets.ModelViewSet):
+    #queryset = User.objects.all().order_by('-date_joined')
+	serializer_class = HotelOperator_Serializer
+	def perform_create(self, serializer):
+		serializer.save(user=self.request.user)
+	def get_queryset(self):
+		user=self.request.user
+		return Operator.objects.filter(user=user)
+		
+@method_decorator(csrf_exempt, name='dispatch')	
+class FlightOperator_ViewSet(viewsets.ModelViewSet):
+    #queryset = User.objects.all().order_by('-date_joined')
+	serializer_class = FlightOperator_Serializer
+	def perform_create(self, serializer):
+		serializer.save(user=self.request.user)
+	def get_queryset(self):
+		user=self.request.user
+		return Flight_Operator.objects.filter(user=user)
+		
+def hotelprofile_edit(request):
+	email = request.GET["email"]
+	phno = request.GET["phno"]
+	
+	u = User.objects.get(id=request.user.id)
+	u.email=email
+	u.save()
+	pro = Operator.objects.get(user=request.user)
+	pro.phone_number=phno
+	pro.save()
+	return redirect('/customer/profile')
+	
+def flightprofile_edit(request):
+	email = request.GET["email"]
+	phno = request.GET["phno"]
+	
+	u = User.objects.get(id=request.user.id)
+	u.email=email
+	u.save()
+	pro = Flight_Operator.objects.get(user=request.user)
+	pro.phone_number=phno
+	pro.save()
+	return redirect('/customer/profile')
