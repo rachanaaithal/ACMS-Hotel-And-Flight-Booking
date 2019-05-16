@@ -1,0 +1,15 @@
+{% extends "base_generic.html" %}
+{% block content %}
+<style>
+.new{float:left; }
+#error{color:red;}
+</style>
+
+ 
+ <div class="new">
+    <div class="container">
+	<a class="btn btn-link" href="{% url 'flight_verify'%}?next={{request.path}}">Flight</a> <br><br>
+	<a class="btn btn-link" href="{% url 'hotel_verify'%}?next={{request.path}}">Hotel</a> <br><br>
+</div>
+</div>
+{% endblock %}

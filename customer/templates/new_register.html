@@ -4,12 +4,13 @@
 .new{float:left; }
 #error{color:red;}
 </style>
-
+<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
  
  <div class="new">
     <div class="container">
-	<a class="user_reg" class='btn btn-link' href="{% url 'user_register'%}?next={{request.path}}">User</a> <br><br>
-	<a class="oper_reg" class='btn btn-link' href="{% url 'oper_register'%}?next={{request.path}}">Operator</a>
+	<a class="btn btn-link" href="{% url 'user_register'%}?next={{request.path}}">User</a> <br><br>
+	<a class="btn btn-link" href="{% url 'oper_register'%}?next={{request.path}}">Hotel Operator</a> <br><br>
+	<a class="btn btn-link" href="{% url 'flight_register'%}?next={{request.path}}">Flight Operator</a>
 </div>
 </div>
 {% endblock %}

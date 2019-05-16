@@ -1,5 +1,7 @@
 {% extends "base_generic.html" %}
 {% block content %}
+
+<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
 <style>
 .new{float:left; }
 #error{color:red;}
@@ -13,14 +15,14 @@
 		<br>
 <div id="main-filter">
 	<div class = "as" id="the-basics" style="float:left">
-          <b>Username:</b>      <input class='form-control' id="username" type="text" name="username"><br><br><br>
-		  <b>Password:</b>      <input class='form-control' id="password" type="password" name="password"><br><br><br>
-		  <b>Confirm Password:</b>      <input class='form-control' id="cpassword" type="password" name="cpassword"><br><br><br>
-		  <b>First Name:</b>    <input class='form-control' id="fname" type="text" name="fname"><br><br><br>
-		  <b>Last Name:</b>     <input class='form-control' id="lname" type="text" name="lname"><br><br><br>
-		  <b>Email:</b>         <input class='form-control' id="email" type="email" name = "email"><br><br><br>
-		  <b>Phone Number:</b>  <input class='form-control' id="phno" type="text" name = "phno"><br><br><br><br>
-		  <input id="btn" class='btn btn-primary' type="button" value="Register">
+          <b>Username:</b>      <input class="form-control" id="username" type="text" name="username"><br><br><br>
+		  <b>Password:</b>      <input class="form-control" id="password" type="password" name="password"><br><br><br>
+		  <b>Confirm Password:</b>      <input class="form-control" id="cpassword" type="password" name="cpassword"><br><br><br>
+		  <b>First Name:</b>    <input class="form-control" id="fname" type="text" name="fname"><br><br><br>
+		  <b>Last Name:</b>     <input class="form-control" id="lname" type="text" name="lname"><br><br><br>
+		  <b>Email:</b>         <input class="form-control" id="email" type="email" name = "email"><br><br><br>
+		  <b>Phone Number:</b>  <input class="form-control" id="phno" type="text" name = "phno"><br><br><br><br>
+		  <input id="btn" type="button" value="Register" class="btn btn-primary">
     </div>
 	<script src="/static/js/register.js"></script>
 	   </div>

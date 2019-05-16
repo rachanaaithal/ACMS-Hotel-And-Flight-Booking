@@ -1,5 +1,7 @@
 {% extends "base_generic.html" %}
 {% block content %}
+
+<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
 <style>
 .new{float:left; }
 #error{color:red;}
@@ -14,34 +16,34 @@
 		<br><div id='error'></div>
 <div id="main-filter">
 	<div class = "as" id="the-basics" style="float:left">
-          <b>Hotel Name:</b> <br>     <input class='form-control' id="name" type="text" name="name"><br><br><br>
+          <b>Hotel Name:</b> <br>     <input class="form-control" id="name" type="text" name="name"><br><br><br>
 		  <b>City:</b>  <br>    <div id='city'></div><br><br><br>
-		  <b>Email:</b><br><input class='form-control' id="email" type="email" name="email"></input><br><br><br>
-		  <b>Phone Number:</b><br>  <input class='form-control' id="phno" type="text" name = "phno"><br><br><br>
-		  <b>Address:</b>   <br>   <textarea class='form-control' id ="add" rows="4" cols="50"></textarea><br><br><br>
-		  <b>Checkin Time:</b> <br>   <input class='form-control' id="ctime" type="time" name="ctime"><br><br><br>
-		  <b>Extra Time:</b>  <br>   <input class='form-control' id="etime" type="number" name="etime" placeholder="In minutes"><br><br><br>
-		  <b>Latitude:</b> <br>        <input class='form-control' id="lat" type="number" name = "lat"><br><br><br>
-		  <b>Logitude:</b>  <br> <input class='form-control' id="long" type="number" name = "long"><br><br><br>
-		  <b>Image Url 1:</b> <br><input class='form-control' id="img1" type="url" name="img1" placeholder="Provide public url of image"><br><br><br>
-		  <b>Image Url 2:</b> <br><input class='form-control' id="img2" type="url" name="img2" placeholder="Provide public url of image"><br><br><br>
-		  <b>Image Url 3:</b> <br><input class='form-control' id="img3" type="url" name="img3" placeholder="Provide public url of image"><br><br><br>
-		  <div id="next_img"></div><input class='btn btn-primary' id="add_img" type="button" value= "Add more images"><br><br><br>
+		  <b>Email:</b><br><input class="form-control" id="email" type="email" name="email"></input><br><br><br>
+		  <b>Phone Number:</b><br>  <input class="form-control" id="phno" type="text" name = "phno"><br><br><br>
+		  <b>Address:</b>   <br>   <textarea  class="form-control" id ="add" rows="4" cols="50"></textarea><br><br><br>
+		  <b>Checkin Time:</b> <br>   <input class="form-control" id="ctime" type="time" name="ctime"><br><br><br>
+		  <b>Extra Time:</b>  <br>   <input class="form-control" id="etime" type="number" name="etime" placeholder="In minutes"><br><br><br>
+		  <b>Latitude:</b> <br>        <input class="form-control" id="lat" type="number" name = "lat"><br><br><br>
+		  <b>Logitude:</b>  <br> <input class="form-control" id="long" type="number" name = "long"><br><br><br>
+		  <b>Image Url 1:</b> <br><input class="form-control" id="img1" type="url" name="img1" placeholder="Provide public url of image"><br><br><br>
+		  <b>Image Url 2:</b> <br><input class="form-control" id="img2" type="url" name="img2" placeholder="Provide public url of image"><br><br><br>
+		  <b>Image Url 3:</b> <br><input class="form-control" id="img3" type="url" name="img3" placeholder="Provide public url of image"><br><br><br>
+		  <div id="next_img"></div><input class="btn btn-primary" id="add_img" type="button" value= "Add more images"><br><br><br>
 		  
 		  <div id="rooms">
 			<b>Add Room Details</b><br><br>
 			<div id="fillthis"></div>
 			<b>Room Type: </b><br><div id="rt1"></div><br><br>
-			<b>Capacity :</b> <br><input class='form-control' id="capacity1" type="number" min="1" max="5" name = "capacity"></input><br><br><br>
-			<b>Description : </b> <br><textarea class='form-control' id ="description1" rows="4" cols="50"></textarea><br><br><br>
-			<b>Base Price : </b> <br> <input class='form-control' id = "bprice1" type ="number" min="0.00"/><br><br><br>
-			<b>Max Price : </b> <br> <input class='form-control' id = "mprice1" type ="number" min="0.00"/><br><br><br>
-			<b>Number of Rooms : </b> <br> <input class='form-control' id="no_rooms1" type="number" name = "no_rooms"></input><br><br><br>
+			<b>Capacity :</b> <br><input class="form-control" id="capacity1" type="number" min="1" max="5" name = "capacity"></input><br><br><br>
+			<b>Description : </b> <br><textarea class="form-control" id ="description1" rows="4" cols="50"></textarea><br><br><br>
+			<b>Base Price : </b> <br> <input class="form-control" id = "bprice1" type ="number" min="0.00"/><br><br><br>
+			<b>Max Price : </b> <br> <input class="form-control" id = "mprice1" type ="number" min="0.00"/><br><br><br>
+			<b>Number of Rooms : </b> <br> <input class="form-control" id="no_rooms1" type="number" name = "no_rooms"></input><br><br><br>
 			<div id = "new_types">
 			</div>
-			<input id="newtype" class='btn btn-primary' type="button" value="Add Room Type"><br><br><br>
+			<input id="newtype" type="button" class="btn btn-primary" value="Add Room Type"><br><br><br>
 		  </div>
-		  <input id="btn" class='btn btn-primary' type="button" value="Register">
+		  <input id="btn" type="button" class="btn btn-primary" value="Register">
     </div>
 	<script src="/static/js/new.js"></script>
 	   </div>

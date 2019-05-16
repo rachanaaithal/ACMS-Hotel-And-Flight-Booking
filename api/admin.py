@@ -21,3 +21,10 @@ admin.site.register(Registered_HotelPhotos)
 
 from api.models import Registered_Rooms
 admin.site.register(Registered_Rooms)
+
+from api.models import NewFlight_Seats,NewFlight
+admin.site.register(NewFlight)
+admin.site.register(NewFlight_Seats)
+
+from api.models import Flight_Operator
+admin.site.register(Flight_Operator)

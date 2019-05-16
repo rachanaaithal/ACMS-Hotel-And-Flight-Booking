@@ -12,12 +12,13 @@
 		<div id="error"></div>
 <div id="main-filter">
 	<div class = "as" id="the-basics" style="float:left">
+	<div id='names'>
 		  <b>First Name:</b>    <input class='form-control' id="fname" type="text" name="fname"><br><br><br>
 		  <b>Last Name:</b>     <input class='form-control' id="lname" type="text" name="lname"><br><br><br>
+		  </div>
 		  <b>Email:</b>         <input class='form-control' id="email" type="email" name = "email"><br><br><br>
 		  <b>Phone Number:</b>  <input class='form-control' id="phno" type="text" name = "phno"><br><br><br><br>
-		  <input id="btn" class='btn btn-primary' type="button" value="CONFIRM CHANGES">
-		   <input id = "next" type="hidden" name="next" value="{{ request.path }}">
+		  <input class='btn btn-primary' id="btn" type="button" value="CONFIRM CHANGES">
     </div>
 	<script src="/static/js/edit.js"></script>
 	   </div>

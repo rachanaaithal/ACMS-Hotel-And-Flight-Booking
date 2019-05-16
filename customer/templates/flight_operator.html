@@ -1,0 +1,37 @@
+{% extends "base_generic.html" %}
+{% block content %}
+<style>
+.new{float:left; }
+#error{color:red;}
+#fillthis{color:red;}
+</style>
+
+ 
+ <div class="new">
+    <div class="container">
+        <h1>Register Here</h1>
+        <h3>Just fill out the form.</h3><br><div id="error"> </div>
+		<br><div id='error'></div>
+<div id="main-filter">
+	<div class = "as" id="the-basics" style="float:left">
+	      <b>Flight Number:</b> <br>     <input class='form-control' id="flight_no" type="number" name="flight_no"><br><br><br>
+          <b>Airline Name:</b> <br>     <input class='form-control' id="name" type="text" name="name"><br><br><br>
+		  <b>Email:</b><br><input id="email" class='form-control' type="email" name="email"></input><br><br><br>
+		  <b>Phone Number:</b><br>  <input class='form-control' id="phno" type="text" name = "phno"><br><br><br>
+		  <b>Day of Month:</b> <br>   <input class='form-control' id="date" type="number" max = '30' min='1' name="date"><br><br><br>
+		  <b>TakeOff Time:</b> <br>   <input class='form-control' id="takeoff" type="time" name="takeoff"><br><br><br>
+		  <b>Landing Time:</b>  <br>   <input class='form-control' id="land" type="time" name="land" ><br><br><br>
+		  <b>Source:</b>  <br>    <div id='source'></div><br><br><br>
+		  <b>Destination:</b>  <br>    <div id='destination'></div><br><br><br>
+		  <b>Image Url :</b> <br><input class='form-control' id="img" type="url" name="img" placeholder="Provide public url of image"><br><br><br>
+		  <b>Tail Id:</b> <br>   <input class='form-control' id="tail_id" type="text" name="tail_id"><br><br><br>
+		  <b>Category : </b><br><div id="rt1"></div><br><br>
+		  <input id="add_seat" class='btn btn-primary' type="button" value="Add Seat Details"><br><br><br>
+		  <div id = "seats">
+			
+		  </div>
+    </div>
+	<script src="/static/js/flight_register.js"></script>
+	   </div>
+  </div>
+{% endblock %}

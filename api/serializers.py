@@ -132,3 +132,23 @@ class OperatorSerializer(serializers.ModelSerializer):
     class Meta:
         model = Operator
         fields = '__all__'
+		
+from api.models import NewFlight
+class NewFlightSerializer(serializers.ModelSerializer):
+    source = serializers.ReadOnlyField(source='source.name')
+    destination=serializers.ReadOnlyField(source='destination.name')
+    class Meta:
+        fields = '__all__'
+        model = NewFlight
+
+from api.models import Operator	
+class HotelOperator_Serializer(serializers.HyperlinkedModelSerializer):
+    class Meta:
+        model = Operator
+        fields = ('id','phone_number')
+		
+from api.models import Flight_Operator	
+class FlightOperator_Serializer(serializers.HyperlinkedModelSerializer):
+    class Meta:
+        model = Flight_Operator
+        fields = ('id','phone_number')
