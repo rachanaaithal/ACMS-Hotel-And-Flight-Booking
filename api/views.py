@@ -69,7 +69,6 @@ class MaxHotelRoomView(generics.ListCreateAPIView):
         city = self.request.GET.get("name",None)
         room_type= self.request.GET.get("type",None)
         room_type=room_type.split('|')
-        print("\n\n\n\n\n\n\n\n\n\nn\nhere:",HotelRoom.objects.filter(category__name__in=room_type),"\n\nnow:",HotelRoom.objects.filter(hotel__city_name__name=city).filter(category__name__in=room_type),"\n\n")
         return HotelRoom.objects.filter(hotel__city_name__name=city).filter(category__name__in=room_type)
     def get(self, request, format=None):
         room=self.get_queryset().order_by('-base_price').first()
