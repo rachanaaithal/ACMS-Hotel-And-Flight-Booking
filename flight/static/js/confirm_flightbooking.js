@@ -67,7 +67,7 @@ function initPage(flight_id, category){
 
         clicked=["Economy", "Business", "First Class"]
         function redirect(){
-        window.location.href = "/flight/"+"?source="+data.source+"&destination="+data.destination+"&start="+data.on_dat+"&type="+clicked.join('|')
+        window.location.href = "/flight/"+"?source="+data.source+"&destination="+data.destination+"&start="+data.on_date+"&type="+clicked.join('|')
         }
 
         setTimeout(redirect, 60000); 
