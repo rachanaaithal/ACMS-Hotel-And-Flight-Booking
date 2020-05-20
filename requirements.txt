@@ -24,7 +24,7 @@ Flask-API==1.1
 ga2==1.0.0.post1
 guacamole==0.9.2
 html5lib==0.999
-httplib2==0.9.1
+httplib2==0.18.0
 idna==2.0
 ipykernel==5.1.0
 ipython==7.4.0
